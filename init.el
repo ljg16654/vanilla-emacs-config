@@ -65,6 +65,15 @@
 
 (require 'org)
 
+(setq org-export-with-toc nil)
+
+(setq org-confirm-babel-evaluate nil)
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
 (use-package auctex
   :defer t)
 
@@ -117,3 +126,5 @@
               "[ ] %? ")))
 
 (use-package command-log-mode)
+
+(use-package emms)

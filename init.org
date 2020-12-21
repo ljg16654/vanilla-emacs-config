@@ -72,10 +72,22 @@ In buffer or across buffers.
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
 #+end_src
 * project
+** version control
 #+begin_src emacs-lisp
 (use-package magit
   :bind (("C-c g" . magit)))
 #+end_src
+** projectile
+#+begin_src emacs-lisp
+(use-package projectile)
+(projectile-mode +1)
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+#+end_src
+
+#+RESULTS:
+: projectile-command-map
+
 * completion
 #+begin_src emacs-lisp
 (use-package ivy
@@ -91,26 +103,48 @@ In buffer or across buffers.
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 #+end_src
 * org
-  #+begin_src emacs-lisp
-  (require 'org)
-  #+end_src
+#+begin_src emacs-lisp
+(require 'org)
+#+end_src
+** export
+#+begin_src emacs-lisp
+(setq org-export-with-toc nil)
+#+end_src
+** babel
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate nil)
+#+end_src
+
+#+RESULTS:
+
+** appearance
+#+begin_src emacs-lisp
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+end_src
+
+#+RESULTS:
+: t
+
 ** latex
-   #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (use-package auctex
   :defer t)
 
 (use-package cdlatex
   :hook (org-mode . turn-on-org-cdlatex))
-   #+end_src
+#+end_src
 ** org-roam
-   #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (use-package org-roam
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config (setq org-roam-directory "~/org-roam")
   :bind (("C-c r f" . org-roam-find-file)
 	 ("C-c r c" . org-roam-db-build-cache)))
-   #+end_src
+#+end_src
 ** org-capture
    #+begin_src emacs-lisp
    (defvar +org-capture-journal-file+ "journal.org")
@@ -157,3 +191,7 @@ In buffer or across buffers.
   (use-package command-log-mode)
   #+end_src
 * TODO lsp
+* music
+#+begin_src emacs-lisp
+(use-package emms)
+#+end_src
