@@ -11,13 +11,9 @@
 : ljg16654@sjtu.edu.cn
 
 * basic
-#+begin_src 
-
-#+end_src
-
 #+begin_src emacs-lisp
 (setq debug-on-error t)
-
+(toggle-frame-fullscreen)
 ;;; custom
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
@@ -38,9 +34,18 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 #+end_src
+* editing
+** focused editing
+#+begin_src emacs-lisp
+  (use-package olivetti
+    :bind (("C-c f e" . olivetti-mode)))
+#+end_src
+
+#+RESULTS:
+
 * theme, font
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil :font "ubuntu mono" :height 120)
+(set-face-attribute 'default nil :font "ubuntu mono" :height 160)
 (load-theme 'modus-operandi)
 #+end_src
 * window and buffer
@@ -62,7 +67,7 @@ In buffer or across buffers.
 (defun langou/goto-config ()
   "go to directory of emacs config"
   (interactive)
-  (find-file "~/vanilla"))
+  (find-file "~/vanilla/init.org"))
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
 #+end_src
@@ -151,3 +156,4 @@ In buffer or across buffers.
   #+begin_src emacs-lisp
   (use-package command-log-mode)
   #+end_src
+* TODO lsp

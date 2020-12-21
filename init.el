@@ -1,5 +1,9 @@
-(setq debug-on-error t)
+(setq user-full-name "Jigang Li"
+      user-mail-address "ljg16654@sjtu.edu.cn"
+)
 
+(setq debug-on-error t)
+(toggle-frame-fullscreen)
 ;;; custom
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
@@ -20,34 +24,33 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-;;; font and theme
-(set-face-attribute 'default nil :font "ubuntu mono" :height 120)
+(use-package olivetti
+  :bind (("C-c f e" . olivetti-mode)))
+
+(set-face-attribute 'default nil :font "ubuntu mono" :height 160)
 (load-theme 'modus-operandi)
 
-;;; window and buffer
-(global-set-key (kbd "s-j") #'next-buffer)
-(global-set-key (kbd "s-k") #'previous-buffer)
-(global-set-key (kbd "s-o") #'other-window)
+(global-set-key (kbd "s-o") #'next-buffer)
+(global-set-key (kbd "s-O") #'previous-buffer)
+(global-set-key (kbd "s-j") #'other-window)
+(global-set-key (kbd "s-k") #'(lambda () (interactive)
+				(other-window -1)))
 (global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
-;;; movement
 (use-package avy
   :bind (("M-g g" . avy-goto-line)))
 
 (defun langou/goto-config ()
   "go to directory of emacs config"
   (interactive)
-  (find-file "~/vanilla"))
+  (find-file "~/vanilla/init.org"))
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
 
-;;; project management
-;;;; magit
 (use-package magit
   :bind (("C-c g" . magit)))
 
-;;; completion
 (use-package ivy
   :config
   (setq ivy-use-virtual-buffers t
@@ -60,23 +63,20 @@
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
-;;; org
-;;;; latex
+(require 'org)
+
 (use-package auctex
   :defer t)
 
 (use-package cdlatex
   :hook (org-mode . turn-on-org-cdlatex))
 
-;;;; org-roam
 (use-package org-roam
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config (setq org-roam-directory "~/org-roam")
   :bind (("C-c r f" . org-roam-find-file)
 	 ("C-c r c" . org-roam-db-build-cache)))
-
-(require 'org)
 
 (defvar +org-capture-journal-file+ "journal.org")
 (expand-file-name +org-capture-journal-file+ org-directory)
@@ -116,7 +116,4 @@
            (file "read-later.org")
               "[ ] %? ")))
 
-;;; misellaneous
 (use-package command-log-mode)
-
-
