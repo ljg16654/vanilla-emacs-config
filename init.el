@@ -1,5 +1,5 @@
 (setq debug-on-error t)
-hi 
+
 ;;; custom
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
@@ -34,6 +34,13 @@ hi
 ;;; movement
 (use-package avy
   :bind (("M-g g" . avy-goto-line)))
+
+(defun langou/goto-config ()
+  "go to directory of emacs config"
+  (interactive)
+  (find-file "~/vanilla"))
+
+(global-set-key (kbd "C-c f p") #'langou/goto-config)
 
 ;;; project management
 ;;;; magit
