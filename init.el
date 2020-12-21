@@ -51,6 +51,11 @@
 (use-package magit
   :bind (("C-c g" . magit)))
 
+(use-package projectile)
+(projectile-mode +1)
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
 (use-package ivy
   :config
   (setq ivy-use-virtual-buffers t
@@ -126,5 +131,18 @@
               "[ ] %? ")))
 
 (use-package command-log-mode)
+
+(use-package company
+  :config
+  (setq company-idle-delay 0))
+(add-hook 'after-init-hook 'global-company-mode)
+(use-package lsp-mode)
+(use-package lsp-python-ms
+  :ensure t
+  :init (setq lsp-python-ms-auto-install-server t
+	      read-process-output-max 1048576)
+  :hook (python-mode . (lambda ()
+			  (require 'lsp-python-ms)
+			  (lsp))))
 
 (use-package emms)

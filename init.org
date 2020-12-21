@@ -48,6 +48,10 @@
 (set-face-attribute 'default nil :font "ubuntu mono" :height 160)
 (load-theme 'modus-operandi)
 #+end_src
+
+#+RESULTS:
+: t
+
 * window and buffer
 #+begin_src emacs-lisp
 (global-set-key (kbd "s-o") #'next-buffer)
@@ -191,6 +195,25 @@ In buffer or across buffers.
   (use-package command-log-mode)
   #+end_src
 * TODO lsp
+#+begin_src emacs-lisp
+  (use-package company
+    :config
+    (setq company-idle-delay 0)
+    :bind
+    (("TAB" . company-indent-or-complete-common)))
+  (add-hook 'after-init-hook 'global-company-mode)
+  (use-package lsp-mode)
+  (use-package lsp-python-ms
+    :ensure t
+    :init (setq lsp-python-ms-auto-install-server t
+		read-process-output-max 1048576)
+    :hook (python-mode . (lambda ()
+			    (require 'lsp-python-ms)
+			    (lsp)))) 
+#+end_src
+#+RESULTS:
+| lambda | nil | (require 'lsp-python-ms) | (lsp) |
+
 * music
 #+begin_src emacs-lisp
 (use-package emms)
