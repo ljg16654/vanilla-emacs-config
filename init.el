@@ -1,9 +1,8 @@
 (setq user-full-name "Jigang Li"
-      user-mail-address "ljg16654@sjtu.edu.cn"
-)
+      user-mail-address "ljg16654@sjtu.edu.cn")
 
 (setq debug-on-error t)
-(toggle-frame-fullscreen)
+;; (toggle-frame-fullscreen)
 ;;; custom
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
@@ -30,7 +29,7 @@
 (set-face-attribute 'default nil :font "ubuntu mono" :height 160)
 (load-theme 'modus-operandi)
 
-(global-set-key (kbd "s-o") #'next-buffer)
+(global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
 (global-set-key (kbd "s-j") #'other-window)
 (global-set-key (kbd "s-k") #'(lambda () (interactive)
@@ -134,9 +133,17 @@
 
 (use-package company
   :config
-  (setq company-idle-delay 0))
+  (setq company-idle-delay 0)
+  :bind
+  (("TAB" . company-indent-or-complete-common)))
 (add-hook 'after-init-hook 'global-company-mode)
 (use-package lsp-mode)
+(use-package flycheck)
+(use-package lsp-ui
+  :demand flycheck
+  :config
+  (setq lsp-ui-sideline-show-diagnostics t
+	lsp-ui-sideline-show-hover t))
 (use-package lsp-python-ms
   :ensure t
   :init (setq lsp-python-ms-auto-install-server t

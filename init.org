@@ -12,27 +12,27 @@
 
 * basic
 #+begin_src emacs-lisp
-(setq debug-on-error t)
-(toggle-frame-fullscreen)
-;;; custom
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(load custom-file)
+  (setq debug-on-error t)
+  ;; (toggle-frame-fullscreen)
+  ;;; custom
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file)
 
-;;; use-package setup
-(require 'package)
+  ;;; use-package setup
+  (require 'package)
 
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
+  (setq package-enable-at-startup nil)
+  (add-to-list 'package-archives
+	       '("melpa" . "https://melpa.org/packages/"))
 
-(package-initialize)
+  (package-initialize)
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
 
-(require 'use-package)
-(setq use-package-always-ensure t)
+  (require 'use-package)
+  (setq use-package-always-ensure t)
 #+end_src
 * editing
 ** focused editing
@@ -54,7 +54,7 @@
 
 * window and buffer
 #+begin_src emacs-lisp
-(global-set-key (kbd "s-o") #'next-buffer)
+(global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
 (global-set-key (kbd "s-j") #'other-window)
 (global-set-key (kbd "s-k") #'(lambda () (interactive)
@@ -62,6 +62,9 @@
 (global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 #+end_src
+
+#+RESULTS:
+: ibuffer
 * movement
 In buffer or across buffers.
 #+begin_src emacs-lisp
@@ -194,7 +197,7 @@ In buffer or across buffers.
   #+begin_src emacs-lisp
   (use-package command-log-mode)
   #+end_src
-* TODO lsp
+* lsp
 #+begin_src emacs-lisp
   (use-package company
     :config
@@ -203,13 +206,19 @@ In buffer or across buffers.
     (("TAB" . company-indent-or-complete-common)))
   (add-hook 'after-init-hook 'global-company-mode)
   (use-package lsp-mode)
+  (use-package flycheck)
+  (use-package lsp-ui
+    :demand flycheck
+    :config
+    (setq lsp-ui-sideline-show-diagnostics t
+	  lsp-ui-sideline-show-hover t))
   (use-package lsp-python-ms
     :ensure t
     :init (setq lsp-python-ms-auto-install-server t
 		read-process-output-max 1048576)
     :hook (python-mode . (lambda ()
 			    (require 'lsp-python-ms)
-			    (lsp)))) 
+			    (lsp))))
 #+end_src
 #+RESULTS:
 | lambda | nil | (require 'lsp-python-ms) | (lsp) |
