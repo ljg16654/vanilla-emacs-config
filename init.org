@@ -1,0 +1,153 @@
+#+TITLE: init
+#+PROPERTY: header-args :tangle init.el
+* personal info
+#+begin_src emacs-lisp
+(setq user-full-name "Jigang Li"
+      user-mail-address "ljg16654@sjtu.edu.cn"
+)
+#+end_src
+
+#+RESULTS:
+: ljg16654@sjtu.edu.cn
+
+* basic
+#+begin_src 
+
+#+end_src
+
+#+begin_src emacs-lisp
+(setq debug-on-error t)
+
+;;; custom
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file)
+
+;;; use-package setup
+(require 'package)
+
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives
+	     '("melpa" . "https://melpa.org/packages/"))
+
+(package-initialize)
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+#+end_src
+* theme, font
+#+begin_src emacs-lisp
+(set-face-attribute 'default nil :font "ubuntu mono" :height 120)
+(load-theme 'modus-operandi)
+#+end_src
+* window and buffer
+#+begin_src emacs-lisp
+(global-set-key (kbd "s-o") #'next-buffer)
+(global-set-key (kbd "s-O") #'previous-buffer)
+(global-set-key (kbd "s-j") #'other-window)
+(global-set-key (kbd "s-k") #'(lambda () (interactive)
+				(other-window -1)))
+(global-unset-key (kbd "C-x C-b"))
+(global-set-key (kbd "C-x C-b") #'ibuffer)
+#+end_src
+* movement
+In buffer or across buffers.
+#+begin_src emacs-lisp
+(use-package avy
+  :bind (("M-g g" . avy-goto-line)))
+
+(defun langou/goto-config ()
+  "go to directory of emacs config"
+  (interactive)
+  (find-file "~/vanilla"))
+
+(global-set-key (kbd "C-c f p") #'langou/goto-config)
+#+end_src
+* project
+#+begin_src emacs-lisp
+(use-package magit
+  :bind (("C-c g" . magit)))
+#+end_src
+* completion
+#+begin_src emacs-lisp
+(use-package ivy
+  :config
+  (setq ivy-use-virtual-buffers t
+	enable-recursive-minibuffers t)
+  :bind (("C-s" . swiper)
+	 ("C-c C-r" . ivy-resume)
+	 ("M-x" . counsel-M-x)
+	 ("C-x C-f" . counsel-find-file)))
+
+(ivy-mode 1)
+(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+#+end_src
+* org
+  #+begin_src emacs-lisp
+  (require 'org)
+  #+end_src
+** latex
+   #+begin_src emacs-lisp
+(use-package auctex
+  :defer t)
+
+(use-package cdlatex
+  :hook (org-mode . turn-on-org-cdlatex))
+   #+end_src
+** org-roam
+   #+begin_src emacs-lisp
+(use-package org-roam
+  :commands org-roam-mode
+  :init (add-hook 'after-init-hook 'org-roam-mode)
+  :config (setq org-roam-directory "~/org-roam")
+  :bind (("C-c r f" . org-roam-find-file)
+	 ("C-c r c" . org-roam-db-build-cache)))
+   #+end_src
+** org-capture
+   #+begin_src emacs-lisp
+   (defvar +org-capture-journal-file+ "journal.org")
+(expand-file-name +org-capture-journal-file+ org-directory)
+
+;;;; org-journal
+(global-set-key (kbd "C-c j") #'(lambda ()
+				  (interactive)
+				  (find-file
+				   (concat org-directory "/journal.org"))))
+
+(global-set-key (kbd "C-c c") #'org-capture)
+
+(setq org-capture-templates
+        '(("t" "Personal t" entry
+           (file+headline +org-capture-todo-file "Inbox")
+              "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+
+          ("n" "Personal notes" entry
+           (file+headline +org-capture-notes-file "Inbox")
+              "* %u %?\n%i\n%a" :prepend t)
+
+          ;; declare root node j
+          ("j" "Journal")
+
+          ("ja" "Journal arbitrary recording" entry
+           (file+olp+datetree "journal.org")
+              "* %?\n%U\n%i" :tree-type week)
+
+          ("jc" "journal clock into something new" entry
+           (file+olp+datetree "journal.org")
+              "* %?" :clock-in t :clock-keep t :tree-type week)
+
+          ("jn" "journal edit the task currently clocked in" plain
+           (clock) "%?" :unnarrowed t)
+
+          ("r" "read later" checkitem
+           (file "read-later.org")
+              "[ ] %? ")))
+   #+end_src
+
+* miscellaneous
+  #+begin_src emacs-lisp
+  (use-package command-log-mode)
+  #+end_src
