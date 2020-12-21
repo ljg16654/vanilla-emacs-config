@@ -1,5 +1,5 @@
 (setq debug-on-error t)
-
+hi 
 ;;; custom
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
@@ -28,10 +28,30 @@
 (global-set-key (kbd "s-j") #'next-buffer)
 (global-set-key (kbd "s-k") #'previous-buffer)
 (global-set-key (kbd "s-o") #'other-window)
+(global-unset-key (kbd "C-x C-b"))
+(global-set-key (kbd "C-x C-b") #'ibuffer)
+
+;;; movement
+(use-package avy
+  :bind (("M-g g" . avy-goto-line)))
 
 ;;; project management
 ;;;; magit
-(use-package magit)
+(use-package magit
+  :bind (("C-c g" . magit)))
+
+;;; completion
+(use-package ivy
+  :config
+  (setq ivy-use-virtual-buffers t
+	enable-recursive-minibuffers t)
+  :bind (("C-s" . swiper)
+	 ("C-c C-r" . ivy-resume)
+	 ("M-x" . counsel-M-x)
+	 ("C-x C-f" . counsel-find-file)))
+
+(ivy-mode 1)
+(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
 ;;; org
 ;;;; latex
