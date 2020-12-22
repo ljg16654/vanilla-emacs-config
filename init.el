@@ -1,8 +1,15 @@
 (setq user-full-name "Jigang Li"
-      user-mail-address "ljg16654@sjtu.edu.cn")
+      user-mail-address "ljg16654@sjtu.edu.cn"
+)
+
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(setq use-file-dialog nil)
+(setq use-dialog-box t)               ; only for mouse events
 
 (setq debug-on-error t)
-;; (toggle-frame-fullscreen)
+;; (toggle-frame-fullscreen) 
 ;;; custom
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
@@ -26,8 +33,16 @@
 (use-package olivetti
   :bind (("C-c f e" . olivetti-mode)))
 
-(set-face-attribute 'default nil :font "ubuntu mono" :height 160)
-(load-theme 'modus-operandi)
+(set-face-attribute 'default nil :font "iosevka" :height 160)
+
+(use-package anti-zenburn-theme)
+(use-package spacemacs-theme
+  :defer t)
+(load-theme 'modus-vivendi t)
+
+(use-package powerline
+    ;; :config (powerline-default-theme)
+)
 
 (global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
@@ -36,6 +51,20 @@
 				(other-window -1)))
 (global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'ibuffer)
+
+(use-package dired
+  :ensure nil
+  :config
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+	"-AGFhlv --group-directories-first --time-style=long-iso")
+  (setq dired-dwim-target t)
+  ;; Hooks' syntax is controlled by the `use-pakage-hook-name-suffix'
+  ;; variable.  The "-hook" suffix is intentional
+  :hook ((dired-mode-hook . dired-hide-details-mode)
+	 (dired-mode-hook . hl-line-mode)))
 
 (use-package avy
   :bind (("M-g g" . avy-goto-line)))
@@ -46,6 +75,11 @@
   (find-file "~/vanilla/init.org"))
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
+
+(global-set-key (kbd "M-i") 'imenu)
+
+(use-package eyebrowse
+  :config (eyebrowse-mode 1))
 
 (use-package magit
   :bind (("C-c g" . magit)))
@@ -153,3 +187,8 @@
 			  (lsp))))
 
 (use-package emms)
+
+(use-package pdf-tools
+  :config (pdf-tools-install))
+
+(use-package vterm)

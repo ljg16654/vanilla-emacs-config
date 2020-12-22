@@ -12,8 +12,19 @@
 
 * basic
 #+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-file-dialog nil)
+  (setq use-dialog-box t)               ; only for mouse events
+#+end_src
+
+#+RESULTS:
+: t
+
+#+begin_src emacs-lisp
   (setq debug-on-error t)
-  ;; (toggle-frame-fullscreen)
+  ;; (toggle-frame-fullscreen) 
   ;;; custom
   (setq custom-file (concat user-emacs-directory "custom.el"))
   (load custom-file)
@@ -45,14 +56,29 @@
 
 * theme, font
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil :font "ubuntu mono" :height 160)
-(load-theme 'modus-operandi)
+(set-face-attribute 'default nil :font "iosevka" :height 160)
+#+end_src
+
+#+RESULTS:
+: t
+#+begin_src emacs-lisp
+  (use-package anti-zenburn-theme)
+  (use-package spacemacs-theme
+    :defer t)
+  (load-theme 'modus-vivendi t)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package powerline
+      ;; :config (powerline-default-theme)
+  )
 #+end_src
 
 #+RESULTS:
 : t
 
 * window and buffer
+** buffer switch
 #+begin_src emacs-lisp
 (global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
@@ -65,8 +91,29 @@
 
 #+RESULTS:
 : ibuffer
+** dired
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :config
+    (setq dired-recursive-copies 'always)
+    (setq dired-recursive-deletes 'always)
+    (setq delete-by-moving-to-trash t)
+    (setq dired-listing-switches
+	  "-AGFhlv --group-directories-first --time-style=long-iso")
+    (setq dired-dwim-target t)
+    ;; Hooks' syntax is controlled by the `use-pakage-hook-name-suffix'
+    ;; variable.  The "-hook" suffix is intentional
+    :hook ((dired-mode-hook . dired-hide-details-mode)
+	   (dired-mode-hook . hl-line-mode)))
+#+end_src
+
+#+RESULTS:
+| hl-line-mode | dired-hide-details-mode |
+
 * movement
 In buffer or across buffers.
+** avy and frequently visited files
 #+begin_src emacs-lisp
 (use-package avy
   :bind (("M-g g" . avy-goto-line)))
@@ -78,7 +125,24 @@ In buffer or across buffers.
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
 #+end_src
+** imenu
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-i") 'imenu)
+#+end_src
+
+#+RESULTS:
+: imenu
+
 * project
+** eyebrowse
+#+begin_src emacs-lisp
+  (use-package eyebrowse
+    :config (eyebrowse-mode 1))
+#+end_src
+
+#+RESULTS:
+: t
+
 ** version control
 #+begin_src emacs-lisp
 (use-package magit
@@ -109,7 +173,7 @@ In buffer or across buffers.
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 #+end_src
-* org
+t* org
 #+begin_src emacs-lisp
 (require 'org)
 #+end_src
@@ -227,3 +291,21 @@ In buffer or across buffers.
 #+begin_src emacs-lisp
 (use-package emms)
 #+end_src
+* doc
+** pdf
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :config (pdf-tools-install))
+#+end_src
+
+#+RESULTS:
+: t
+* shell
+** vterm
+#+begin_src emacs-lisp
+  (use-package vterm
+    :bind (("s-v" . vterm)))
+#+end_src
+
+#+RESULTS:
+: vterm
