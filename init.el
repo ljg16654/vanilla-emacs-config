@@ -126,6 +126,9 @@
 	 ("C-c r c" . org-roam-db-build-cache)))
 
 (defvar +org-capture-journal-file+ "journal.org")
+(defvar +org-capture-todo-file+ "todo.org")
+(defvar +org-capture-notes-file+ "notes.org")
+
 (expand-file-name +org-capture-journal-file+ org-directory)
 
 ;;;; org-journal
@@ -137,31 +140,31 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 
 (setq org-capture-templates
-        '(("t" "Personal t" entry
-           (file+headline +org-capture-todo-file "Inbox")
-              "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+	'(("t" "Personal t" entry
+	   (file+headline +org-capture-todo-file+ "Inbox")
+	      "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
 
-          ("n" "Personal notes" entry
-           (file+headline +org-capture-notes-file "Inbox")
-              "* %u %?\n%i\n%a" :prepend t)
+	  ("n" "Personal notes" entry
+	   (file+headline +org-capture-notes-file+ "Inbox")
+	      "* %u %?\n%i\n%a" :prepend t)
 
-          ;; declare root node j
-          ("j" "Journal")
+	  ;; declare root node j
+	  ("j" "Journal")
 
-          ("ja" "Journal arbitrary recording" entry
-           (file+olp+datetree "journal.org")
-              "* %?\n%U\n%i" :tree-type week)
+	  ("ja" "Journal arbitrary recording" entry
+	   (file+olp+datetree "journal.org")
+	      "* %?\n%U\n%i" :tree-type week)
 
-          ("jc" "journal clock into something new" entry
-           (file+olp+datetree "journal.org")
-              "* %?" :clock-in t :clock-keep t :tree-type week)
+	  ("jc" "journal clock into something new" entry
+	   (file+olp+datetree "journal.org")
+	      "* %?" :clock-in t :clock-keep t :tree-type week)
 
-          ("jn" "journal edit the task currently clocked in" plain
-           (clock) "%?" :unnarrowed t)
+	  ("jn" "journal edit the task currently clocked in" plain
+	   (clock) "%?" :unnarrowed t)
 
-          ("r" "read later" checkitem
-           (file "read-later.org")
-              "[ ] %? ")))
+	  ("r" "read later" checkitem
+	   (file "read-later.org")
+	      "[ ] %? ")))
 
 (use-package command-log-mode)
 
@@ -191,4 +194,5 @@
 (use-package pdf-tools
   :config (pdf-tools-install))
 
-(use-package vterm)
+(use-package vterm
+  :bind (("s-v" . vterm)))
