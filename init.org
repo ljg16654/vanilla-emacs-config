@@ -67,16 +67,6 @@
     :defer t)
   (load-theme 'modus-vivendi t)
 #+end_src
-
-#+begin_src emacs-lisp
-  (use-package powerline
-      ;; :config (powerline-default-theme)
-  )
-#+end_src
-
-#+RESULTS:
-: t
-
 * window and buffer
 ** buffer switch
 #+begin_src emacs-lisp
