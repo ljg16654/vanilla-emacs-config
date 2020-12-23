@@ -160,6 +160,7 @@ In buffer or across buffers.
 : projectile-command-map
 
 * completion
+** ivy, swiper and counsel
 #+begin_src emacs-lisp
 (use-package ivy
   :config
@@ -173,7 +174,19 @@ In buffer or across buffers.
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 #+end_src
-t* org
+** yasnippet
+The snippets are currently stored in DOOMDIR and I may move them to somewhere else later.
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :config
+    (progn
+      (setq yas-snippet-dirs
+	     (list "~/.doom.d/snippets"))
+      (yas-global-mode)))
+#+end_src
+#+RESULTS:
+: t
+* org
 #+begin_src emacs-lisp
 (require 'org)
 #+end_src
@@ -256,7 +269,7 @@ t* org
 		(clock) "%?" :unnarrowed t)
 
 	       ("r" "read later" checkitem
-		(file "read-later.org")
+		(file+headline "read-later.org" "Inbox")
 		   "[ ] %? ")))
    #+end_src
 
@@ -295,8 +308,22 @@ t* org
 
 * music
 #+begin_src emacs-lisp
-(use-package emms)
+  (use-package emms
+    :config
+    (progn
+      (emms-all)
+      (emms-default-players)
+      (setq emms-source-file-default-directory "~/Music")
+      (append emms-player-mplayer-parameters
+	      (list "-novideo"))))
+
+  (global-set-key (kbd "C-c m m") #'emms)
+  (global-set-key (kbd "C-c m p") #'emms-add-playlist)
 #+end_src
+
+#+RESULTS:
+: emms-add-playlist
+
 * doc
 ** pdf
 #+begin_src emacs-lisp

@@ -101,6 +101,13 @@
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+(use-package yasnippet
+  :config
+  (progn
+    (setq yas-snippet-dirs
+	   (list "~/.doom.d/snippets"))
+    (yas-global-mode)))
+
 (require 'org)
 
 (setq org-export-with-toc nil)
@@ -163,7 +170,7 @@
 	   (clock) "%?" :unnarrowed t)
 
 	  ("r" "read later" checkitem
-	   (file "read-later.org")
+	   (file+headline "read-later.org" "Inbox")
 	      "[ ] %? ")))
 
 (use-package command-log-mode)
@@ -189,7 +196,17 @@
 			  (require 'lsp-python-ms)
 			  (lsp))))
 
-(use-package emms)
+(use-package emms
+  :config
+  (progn
+    (emms-all)
+    (emms-default-players)
+    (setq emms-source-file-default-directory "~/Music")
+    (append emms-player-mplayer-parameters
+	    (list "-novideo"))))
+
+(global-set-key (kbd "C-c m m") #'emms)
+(global-set-key (kbd "C-c m p") #'emms-add-playlist)
 
 (use-package pdf-tools
   :config (pdf-tools-install))
