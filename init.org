@@ -220,12 +220,20 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
 	 ("C-c r c" . org-roam-db-build-cache)))
 #+end_src
 ** org-capture
+[2020-12-24 四] A weired phenomena that I just found is that the
+result of using defvar and using string for filename directly is
+different!  If I use defvar after =file+headline=, the filename is
+understood as a file in the relative path and something like
+=~/vanilla/just-for-fun.org= is created (clearly the evaluation
+happens in the org file in =~/vanilla=. However, if a string
+="just-for-fun.org"= is given instead, Emacs understands it as a file
+in my org-directory.
+
    #+begin_src emacs-lisp
      (defvar +org-capture-journal-file+ "journal.org")
      (defvar +org-capture-todo-file+ "todo.org")
      (defvar +org-capture-notes-file+ "notes.org")
-
-     (expand-file-name +org-capture-journal-file+ org-directory)
+     (defvar +org-capture-just-for-fun-file+ "just-for-fun.org")
 
      ;;;; org-journal
      (global-set-key (kbd "C-c j") #'(lambda ()
@@ -237,13 +245,17 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
 
      (setq org-capture-templates
 	     '(("t" "Personal t" entry
-		(file+headline +org-capture-todo-file+ "Inbox")
+		(file+headline "todo.org" "Inbox")
 		   "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
 
 	       ("n" "Personal notes" entry
-		(file+headline +org-capture-notes-file+ "Inbox")
-		   "* %u %?\n%i\n%a" :prepend t)
+		(file+headline "notes.org" "Inbox")
+		   "* %U %?\n%i\n%a" :prepend t)
 
+	       ("f" "Maybe it would be fun someday..." entry
+		(file+headline "just-for-fun.org" "Inbox")
+		"* %U %?" :prepend t)
+	  
 	       ;; declare root node j
 	       ("j" "Journal")
 
@@ -264,7 +276,7 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
    #+end_src
 
    #+RESULTS:
-   | t | Personal t | entry | (file+headline +org-capture-todo-file+ Inbox) | * TODO [%^{Select the urgency | A | B | C}] %? |
+   | t | Personal t | entry | (file+headline todo.org Inbox) | * TODO [%^{Select the urgency | A | B | C}] %? |
 
 * miscellaneous
   #+begin_src emacs-lisp

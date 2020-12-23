@@ -40,10 +40,6 @@
   :defer t)
 (load-theme 'modus-vivendi t)
 
-(use-package powerline
-    ;; :config (powerline-default-theme)
-)
-
 (global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
 (global-set-key (kbd "s-j") #'other-window)
@@ -135,6 +131,7 @@
 (defvar +org-capture-journal-file+ "journal.org")
 (defvar +org-capture-todo-file+ "todo.org")
 (defvar +org-capture-notes-file+ "notes.org")
+(defvar +org-capture-just-for-fun-file+ "just-for-fun.org")
 
 (expand-file-name +org-capture-journal-file+ org-directory)
 
@@ -153,7 +150,11 @@
 
 	  ("n" "Personal notes" entry
 	   (file+headline +org-capture-notes-file+ "Inbox")
-	      "* %u %?\n%i\n%a" :prepend t)
+	      "* %U %?\n%i\n%a" :prepend t)
+
+	  ("f" "Maybe it would be fun someday..." entry
+	   (file+headline +org-capture-just-for-fun-file+ "Inbox")
+	   "* %U %?" :prepend t)
 
 	  ;; declare root node j
 	  ("j" "Journal")
