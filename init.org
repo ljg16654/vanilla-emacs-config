@@ -244,7 +244,7 @@ in my org-directory.
      (global-set-key (kbd "C-c c") #'org-capture)
 
      (setq org-capture-templates
-	     '(("t" "Personal t" entry
+	     '(("t" "Personal todo" entry
 		(file+headline "todo.org" "Inbox")
 		   "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
 
@@ -255,7 +255,7 @@ in my org-directory.
 	       ("f" "Maybe it would be fun someday..." entry
 		(file+headline "just-for-fun.org" "Inbox")
 		"* %U %?" :prepend t)
-	  
+
 	       ;; declare root node j
 	       ("j" "Journal")
 
@@ -276,12 +276,44 @@ in my org-directory.
    #+end_src
 
    #+RESULTS:
-   | t | Personal t | entry | (file+headline todo.org Inbox) | * TODO [%^{Select the urgency | A | B | C}] %? |
+   | t | Personal todo | entry | (file+headline todo.org Inbox) | * TODO [%^{Select the urgency | A | B | C}] %? |
+** org-agenda
+#+begin_src emacs-lisp
+(setq org-agenda-files (apply (function append)
+			        (mapcar
+			         (lambda (directory)
+				        (directory-files-recursively directory org-agenda-file-regexp))
+			            '("~/org/"))))
+#+end_src
+
+#+RESULTS:
+| ~/org/journal/2020-10-24.org | ~/org/journal/2020-10-25.org | ~/org/journal/2020-10-30.org | ~/org/journal/2020-11-12.org | ~/org/journal/2020-11-13.org | ~/org/journal/2020-11-14.org | ~/org/journal/2020-11-17.org | ~/org/journal/2020-12-20.org | ~/org/habit.org | ~/org/journal.org | ~/org/just-for-fun.org | ~/org/notes.org | ~/org/read-later.org | ~/org/todo.org |
+** habit
+#+begin_src emacs-lisp
+  (add-to-list 'org-modules 'org-habit)
+  (global-set-key (kbd "s-a") #'org-agenda)
+#+end_src
+
+#+RESULTS:
+: org-agenda
 
 * miscellaneous
+** command-log
   #+begin_src emacs-lisp
   (use-package command-log-mode)
   #+end_src
+** ligature
+#+begin_src emacs-lisp
+  (defconst lisp--prettify-symbols-alist
+      '(("lambda"  . ?λ)))
+
+  (add-hook 'lisp-mode-hook #'(lambda () (interactive)
+			       (prettify-symbols-mode +1)))
+#+end_src
+
+#+RESULTS:
+| lambda | nil | (interactive) | (prettify-symbols-mode 1) |
+
 * lsp
 #+begin_src emacs-lisp
   (use-package company

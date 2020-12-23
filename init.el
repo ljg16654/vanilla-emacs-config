@@ -133,8 +133,6 @@
 (defvar +org-capture-notes-file+ "notes.org")
 (defvar +org-capture-just-for-fun-file+ "just-for-fun.org")
 
-(expand-file-name +org-capture-journal-file+ org-directory)
-
 ;;;; org-journal
 (global-set-key (kbd "C-c j") #'(lambda ()
 				  (interactive)
@@ -144,16 +142,16 @@
 (global-set-key (kbd "C-c c") #'org-capture)
 
 (setq org-capture-templates
-	'(("t" "Personal t" entry
-	   (file+headline +org-capture-todo-file+ "Inbox")
+	'(("t" "Personal todo" entry
+	   (file+headline "todo.org" "Inbox")
 	      "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
 
 	  ("n" "Personal notes" entry
-	   (file+headline +org-capture-notes-file+ "Inbox")
+	   (file+headline "notes.org" "Inbox")
 	      "* %U %?\n%i\n%a" :prepend t)
 
 	  ("f" "Maybe it would be fun someday..." entry
-	   (file+headline +org-capture-just-for-fun-file+ "Inbox")
+	   (file+headline "just-for-fun.org" "Inbox")
 	   "* %U %?" :prepend t)
 
 	  ;; declare root node j
@@ -174,7 +172,22 @@
 	   (file+headline "read-later.org" "Inbox")
 	      "[ ] %? ")))
 
+(setq org-agenda-files (apply (function append)
+			        (mapcar
+			         (lambda (directory)
+				        (directory-files-recursively directory org-agenda-file-regexp))
+			            '("~/org/"))))
+
+(add-to-list 'org-modules 'org-habit)
+(global-set-key (kbd "s-a") #'org-agenda)
+
 (use-package command-log-mode)
+
+(defconst lisp--prettify-symbols-alist
+    '(("lambda"  . ?λ)))
+
+(add-hook 'lisp-mode-hook #'(lambda () (interactive)
+			     (prettify-symbols-mode +1)))
 
 (use-package company
   :config
