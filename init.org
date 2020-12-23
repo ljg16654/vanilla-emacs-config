@@ -379,6 +379,7 @@ in my org-directory.
 #+RESULTS:
 : vterm
 * TODO modeline config
+[[https://occasionallycogent.com/custom_emacs_modeline/index.html][A promising tutorial]]
 ** improve display of emms
 + only show name of the song and artist
 + if too long, scroll display
