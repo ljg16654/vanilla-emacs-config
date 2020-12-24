@@ -11,6 +11,7 @@
 : ljg16654@sjtu.edu.cn
 
 * basic
+** remove unused UI components
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
   (tool-bar-mode -1)
@@ -22,6 +23,7 @@
 #+RESULTS:
 : t
 
+** set debug on error and use-package
 #+begin_src emacs-lisp
   (setq debug-on-error t)
   ;; (toggle-frame-fullscreen) 
@@ -45,6 +47,25 @@
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+end_src
+
+** common functionallity
+*** copy filename 
+From Doom Emacs. Naming is altered to be consistent with Emacs terms
+(yank -> save-to-king-ring).
+#+begin_src emacs-lisp
+(defun +default/save-to-king-ring-buffer-filename ()
+  "Copy the current buffer's path to the kill ring."
+  (interactive)
+  (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
+      (message (kill-new (abbreviate-file-name filename)))
+    (error "Couldn't find filename in current buffer")))
+
+(global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
+#+end_src
+
+#+RESULTS:
+: +default/save-to-king-ring-buffer-filename
+
 * editing
 ** focused editing
 #+begin_src emacs-lisp

@@ -30,6 +30,15 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+(defun +default/save-to-king-ring-buffer-filename ()
+  "Copy the current buffer's path to the kill ring."
+  (interactive)
+  (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
+      (message (kill-new (abbreviate-file-name filename)))
+    (error "Couldn't find filename in current buffer")))
+
+(global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
+
 (use-package olivetti
   :bind (("C-c f e" . olivetti-mode)))
 
