@@ -1,6 +1,5 @@
 (setq user-full-name "Jigang Li"
-      user-mail-address "ljg16654@sjtu.edu.cn"
-)
+      user-mail-address "ljg16654@sjtu.edu.cn")
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -42,7 +41,7 @@
 (use-package olivetti
   :bind (("C-c f e" . olivetti-mode)))
 
-(set-face-attribute 'default nil :font "iosevka" :height 160)
+(set-face-attribute 'default nil :font "iosevka" :height 130)
 
 (use-package anti-zenburn-theme)
 (use-package spacemacs-theme
@@ -236,3 +235,14 @@
 
 (use-package vterm
   :bind (("s-v" . vterm)))
+
+(defun mode-line-format-raw ()
+  (interactive)
+    (setq mode-line-format
+	  '("%e" mode-line-front-space mode-line-mule-info mode-line-client
+	    mode-line-modified mode-line-remote
+	    mode-line-frame-identification
+	    mode-line-buffer-identification " " mode-line-position
+	    (vc-mode vc-mode)
+	    "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
+))

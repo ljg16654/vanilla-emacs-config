@@ -3,12 +3,11 @@
 * personal info
 #+begin_src emacs-lisp
 (setq user-full-name "Jigang Li"
-      user-mail-address "ljg16654@sjtu.edu.cn"
-)
+      user-mail-address "ljg16654@sjtu.edu.cn")
 #+end_src
 
 #+RESULTS:
-: ljg16654@sjtu.edu.cn
+: Ljg16654@sjtu.edu.cn
 
 * basic
 ** remove unused UI components
@@ -404,7 +403,7 @@ in my org-directory.
 [[info:emacs#Mode Line][info:emacs#Mode Line]]
 [[help:mode-line-format]]
 ** the default
-   CS:CH-FR BUF  POS LINE (MAJOR MODE)
+CS:CH-FR BUF  POS LINE (MAJOR MODE)
 + CS :: coding system.
 + ':' :: eol convention. Unix by default (on my XPS15 9500 running
   Linux). One may also choose Mac or DOS.
