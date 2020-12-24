@@ -74,7 +74,7 @@
   :bind (("M-g g" . avy-goto-line)))
 
 (defun langou/goto-config ()
-  "go to directory of emacs config"
+  "go to personal configuration of emacs"
   (interactive)
   (find-file "~/vanilla/init.org"))
 

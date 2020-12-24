@@ -129,7 +129,7 @@ In buffer or across buffers.
   :bind (("M-g g" . avy-goto-line)))
 
 (defun langou/goto-config ()
-  "go to directory of emacs config"
+  "go to personal configuration of emacs"
   (interactive)
   (find-file "~/vanilla/init.org"))
 
@@ -196,6 +196,17 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
 #+end_src
 #+RESULTS:
 : t
+** which key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :init (which-key-mode)
+    :config
+    (setq which-key-idle-delay 0.3))
+#+end_src
+
+#+RESULTS:
+: t
+
 * org
 #+begin_src emacs-lisp
 (require 'org)
@@ -322,7 +333,7 @@ print(sys.version)
 
 #+RESULTS:
 : t
-* shell
+* shell and term
 ** vterm
 #+begin_src emacs-lisp
   (use-package vterm
@@ -363,4 +374,3 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 + if too long, scroll display
 ** shrink the minor modes to a single slot
 look like | minor mode | project | .etc.
-
