@@ -126,24 +126,76 @@
 
 (setq org-confirm-babel-evaluate nil)
 
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
- (emacs-lisp . t)
- (gnuplot . t)
- (shell . t)
- (java . t)
- (C . t)
- (clojure . t)
- (js . t)
- (ditaa . t)
- (dot . t)
- (org . t)
- (latex . t)
- (haskell . t)
- ))
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(setq org-babel-python-command "python3")
+(use-package auctex
+  :defer t)
+
+(use-package cdlatex
+  :hook (org-mode . turn-on-org-cdlatex))
+
+(use-package org-roam
+  :commands org-roam-mode
+  :init (add-hook 'after-init-hook 'org-roam-mode)
+  :config (setq org-roam-directory "~/org-roam")
+  :bind (("C-c r f" . org-roam-find-file)
+	 ("C-c r c" . org-roam-db-build-cache)))
+
+(defvar +org-capture-journal-file+ "journal.org")
+(defvar +org-capture-todo-file+ "todo.org")
+(defvar +org-capture-notes-file+ "notes.org")
+(defvar +org-capture-just-for-fun-file+ "just-for-fun.org")
+
+;;;; org-journal
+(global-set-key (kbd "C-c j") #'(lambda ()
+				  (interactive)
+				  (find-file
+				   (concat org-directory "/journal.org"))))
+
+(global-set-key (kbd "C-c c") #'org-capture)
+
+(setq org-capture-templates
+	'(("t" "Personal todo" entry
+	   (file+headline "todo.org" "Inbox")
+	      "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+
+	  ("n" "Personal notes" entry
+	   (file+headline "notes.org" "Inbox")
+	      "* %U %?\n%i\n%a" :prepend t)
+
+	  ("f" "Maybe it would be fun someday..." entry
+	   (file+headline "just-for-fun.org" "Inbox")
+	   "* %U %?" :prepend t)
+
+	  ;; declare root node j
+	  ("j" "Journal")
+
+	  ("ja" "Journal arbitrary recording" entry
+	   (file+olp+datetree "journal.org")
+	      "* %?\n%U\n%i" :tree-type week)
+
+	  ("jc" "journal clock into something new" entry
+	   (file+olp+datetree "journal.org")
+	      "* %?" :clock-in t :clock-keep t :tree-type week)
+
+	  ("jn" "journal edit the task currently clocked in" plain
+	   (clock) "%?" :unnarrowed t)
+
+	  ("r" "read later" checkitem
+	   (file+headline "read-later.org" "Inbox")
+	      "[ ] %? ")))
+
+(setq org-agenda-files (apply (function append)
+			        (mapcar
+			         (lambda (directory)
+				        (directory-files-recursively directory org-agenda-file-regexp))
+			            '("~/org/"))))
+
+(add-to-list 'org-modules 'org-habit)
+(global-set-key (kbd "s-a") #'org-agenda)
 
 (setq browse-url-browser-function 'browse-url-firefox)
 
