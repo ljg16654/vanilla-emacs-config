@@ -77,7 +77,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 * theme, font
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil :font "iosevka" :height 160)
+(set-face-attribute 'default nil :font "iosevka" :height 130)
 #+end_src
 
 #+RESULTS:
@@ -400,7 +400,32 @@ in my org-directory.
 #+RESULTS:
 : vterm
 * TODO modeline config
-[[https://occasionallycogent.com/custom_emacs_modeline/index.html][A promising tutorial]]
+[[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
+[[info:emacs#Mode Line][info:emacs#Mode Line]]
+[[help:mode-line-format]]
+** the default
+   CS:CH-FR BUF  POS LINE (MAJOR MODE)
++ CS :: coding system.
++ ':' :: eol convention. Unix by default (on my XPS15 9500 running
+  Linux). One may also choose Mac or DOS.
++ &optional @ :: for emacsclient.
++ CH :: change(?) 
++ '-' :: becomes '@' if the current buffer is on a remote machine.
++ FR :: only appears on text terminals
++ BUFF :: name of buffer.
++ POS :: position in the buffer.
+#+begin_src emacs-lisp
+  (defun mode-line-format-raw ()
+    (interactive)
+      (setq mode-line-format
+	    '("%e" mode-line-front-space mode-line-mule-info mode-line-client
+	      mode-line-modified mode-line-remote
+	      mode-line-frame-identification
+	      mode-line-buffer-identification " " mode-line-position
+	      (vc-mode vc-mode)
+	      "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
+  ))
+#+end_src
 ** improve display of emms
 + only show name of the song and artist
 + if too long, scroll display
