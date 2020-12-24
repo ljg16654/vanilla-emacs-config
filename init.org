@@ -17,6 +17,7 @@
   (scroll-bar-mode -1)
   (setq use-file-dialog nil)
   (setq use-dialog-box t)               ; only for mouse events
+  (setq inhibit-splash-screen t)
 #+end_src
 
 #+RESULTS:
@@ -85,18 +86,20 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
   (use-package anti-zenburn-theme)
   (use-package spacemacs-theme
     :defer t)
-  (load-theme 'modus-vivendi t)
+  (load-theme 'spacemacs-light nil)
 #+end_src
 * window and buffer
 ** buffer switch
 #+begin_src emacs-lisp
-(global-set-key (kbd "s-o") #'ibuffer)
-(global-set-key (kbd "s-O") #'previous-buffer)
-(global-set-key (kbd "s-j") #'other-window)
-(global-set-key (kbd "s-k") #'(lambda () (interactive)
-				(other-window -1)))
-(global-unset-key (kbd "C-x C-b"))
-(global-set-key (kbd "C-x C-b") #'ibuffer)
+  (global-set-key (kbd "s-o") #'ibuffer)
+  (global-set-key (kbd "s-O") #'previous-buffer)
+  (global-set-key (kbd "s-n") #'other-window)
+  (global-set-key (kbd "s-p") #'(lambda () (interactive)
+				  (other-window -1)))
+  (global-set-key (kbd "s-k") #'(lambda () (interactive)
+				  (kill-buffer)))
+  (global-unset-key (kbd "C-x C-b"))
+  (global-set-key (kbd "C-x C-b") #'ibuffer)
 #+end_src
 
 #+RESULTS:
@@ -261,7 +264,15 @@ print(sys.version)
 : 3.8.5 (default, Jul 28 2020, 12:59:40) 
 : [GCC 9.3.0]
 
-* miscellaneous
+* miscellaneous 
+** default browser
+#+begin_src emacs-lisp
+(setq browse-url-browser-function 'browse-url-firefox)
+#+end_src
+
+#+RESULTS:
+: browse-url-firefox
+
 ** command-log
   #+begin_src emacs-lisp
   (use-package command-log-mode)
@@ -360,7 +371,8 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+begin_src emacs-lisp
   (defun mode-line-format-raw ()
     (interactive)
-      (setq mode-line-format
+
+    (setq mode-line-format
 	    '("%e" mode-line-front-space mode-line-mule-info mode-line-client
 	      mode-line-modified mode-line-remote
 	      mode-line-frame-identification
@@ -374,3 +386,12 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 + if too long, scroll display
 ** shrink the minor modes to a single slot
 look like | minor mode | project | .etc.
+* languages
+** lisp
+#+begin_src emacs-lisp
+  (use-package lispy)
+  (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+#+end_src
+
+#+RESULTS:
+| lambda | nil | (lispy-mode 1) |

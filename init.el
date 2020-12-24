@@ -6,6 +6,7 @@
 (scroll-bar-mode -1)
 (setq use-file-dialog nil)
 (setq use-dialog-box t)               ; only for mouse events
+(setq inhibit-splash-screen t)
 
 (setq debug-on-error t)
 ;; (toggle-frame-fullscreen) 
@@ -46,13 +47,15 @@
 (use-package anti-zenburn-theme)
 (use-package spacemacs-theme
   :defer t)
-(load-theme 'modus-vivendi t)
+(load-theme 'spacemacs-light nil)
 
 (global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
-(global-set-key (kbd "s-j") #'other-window)
-(global-set-key (kbd "s-k") #'(lambda () (interactive)
+(global-set-key (kbd "s-n") #'other-window)
+(global-set-key (kbd "s-p") #'(lambda () (interactive)
 				(other-window -1)))
+(global-set-key (kbd "s-k") #'(lambda () (interactive)
+				(kill-buffer)))
 (global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
@@ -112,6 +115,11 @@
 	   (list "~/.doom.d/snippets"))
     (yas-global-mode)))
 
+(use-package which-key
+  :init (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3))
+
 (require 'org)
 
 (setq org-export-with-toc nil)
@@ -136,6 +144,8 @@
  ))
 
 (setq org-babel-python-command "python3")
+
+(setq browse-url-browser-function 'browse-url-firefox)
 
 (use-package command-log-mode)
 
@@ -186,7 +196,8 @@
 
 (defun mode-line-format-raw ()
   (interactive)
-    (setq mode-line-format
+
+  (setq mode-line-format
 	  '("%e" mode-line-front-space mode-line-mule-info mode-line-client
 	    mode-line-modified mode-line-remote
 	    mode-line-frame-identification
@@ -194,3 +205,6 @@
 	    (vc-mode vc-mode)
 	    "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
 ))
+
+(use-package lispy)
+(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
