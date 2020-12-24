@@ -126,6 +126,25 @@
 
 (setq org-confirm-babel-evaluate nil)
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+ (emacs-lisp . t)
+ (gnuplot . t)
+ (shell . t)
+ (java . t)
+ (C . t)
+ (clojure . t)
+ (js . t)
+ (ditaa . t)
+ (dot . t)
+ (org . t)
+ (latex . t)
+ (haskell . t)
+ ))
+
+(setq org-babel-python-command "python3")
+
 (use-package org-bullets
   :ensure t
   :config

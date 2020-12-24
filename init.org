@@ -219,11 +219,50 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
 (setq org-export-with-toc nil)
 #+end_src
 ** babel
+*** basic settings
 #+begin_src emacs-lisp
 (setq org-confirm-babel-evaluate nil)
 #+end_src
 
+*** languages
+Include languages: 
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+   (emacs-lisp . t)
+   (gnuplot . t)
+   (shell . t)
+   (java . t)
+   (C . t)
+   (clojure . t)
+   (js . t)
+   (ditaa . t)
+   (dot . t)
+   (org . t)
+   (latex . t)
+   (haskell . t)
+   ))
+#+end_src
+
 #+RESULTS:
+Set command for python (Ubuntu 20.04 symlinks python to python2.7, so
+the default settings calls python2.7).
+#+begin_src emacs-lisp
+(setq org-babel-python-command "python3")
+#+end_src
+
+#+RESULTS:
+: python3
+
+#+begin_src python :results output :tangle nil
+import sys
+print(sys.version)
+#+end_src
+
+#+RESULTS:
+: 3.8.5 (default, Jul 28 2020, 12:59:40) 
+: [GCC 9.3.0]
 
 ** appearance
 #+begin_src emacs-lisp
