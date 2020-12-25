@@ -42,7 +42,7 @@
 (use-package olivetti
   :bind (("C-c f e" . olivetti-mode)))
 
-(set-face-attribute 'default nil :font "iosevka" :height 130)
+(set-face-attribute 'default nil :font "iosevka" :height 135)
 
 (use-package anti-zenburn-theme)
 (use-package spacemacs-theme
@@ -51,9 +51,9 @@
 
 (global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
-(global-set-key (kbd "s-n") #'other-window)
-(global-set-key (kbd "s-p") #'(lambda () (interactive)
-				(other-window -1)))
+(global-set-key (kbd "s-n") #'ace-window)
+(setq aw-keys
+      (list ?a ?s ?d ?f ?j ?k ?l))
 (global-set-key (kbd "s-k") #'(lambda () (interactive)
 				(kill-buffer)))
 (global-unset-key (kbd "C-x C-b"))
@@ -221,10 +221,24 @@
 (use-package command-log-mode)
 
 (defconst lisp--prettify-symbols-alist
-    '(("lambda"  . ?λ)))
+      '(("lambda"  . ?λ)))
 
-(add-hook 'lisp-mode-hook #'(lambda () (interactive)
-			     (prettify-symbols-mode +1)))
+  (add-hook 'lisp-mode-hook #'(lambda () (interactive)
+			       (prettify-symbols-mode +1)))
+
+
+(setq python-prettify-symbols-alist
+      (list
+       '("lambda"  . ?λ)
+       '("**2" . ?²)
+       '("sum" . ?∑)
+       '("sigma" . ?σ)
+       '("mu" . ?μ)
+       '("theta" . ?θ)
+       '("_0" . ?₀)
+       '("_1" . ?₁)
+       '("_2" . ?₂)
+       ))
 
 (use-package company
   :config
@@ -264,18 +278,6 @@
 
 (use-package vterm
   :bind (("s-v" . vterm)))
-
-(defun mode-line-format-raw ()
-  (interactive)
-
-  (setq mode-line-format
-	  '("%e" mode-line-front-space mode-line-mule-info mode-line-client
-	    mode-line-modified mode-line-remote
-	    mode-line-frame-identification
-	    mode-line-buffer-identification " " mode-line-position
-	    (vc-mode vc-mode)
-	    "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
-))
 
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
