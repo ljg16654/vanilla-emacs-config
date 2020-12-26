@@ -304,6 +304,8 @@
 (use-package vterm
   :bind (("s-v" . vterm)))
 
+(global-set-key (kbd "s-e") #'eshell)
+
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 
@@ -311,42 +313,59 @@
 
 (use-package exwm
   :config
-  (setq exwm-workspace-number 5)
-  (start-process-shell-command "xmodmap" nil "xmodmap ~/.Xmodmap"))
+  (progn
+    (setq exwm-workspace-number 10)
+    (setq exwm-input-prefix-keys
+	  '(?\C-x
+	    ?\s-j
+	    ?\s-k
+	    ?\s-v
+	    ?\C-u
+	    ?\C-h
+	    ?\M-x
+	    ?\M-&
+	    ?\M-:
+	    ?\C-\ ))
+    (setq exwm-input-global-keys
+	  `(([?\s-r] . exwm-reset)
+	    ([?\s-w] . exwm-workspace-switch)
+	    ([?\s-o] . ibuffer)
+	    ([?\s-\;] . (lambda (command)
+			  (interactive (list (read-shell-command "$ ")))
+			  (start-process-shell-command command nil command)))
+	    ,@(mapcar (lambda (i)
+			`(,(kbd (format "s-%d" i)) .
+			  (lambda ()
+			    (interactive)
+			    (exwm-workspace-switch-create ,i))))
+		      (number-sequence 0 9))))
+    (setq exwm-workspace-warp-cursor t
+	  mouse-autoselect-window t
+	  focus-follows-mouse t)
+    (exwm-enable)
+    ))
 
-(require 'exwm-config)
-(exwm-enable)
 (display-time-mode)
 (display-battery-mode)
 
 (require 'exwm-systemtray)
 (exwm-systemtray-enable)
 
-(setq exwm-input-prefix-keys
-      '(?\C-x
-	?\s-j
-	?\s-k
-	?\s-v
-	?\C-u
-	?\C-h
-	?\M-x
-	?\M-&
-	?\M-:
-	?\C-\ ))
+(require 'exwm-randr)
+(setq exwm-randr-workspace-monitor-plist '(9 "DP-1-2" 9 "DP-2" 9 "DP-1-1" 9 "DP-1"))
+(exwm-randr-enable)
 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+(exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
 
-(setq exwm-input-global-keys
-      `(([?\s-r] . exwm-reset)
-	((kbd "s-w") . exwm-workspace-switch)
-	((kbd "s-o") . ibuffer)
-	([s-left] . windmove-left)
-	([s-right] . windmove-right)
-	([s-up] . windmove-up)
-	([s-down] . windmove-down)
-	,@(mapcar (lambda (i)
-		    `(,(kbd (format "s-%d" i)) .
-		      (lambda ()
-			(interactive)
-			(exwm-workspace-switch-create ,i))))
-		  (number-sequence 0 9))))
+(defun efs/run-in-background (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+(defun efs/update-displays ()
+  (efs/run-in-background "autorandr --change --force")
+  (message "Display config: %s"
+	   (string-trim (shell-command-to-string "autorandr --current"))))
+
+(add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
+(efs/update-displays)

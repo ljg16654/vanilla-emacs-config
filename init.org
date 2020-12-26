@@ -512,7 +512,15 @@ in my org-directory.
 
 #+RESULTS:
 : vterm
-jjj* TODOjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj modeline config
+** eshell
+#+begin_src emacs-lisp
+  (global-set-key (kbd "s-e") #'eshell)
+#+end_src
+
+#+RESULTS:
+: eshell
+
+* modeline config
 [[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
 [[info:emacs#Mode Line][info:emacs#Mode Line]]
 [[help:mode-line-format]]
@@ -594,11 +602,38 @@ look like | minor mode | project | .etc.
 #+begin_src emacs-lisp 
   (use-package exwm
     :config
-    (setq exwm-workspace-number 5)
-    (start-process-shell-command "xmodmap" nil "xmodmap ~/.Xmodmap"))
+    (progn
+      (setq exwm-workspace-number 10)
+      (setq exwm-input-prefix-keys
+	    '(?\C-x
+	      ?\s-j
+	      ?\s-k
+	      ?\s-v
+	      ?\C-u
+	      ?\C-h
+	      ?\M-x
+	      ?\M-&
+	      ?\M-:
+	      ?\C-\ ))
+      (setq exwm-input-global-keys
+	    `(([?\s-r] . exwm-reset)
+	      ([?\s-w] . exwm-workspace-switch)
+	      ([?\s-o] . ibuffer)
+	      ([?\s-\;] . (lambda (command)
+			    (interactive (list (read-shell-command "$ ")))
+			    (start-process-shell-command command nil command)))
+	      ,@(mapcar (lambda (i)
+			  `(,(kbd (format "s-%d" i)) .
+			    (lambda ()
+			      (interactive)
+			      (exwm-workspace-switch-create ,i))))
+			(number-sequence 0 9))))
+      (setq exwm-workspace-warp-cursor t
+	    mouse-autoselect-window t
+	    focus-follows-mouse t)
+      (exwm-enable)
+      ))
 
-  (require 'exwm-config)
-  (exwm-enable)
   (display-time-mode)
   (display-battery-mode)
 #+end_src
@@ -613,48 +648,35 @@ look like | minor mode | project | .etc.
 
 #+RESULTS:
 | exwm-systemtray--exit |
-*** keys that go into emacs but not into the underlying windows
+also, make sure xrandr update refresh EXWM frames
 #+begin_src emacs-lisp
-  (setq exwm-input-prefix-keys
-	'(?\C-x
-	  ?\s-j
-	  ?\s-k
-	  ?\s-v
-	  ?\C-u
-	  ?\C-h
-	  ?\M-x
-	  ?\M-&
-	  ?\M-:
-	  ?\C-\ ))
+  (require 'exwm-randr)
+  (setq exwm-randr-workspace-monitor-plist '(9 "DP-1-2" 9 "DP-2" 9 "DP-1-1" 9 "DP-1"))
+  (exwm-randr-enable)
 #+end_src
 
 #+RESULTS:
-| 24 | 8388714 | 8388715 | 8388726 | 21 | 8 | 134217848 | 134217766 | 134217786 | 67108896 |
+| exwm-randr--exit | exwm-systemtray--exit |
+
 After =C-q=, send key to the window 
 #+begin_src emacs-lisp
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+(exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
 #+end_src
 
 #+RESULTS:
-: exwm-input-send-next-key
-
-*** global keys
+** autorandr
 #+begin_src emacs-lisp
-  (setq exwm-input-global-keys
-	`(([?\s-r] . exwm-reset)
-	  ((kbd "s-w") . exwm-workspace-switch)
-	  ((kbd "s-o") . ibuffer)
-	  ([s-left] . windmove-left)
-	  ([s-right] . windmove-right)
-	  ([s-up] . windmove-up)
-	  ([s-down] . windmove-down)
-	  ,@(mapcar (lambda (i)
-		      `(,(kbd (format "s-%d" i)) .
-			(lambda ()
-			  (interactive)
-			  (exwm-workspace-switch-create ,i))))
-		    (number-sequence 0 9))))
-#+end_src
+  (defun efs/run-in-background (command)
+    (let ((command-parts (split-string command "[ ]+")))
+      (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
-#+RESULTS:
-: (([8388722] . exwm-reset) ([8388714] . other-window) ((kbd s-w) . exwm-workspace-switch) ((kbd s-o) . ibuffer) ([s-left] . windmove-left) ([s-right] . windmove-right) ([s-up] . windmove-up) ([s-down] . windmove-down) ([8388656] lambda nil (interactive) (exwm-workspace-switch-create 0)) ([8388657] lambda nil (interactive) (exwm-workspace-switch-create 1)) ([8388658] lambda nil (interactive) (exwm-workspace-switch-create 2)) ([8388659] lambda nil (interactive) (exwm-workspace-switch-create 3)) ([8388660] lambda nil (interactive) (exwm-workspace-switch-create 4)) ([8388661] lambda nil (interactive) (exwm-workspace-switch-create 5)) ([8388662] lambda nil (interactive) (exwm-workspace-switch-create 6)) ([8388663] lambda nil (interactive) (exwm-workspace-switch-create 7)) ([8388664] lambda nil (interactive) (exwm-workspace-switch-create 8)) ([8388665] lambda nil (interactive) (exwm-workspace-switch-create 9)))
+  (defun efs/update-displays ()
+    (efs/run-in-background "autorandr --change --force")
+    (message "Display config: %s"
+	     (string-trim (shell-command-to-string "autorandr --current"))))
+
+  (add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
+  (efs/update-displays)
+
+#+end_src
