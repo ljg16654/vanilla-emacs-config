@@ -93,11 +93,13 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 #+begin_src emacs-lisp
   (global-set-key (kbd "s-o") #'ibuffer)
   (global-set-key (kbd "s-O") #'previous-buffer)
-  (global-set-key (kbd "s-n") #'ace-window)
   (setq aw-keys
 	(list ?a ?s ?d ?f ?j ?k ?l))
+  (global-set-key (kbd "s-j") #'other-window)
   (global-set-key (kbd "s-k") #'(lambda () (interactive)
-				  (kill-buffer)))
+		  (other-window -1)))
+  ;; (global-set-key (kbd "s-k") #'(lambda () (interactive)
+  ;; 				(kill-buffer)))
   (global-unset-key (kbd "C-x C-b"))
   (global-set-key (kbd "C-x C-b") #'ibuffer)
 #+end_src
@@ -148,6 +150,16 @@ In buffer or across buffers.
 
 * project
 ** eyebrowse
+|-----------+-----------------------|
+| key       | Doom Emacs equivalent |
+|-----------+-----------------------|
+| C-c C-w c | SPC TAB n             |
+| C-c C-w . | ?                     |
+| C-c C-w , | SPC TAB r             |
+| M-<num>   | M-<num>               |
+|-----------+-----------------------|
+
+
 #+begin_src emacs-lisp
 (use-package eyebrowse
   :diminish eyebrowse-mode
@@ -483,7 +495,6 @@ in my org-directory.
 : emms-add-playlist
 ** TODO improve config
 + block mplayer from poping up
-* doc
 ** pdf
 #+begin_src emacs-lisp
   (use-package pdf-tools
@@ -501,11 +512,11 @@ in my org-directory.
 
 #+RESULTS:
 : vterm
-* TODO modeline config
+jjj* TODOjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj modeline config
 [[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
 [[info:emacs#Mode Line][info:emacs#Mode Line]]
 [[help:mode-line-format]]
-** the default
+** COMMENT the default
 CS:CH-FR BUF  POS LINE (MAJOR MODE)
 + CS :: coding system.
 + ':' :: eol convention. Unix by default (on my XPS15 9500 running
@@ -516,7 +527,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 + FR :: only appears on text terminals
 + BUFF :: name of buffer.
 + POS :: position in the buffer.
-#+begin_src emacs-lisp :tangle nil
+#+begin_src emacs-lisp
   (defun mode-line-format-raw ()
     (interactive)
 
@@ -529,13 +540,40 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 	      "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
   ))
 #+end_src
+
+#+begin_src emacs-lisp
+  (use-package diminish)
+  (diminish 'ivy-mode)
+  (diminish 'auto-revert-mode)
+  (diminish 'yas-minor-mode)
+  (diminish 'org-cdlatex-mode)
+  (diminish 'which-key-mode)
+  (diminish 'org-roam-mode)
+  (diminish 'company-mode)
+#+end_src
+
+#+RESULTS:
+|   |
+#+begin_src emacs-lisp :tangle nil
+  (use-package telephone-line
+    :config (progn (setq telephone-line-primary-left-separator 'telephone-line-cubed-left
+			 telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
+			 telephone-line-primary-right-separator 'telephone-line-cubed-right
+			 telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right
+			 telephone-line-height 24)
+		   (telephone-line-mode +1)))
+#+end_src
+
+#+RESULTS:
+: t
+
 ** improve display of emms
 + only show name of the song and artist
 + if too long, scroll display
 ** shrink the minor modes to a single slot
 look like | minor mode | project | .etc.
 * languages
-** lisp
+** lisp-general
 #+begin_src emacs-lisp
   (use-package lispy)
   (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
@@ -543,3 +581,80 @@ look like | minor mode | project | .etc.
 
 #+RESULTS:
 | lambda | nil | (lispy-mode 1) |
+** racket
+#+begin_src emacs-lisp
+(use-package racket-mode)
+#+end_src
+
+#+RESULTS:
+* experimental 
+** exwm
+*** the minimum setup
+[[https://github.com/ch11ng/exwm/wiki][exwm wiki]]
+#+begin_src emacs-lisp 
+  (use-package exwm
+    :config
+    (setq exwm-workspace-number 5)
+    (start-process-shell-command "xmodmap" nil "xmodmap ~/.Xmodmap"))
+
+  (require 'exwm-config)
+  (exwm-enable)
+  (display-time-mode)
+  (display-battery-mode)
+#+end_src
+
+#+RESULTS:
+: t
+
+#+begin_src emacs-lisp
+(require 'exwm-systemtray)
+(exwm-systemtray-enable)
+#+end_src
+
+#+RESULTS:
+| exwm-systemtray--exit |
+*** keys that go into emacs but not into the underlying windows
+#+begin_src emacs-lisp
+  (setq exwm-input-prefix-keys
+	'(?\C-x
+	  ?\s-j
+	  ?\s-k
+	  ?\s-v
+	  ?\C-u
+	  ?\C-h
+	  ?\M-x
+	  ?\M-&
+	  ?\M-:
+	  ?\C-\ ))
+#+end_src
+
+#+RESULTS:
+| 24 | 8388714 | 8388715 | 8388726 | 21 | 8 | 134217848 | 134217766 | 134217786 | 67108896 |
+After =C-q=, send key to the window 
+#+begin_src emacs-lisp
+(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+#+end_src
+
+#+RESULTS:
+: exwm-input-send-next-key
+
+*** global keys
+#+begin_src emacs-lisp
+  (setq exwm-input-global-keys
+	`(([?\s-r] . exwm-reset)
+	  ((kbd "s-w") . exwm-workspace-switch)
+	  ((kbd "s-o") . ibuffer)
+	  ([s-left] . windmove-left)
+	  ([s-right] . windmove-right)
+	  ([s-up] . windmove-up)
+	  ([s-down] . windmove-down)
+	  ,@(mapcar (lambda (i)
+		      `(,(kbd (format "s-%d" i)) .
+			(lambda ()
+			  (interactive)
+			  (exwm-workspace-switch-create ,i))))
+		    (number-sequence 0 9))))
+#+end_src
+
+#+RESULTS:
+: (([8388722] . exwm-reset) ([8388714] . other-window) ((kbd s-w) . exwm-workspace-switch) ((kbd s-o) . ibuffer) ([s-left] . windmove-left) ([s-right] . windmove-right) ([s-up] . windmove-up) ([s-down] . windmove-down) ([8388656] lambda nil (interactive) (exwm-workspace-switch-create 0)) ([8388657] lambda nil (interactive) (exwm-workspace-switch-create 1)) ([8388658] lambda nil (interactive) (exwm-workspace-switch-create 2)) ([8388659] lambda nil (interactive) (exwm-workspace-switch-create 3)) ([8388660] lambda nil (interactive) (exwm-workspace-switch-create 4)) ([8388661] lambda nil (interactive) (exwm-workspace-switch-create 5)) ([8388662] lambda nil (interactive) (exwm-workspace-switch-create 6)) ([8388663] lambda nil (interactive) (exwm-workspace-switch-create 7)) ([8388664] lambda nil (interactive) (exwm-workspace-switch-create 8)) ([8388665] lambda nil (interactive) (exwm-workspace-switch-create 9)))

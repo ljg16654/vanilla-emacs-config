@@ -51,11 +51,13 @@
 
 (global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
-(global-set-key (kbd "s-n") #'ace-window)
 (setq aw-keys
       (list ?a ?s ?d ?f ?j ?k ?l))
+(global-set-key (kbd "s-j") #'other-window)
 (global-set-key (kbd "s-k") #'(lambda () (interactive)
-				(kill-buffer)))
+		(other-window -1)))
+;; (global-set-key (kbd "s-k") #'(lambda () (interactive)
+;; 				(kill-buffer)))
 (global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
@@ -86,7 +88,14 @@
 (global-set-key (kbd "M-i") 'imenu)
 
 (use-package eyebrowse
-  :config (eyebrowse-mode 1))
+  :diminish eyebrowse-mode
+  :config (progn
+            (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+            (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+            (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+            (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+            (eyebrowse-mode t)
+            (setq eyebrowse-new-workspace t)))
 
 (use-package magit
   :bind (("C-c g" . magit)))
@@ -161,7 +170,23 @@
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config (setq org-roam-directory "~/org-roam")
   :bind (("C-c r f" . org-roam-find-file)
-	 ("C-c r c" . org-roam-db-build-cache)))
+	 ("C-c r c" . org-roam-db-build-cache)
+	 ("C-c r i" . org-roam-insert)))
+
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 8080
+        org-roam-server-authenticate nil
+        org-roam-server-export-inline-images t
+        org-roam-server-serve-files nil
+        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+        org-roam-server-network-poll t
+        org-roam-server-network-arrows nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20))
 
 (defvar +org-capture-journal-file+ "journal.org")
 (defvar +org-capture-todo-file+ "todo.org")
@@ -281,3 +306,47 @@
 
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+
+(use-package racket-mode)
+
+(use-package exwm
+  :config
+  (setq exwm-workspace-number 5)
+  (start-process-shell-command "xmodmap" nil "xmodmap ~/.Xmodmap"))
+
+(require 'exwm-config)
+(exwm-enable)
+(display-time-mode)
+(display-battery-mode)
+
+(require 'exwm-systemtray)
+(exwm-systemtray-enable)
+
+(setq exwm-input-prefix-keys
+      '(?\C-x
+	?\s-j
+	?\s-k
+	?\s-v
+	?\C-u
+	?\C-h
+	?\M-x
+	?\M-&
+	?\M-:
+	?\C-\ ))
+
+(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+
+(setq exwm-input-global-keys
+      `(([?\s-r] . exwm-reset)
+	((kbd "s-w") . exwm-workspace-switch)
+	((kbd "s-o") . ibuffer)
+	([s-left] . windmove-left)
+	([s-right] . windmove-right)
+	([s-up] . windmove-up)
+	([s-down] . windmove-down)
+	,@(mapcar (lambda (i)
+		    `(,(kbd (format "s-%d" i)) .
+		      (lambda ()
+			(interactive)
+			(exwm-workspace-switch-create ,i))))
+		  (number-sequence 0 9))))
