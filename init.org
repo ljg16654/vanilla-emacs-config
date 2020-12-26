@@ -1,5 +1,10 @@
 #+TITLE: init
 #+PROPERTY: header-args :tangle init.el
+* awesome configs for reference
++ james cash ::  [[file:~/repos/james-cash-dotfiles/emacs.d/eshell][file:~/repos/james-cash-dotfiles/emacs.d/eshell]]
++ prot :: [[file:~/repos/prot-dotfiles/emacs/.emacs.d/emacs-init.org]]
++ Doom Emacs
++ Emacs from scratch series :: [[file:~/repos/emacs-from-scratch/Emacs.org]]
 * personal info
 #+begin_src emacs-lisp
 (setq user-full-name "Jigang Li"
