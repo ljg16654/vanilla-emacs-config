@@ -97,6 +97,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 ** buffer switch
 #+begin_src emacs-lisp
   (global-set-key (kbd "s-o") #'ibuffer)
+  (global-set-key (kbd "H-a") #'counsel-switch-buffer)
   (global-set-key (kbd "s-O") #'previous-buffer)
   (setq aw-keys
 	(list ?a ?s ?d ?f ?j ?k ?l))
@@ -130,6 +131,14 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 #+RESULTS:
 | hl-line-mode | dired-hide-details-mode |
+** naming
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c b r") #'rename-buffer)
+(global-set-key (kbd "H-r") #'rename-buffer)
+#+end_src
+
+#+RESULTS:
+: rename-buffer
 
 * movement
 In buffer or across buffers.
@@ -144,7 +153,12 @@ In buffer or across buffers.
   (find-file "~/vanilla/init.org"))
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
+(global-set-key (kbd "H-f p") #'langou/goto-config)
 #+end_src
+
+#+RESULTS:
+: langou/goto-config
+
 ** imenu
 #+begin_src emacs-lisp
 (global-set-key (kbd "M-i") 'imenu)
@@ -183,8 +197,13 @@ In buffer or across buffers.
 ** version control
 #+begin_src emacs-lisp
 (use-package magit
-  :bind (("C-c g" . magit)))
+  :bind (("C-c g" . magit) ("H-g" . magit))
+)
 #+end_src
+
+#+RESULTS:
+: magit
+
 ** projectile
 #+begin_src emacs-lisp
 (use-package projectile)
@@ -360,6 +379,7 @@ in my org-directory.
 					(concat org-directory "/journal.org"))))
 
      (global-set-key (kbd "C-c c") #'org-capture)
+     (global-set-key (kbd "H-c") #'org-capture)
 
      (setq org-capture-templates
 	     '(("t" "Personal todo" entry
