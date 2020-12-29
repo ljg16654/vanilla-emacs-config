@@ -63,6 +63,20 @@
 (global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
+(defun prot-simple-kill-buffer-current (&optional arg)
+  "Kill current buffer or abort recursion when in minibuffer.
+With optional prefix ARG (\\[universal-argument]) delete the
+buffer's window as well."
+  (interactive "P")
+  (if (minibufferp)
+      (abort-recursive-edit)
+    (kill-buffer (current-buffer)))
+  (when (and arg
+             (not (one-window-p)))
+    (delete-window)))
+
+(global-set-key (kbd "s-C") #'prot-simple-kill-buffer-current)
+
 (use-package dired
   :ensure nil
   :config
@@ -172,6 +186,9 @@
 (use-package cdlatex
   :hook (org-mode . turn-on-org-cdlatex))
 
+(defun langou/org-latex-delete-cache () (interactive)
+       (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
+
 (use-package org-roam
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
@@ -217,11 +234,11 @@
 (setq org-capture-templates
 	'(("t" "Personal todo" entry
 	   (file+headline "todo.org" "Inbox")
-	      "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+	   "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
 
 	  ("n" "Personal notes" entry
 	   (file+headline "notes.org" "Inbox")
-	      "* %U %?\n%i\n%a" :prepend t)
+	   "* %U %?\n%i\n%a" :prepend t)
 
 	  ("f" "Maybe it would be fun someday..." entry
 	   (file+headline "just-for-fun.org" "Inbox")
@@ -232,18 +249,22 @@
 
 	  ("ja" "Journal arbitrary recording" entry
 	   (file+olp+datetree "journal.org")
-	      "* %?\n%U\n%i" :tree-type week)
+	   "* %?\n%U\n%i" :tree-type week)
 
 	  ("jc" "journal clock into something new" entry
 	   (file+olp+datetree "journal.org")
-	      "* %?" :clock-in t :clock-keep t :tree-type week)
+	   "* %?" :clock-in t :clock-keep t :tree-type week)
 
 	  ("jn" "journal edit the task currently clocked in" plain
 	   (clock) "%?" :unnarrowed t)
 
 	  ("r" "read later" checkitem
 	   (file+headline "read-later.org" "Inbox")
-	      "[ ] %? ")))
+	   "[ ] %? ")
+
+	  ("v" "vocabularies" entry
+	   (file+headline "voc.org" "Inbox")
+	   "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic (and reversed card)\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n\n")))
 
 (setq org-agenda-files (apply (function append)
 			        (mapcar
@@ -401,3 +422,5 @@
 
 (add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
 (efs/update-displays)
+
+(use-package anki-editor)

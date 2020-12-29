@@ -113,6 +113,27 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 #+RESULTS:
 : ibuffer
+** kill buffer
+#+begin_src emacs-lisp
+(defun prot-simple-kill-buffer-current (&optional arg)
+  "Kill current buffer or abort recursion when in minibuffer.
+With optional prefix ARG (\\[universal-argument]) delete the
+buffer's window as well."
+  (interactive "P")
+  (if (minibufferp)
+      (abort-recursive-edit)
+    (kill-buffer (current-buffer)))
+  (when (and arg
+             (not (one-window-p)))
+    (delete-window)))
+
+(global-set-key (kbd "s-C") #'prot-simple-kill-buffer-current)
+
+#+end_src
+
+#+RESULTS:
+: prot-simple-kill-buffer-current
+
 ** dired
 #+begin_src emacs-lisp
   (use-package dired
