@@ -50,6 +50,7 @@
 (load-theme 'spacemacs-light nil)
 
 (global-set-key (kbd "s-o") #'ibuffer)
+(global-set-key (kbd "H-a") #'counsel-switch-buffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
 (setq aw-keys
       (list ?a ?s ?d ?f ?j ?k ?l))
@@ -58,6 +59,7 @@
 		(other-window -1)))
 ;; (global-set-key (kbd "s-k") #'(lambda () (interactive)
 ;; 				(kill-buffer)))
+(global-set-key (kbd "H-s") #'delete-other-windows)
 (global-unset-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
@@ -75,6 +77,9 @@
   :hook ((dired-mode-hook . dired-hide-details-mode)
 	 (dired-mode-hook . hl-line-mode)))
 
+(global-set-key (kbd "C-c b r") #'rename-buffer)
+(global-set-key (kbd "H-b") #'rename-buffer)
+
 (use-package avy
   :bind (("M-g g" . avy-goto-line)))
 
@@ -84,6 +89,7 @@
   (find-file "~/vanilla/init.org"))
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
+(global-set-key (kbd "H-f p") #'langou/goto-config)
 
 (global-set-key (kbd "M-i") 'imenu)
 
@@ -98,7 +104,8 @@
             (setq eyebrowse-new-workspace t)))
 
 (use-package magit
-  :bind (("C-c g" . magit)))
+  :bind (("C-c g" . magit) ("H-g" . magit))
+)
 
 (use-package projectile)
 (projectile-mode +1)
@@ -170,8 +177,13 @@
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config (setq org-roam-directory "~/org-roam")
   :bind (("C-c r f" . org-roam-find-file)
+         ;("H-r f" . org-roam-find-file)
 	 ("C-c r c" . org-roam-db-build-cache)
-	 ("C-c r i" . org-roam-insert)))
+	 ; ("H-r c" . org-roam-db-build-cache)
+	 ("C-c r i" . org-roam-insert)
+	 ;("H-r i" . org-roam-insert)
+	 )
+)
 
 (use-package org-roam-server
   :ensure t
@@ -200,6 +212,7 @@
 				   (concat org-directory "/journal.org"))))
 
 (global-set-key (kbd "C-c c") #'org-capture)
+(global-set-key (kbd "H-c") #'org-capture)
 
 (setq org-capture-templates
 	'(("t" "Personal todo" entry
@@ -306,6 +319,12 @@
 
 (global-set-key (kbd "s-e") #'eshell)
 
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :config
+  (progn
+    (setq doom-modeline-height 23)))
+
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 
@@ -325,6 +344,11 @@
 	    ?\M-x
 	    ?\M-&
 	    ?\M-:
+	    ?\H-a
+	    ?\H-b
+	    ?\H-c
+	    ?\H-f
+	    ?\H-s
 	    ?\C-\ ))
     (setq exwm-input-global-keys
 	  `(([?\s-r] . exwm-reset)
@@ -339,6 +363,14 @@
 			    (interactive)
 			    (exwm-workspace-switch-create ,i))))
 		      (number-sequence 0 9))))
+    (exwm-input-set-simulation-keys
+     '(([?\C-b] . left)
+       ([?\C-f] . right)
+       ([?\C-p] . up)
+       ([?\C-n] . down)
+       ([?\C-a] . home)
+       ([?\C-e] . end)
+       ))
     (setq exwm-workspace-warp-cursor t
 	  mouse-autoselect-window t
 	  focus-follows-mouse t)

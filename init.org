@@ -106,6 +106,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 		  (other-window -1)))
   ;; (global-set-key (kbd "s-k") #'(lambda () (interactive)
   ;; 				(kill-buffer)))
+  (global-set-key (kbd "H-s") #'delete-other-windows)
   (global-unset-key (kbd "C-x C-b"))
   (global-set-key (kbd "C-x C-b") #'ibuffer)
 #+end_src
@@ -134,7 +135,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 ** naming
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c b r") #'rename-buffer)
-(global-set-key (kbd "H-r") #'rename-buffer)
+(global-set-key (kbd "H-b") #'rename-buffer)
 #+end_src
 
 #+RESULTS:
@@ -230,6 +231,8 @@ In buffer or across buffers.
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 #+end_src
+
+
 ** yasnippet
 The snippets are currently stored in DOOMDIR and I may move them to somewhere else later.
 #+begin_src emacs-lisp
@@ -248,6 +251,16 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
     :init (which-key-mode)
     :config
     (setq which-key-idle-delay 0.3))
+#+end_src
+
+#+RESULTS:
+: t
+
+
+enhance ivy with ivy-rich: 
+#+begin_src emacs-lisp :tangle nil
+  (use-package ivy-rich
+    :config (ivy-rich-mode +1))
 #+end_src
 
 #+RESULTS:
@@ -326,6 +339,13 @@ print(sys.version)
 (use-package cdlatex
   :hook (org-mode . turn-on-org-cdlatex))
 #+end_src
+
+*** TODO rewrite clear cache
+#+begin_src emacs-lisp
+(defun langou/org-latex-delete-cache () (interactive)
+       (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
+#+end_src
+
 ** org-roam
 #+begin_src emacs-lisp
 (use-package org-roam
@@ -333,9 +353,17 @@ print(sys.version)
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config (setq org-roam-directory "~/org-roam")
   :bind (("C-c r f" . org-roam-find-file)
+         ;("H-r f" . org-roam-find-file)
 	 ("C-c r c" . org-roam-db-build-cache)
-	 ("C-c r i" . org-roam-insert)))
+	 ; ("H-r c" . org-roam-db-build-cache)
+	 ("C-c r i" . org-roam-insert)
+	 ;("H-r i" . org-roam-insert)
+	 )
+)
 #+end_src
+
+#+RESULTS:
+: org-roam-insert
 
 #+begin_src emacs-lisp
 (use-package org-roam-server
@@ -384,11 +412,11 @@ in my org-directory.
      (setq org-capture-templates
 	     '(("t" "Personal todo" entry
 		(file+headline "todo.org" "Inbox")
-		   "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+		"* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
 
 	       ("n" "Personal notes" entry
 		(file+headline "notes.org" "Inbox")
-		   "* %U %?\n%i\n%a" :prepend t)
+		"* %U %?\n%i\n%a" :prepend t)
 
 	       ("f" "Maybe it would be fun someday..." entry
 		(file+headline "just-for-fun.org" "Inbox")
@@ -399,18 +427,22 @@ in my org-directory.
 
 	       ("ja" "Journal arbitrary recording" entry
 		(file+olp+datetree "journal.org")
-		   "* %?\n%U\n%i" :tree-type week)
+		"* %?\n%U\n%i" :tree-type week)
 
 	       ("jc" "journal clock into something new" entry
 		(file+olp+datetree "journal.org")
-		   "* %?" :clock-in t :clock-keep t :tree-type week)
+		"* %?" :clock-in t :clock-keep t :tree-type week)
 
 	       ("jn" "journal edit the task currently clocked in" plain
 		(clock) "%?" :unnarrowed t)
 
 	       ("r" "read later" checkitem
 		(file+headline "read-later.org" "Inbox")
-		   "[ ] %? ")))
+		"[ ] %? ")
+
+	       ("v" "vocabularies" entry
+		(file+headline "voc.org" "Inbox")
+		"* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic (and reversed card)\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n\n")))
    #+end_src
 
    #+RESULTS:
@@ -434,7 +466,9 @@ in my org-directory.
 
 #+RESULTS:
 : org-agenda
-
+** misc
+*** TODO shortkey conflict 
+shortkey of org-mark-ring-goto conflicts with yasnippet.
 * miscellaneous 
 ** default browser
 #+begin_src emacs-lisp
@@ -574,7 +608,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   ))
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
   (use-package diminish)
   (diminish 'ivy-mode)
   (diminish 'auto-revert-mode)
@@ -599,12 +633,19 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 #+RESULTS:
 : t
+** doom modeline
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :config
+    (progn
+      (setq doom-modeline-height 23)))
 
-** improve display of emms
-+ only show name of the song and artist
-+ if too long, scroll display
-** shrink the minor modes to a single slot
-look like | minor mode | project | .etc.
+#+end_src
+
+#+RESULTS:
+: t
+
 * languages
 ** lisp-general
 #+begin_src emacs-lisp
@@ -639,6 +680,11 @@ look like | minor mode | project | .etc.
 	      ?\M-x
 	      ?\M-&
 	      ?\M-:
+	      ?\H-a
+	      ?\H-b
+	      ?\H-c
+	      ?\H-f
+	      ?\H-s
 	      ?\C-\ ))
       (setq exwm-input-global-keys
 	    `(([?\s-r] . exwm-reset)
@@ -653,6 +699,14 @@ look like | minor mode | project | .etc.
 			      (interactive)
 			      (exwm-workspace-switch-create ,i))))
 			(number-sequence 0 9))))
+      (exwm-input-set-simulation-keys
+       '(([?\C-b] . left)
+	 ([?\C-f] . right)
+	 ([?\C-p] . up)
+	 ([?\C-n] . down)
+	 ([?\C-a] . home)
+	 ([?\C-e] . end)
+	 ))
       (setq exwm-workspace-warp-cursor t
 	    mouse-autoselect-window t
 	    focus-follows-mouse t)
@@ -705,3 +759,9 @@ After =C-q=, send key to the window
   (efs/update-displays)
 
 #+end_src
+** anki
+#+begin_src emacs-lisp
+(use-package anki-editor)
+#+end_src
+
+#+RESULTS:
