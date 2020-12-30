@@ -200,8 +200,10 @@ In buffer or across buffers.
 | M-<num>   | M-<num>               |
 |-----------+-----------------------|
 
-
-#+begin_src emacs-lisp
+The shortkeys conflict with org-refile. Since I'm now using EXWM and
+considering to use tab-bar-mode for managment of window layout,
+tangling is currently disabled.
+#+begin_src emacs-lisp :tangle nil
 (use-package eyebrowse
   :diminish eyebrowse-mode
   :config (progn
@@ -291,6 +293,56 @@ enhance ivy with ivy-rich:
 #+begin_src emacs-lisp
 (require 'org)
 #+end_src
+** refile
+#+begin_src emacs-lisp
+  (setq +personal-org-roam-files+ (apply (function append)
+				  (mapcar
+				   (lambda (directory)
+					  (directory-files-recursively directory org-agenda-file-regexp))
+				      '("~/org-roam/"))))
+
+  (setq org-refile-targets
+	'((nil :maxlevel . 5)
+	  (org-agenda-files :maxlevel . 5)
+	  (+personal-org-roam-files+ :maxlevel . 5)
+	  )
+	;; Without this, completers like ivy/helm are only given the first level of
+	;; each outline candidates. i.e. all the candidates under the "Tasks" heading
+	;; are just "Tasks/". This is unhelpful. We want the full path to each refile
+	;; target! e.g. FILE/Tasks/heading/subheading
+	org-refile-use-outline-path 'file
+	org-outline-path-complete-in-steps nil)
+#+end_src
+
+#+RESULTS:
+
+** the todo-keywords cycle
+Track state changes.
++ ! :: timestamp 
++ @ :: timestamp with note
+
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+	'((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(s@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
+	  (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")
+	  ))
+#+end_src
+
+#+RESULTS:
+| sequence | MAYBE(m@) | TODO(t) | IN-PROGRESS(i@) | STUCK(s@/@) |   |          | DONE(d@) | CANCELLED(c@) |
+| sequence | REPORT(r) | BUG(b)  | KNOWNCAUSE(k)   |             |   | FIXED(f) |          |               |
+#+begin_src emacs-lisp
+  (setq org-stuck-projects
+	;; identify a project with TODO keywords/tags
+	;; identify non-stuck state with TODO keywords
+	;; identify non-stuck state with tags
+	;; regexp match non-stuck projects
+	'("-moyu&-MAYBE" ("TODO" "IN-PROGRESS") nil ""))
+#+end_src
+
+#+RESULTS:
+| -moyu&-MAYBE | (TODO IN-PROGRESS) | nil |   |
+
 ** export
 #+begin_src emacs-lisp
 (setq org-export-with-toc nil)
@@ -405,6 +457,9 @@ print(sys.version)
 #+RESULTS:
 : t
 
+#+RESULTS:
+| ~/org-roam/20201214204228-ros_tf2.org | ~/org-roam/20201214205049-rviz.org | ~/org-roam/20201214205651-realsense_ros_slam.org | ~/org-roam/20201214211147-t265.org | ~/org-roam/20201214222731-realsenseapi.org | ~/org-roam/20201214223854-ros_messages.org | ~/org-roam/20201214224109-slaminjava.org | ~/org-roam/20201215124701-rospy.org | ~/org-roam/20201215132203-ubuntu20_04python.org | ~/org-roam/20201216124143-org_roam.org | ~/org-roam/20201216125059-hightlight_current_line.org | ~/org-roam/20201216125829-org_roam_titles.org | ~/org-roam/20201216131340-org_roam_tags.org | ~/org-roam/20201216134825-org_refile.org | ~/org-roam/20201216143227-org_tag.org | ~/org-roam/20201216152610-dkf.org | ~/org-roam/20201216211516-landmark_measurements.org | ~/org-roam/20201217210551-roscheatsheet.org | ~/org-roam/20201218204707-online_slam.org | ~/org-roam/20201218204931-slam_classification.org | ~/org-roam/20201218205027-full_slam.org | ~/org-roam/20201218212202-ekf_localization.org | ~/org-roam/20201218215300-linear_change_of_gaussian_random_variable.org | ~/org-roam/20201218222748-closure_properties_of_gaussian.org | ~/org-roam/20201218222758-convolution_of_gaussians.org | ~/org-roam/20201218224913-the_correspondence_problem.org | ~/org-roam/20201218224937-maximum_likelihood_correspondence.org | ~/org-roam/20201219104714-sum_of_gaussian_random_variable.org | ~/org-roam/20201219113346-kalman_filter_measurement_update.org | ~/org-roam/20201219114054-second_order_derivative_or_matrix.org | ~/org-roam/20201219124804-full_bayesian_implementation_of_ekf_under_unkown_data_association.org | ~/org-roam/20201219124946-mht.org | ~/org-roam/20201219165336-ekf_slam.org | ~/org-roam/20201222135306-regexp_sentence_end.org | ~/org-roam/20201223191322-uwa_framework.org | ~/org-roam/20201225012254-pyplot_colors.org | ~/org-roam/20201225023227-particle_filter_in_python.org | ~/org-roam/20201226011741-shell_script_array_size.org | ~/org-roam/20201226011850-shell_script_give_command_output_to_an_array.org | ~/org-roam/20201226013739-shell_script_number_of_command_line_arguments.org | ~/org-roam/20201226134132-emacs_tips.org | ~/org-roam/20201226192118-ssh_passphrase.org | ~/org-roam/20201227183820-catkin_build.org | ~/org-roam/20201227190758-catkin_clean.org | ~/org-roam/fastSLAM.org | ~/org-roam/particleFilter.org | ~/org-roam/pointCloudRegistration.org |
+
 ** org-capture
 [2020-12-24 四] A weired phenomena that I just found is that the
 result of using defvar and using string for filename directly is
@@ -441,7 +496,7 @@ in my org-directory.
 
 	       ("f" "Maybe it would be fun someday..." entry
 		(file+headline "just-for-fun.org" "Inbox")
-		"* %U %?" :prepend t)
+		"* MAYBE %U %?" :prepend t)
 
 	       ;; declare root node j
 	       ("j" "Journal")
@@ -528,6 +583,13 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+RESULTS:
 : ((lambda . 955) (**2 . 178) (sum . 8721) (sigma . 963) (mu . 956) (theta . 952))
+** bookmarks
+#+begin_src emacs-lisp
+(global-set-key (kbd "H-<return>") #'bookmark-jump)
+#+end_src
+
+#+RESULTS:
+: bookmark-jump
 
 * lsp
 #+begin_src emacs-lisp
@@ -694,6 +756,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
       (setq exwm-input-prefix-keys
 	    '(?\C-x
 	      ?\s-j
+	      ?\s-Cj/
 	      ?\s-k
 	      ?\s-v
 	      ?\C-u

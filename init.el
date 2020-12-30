@@ -107,16 +107,6 @@ buffer's window as well."
 
 (global-set-key (kbd "M-i") 'imenu)
 
-(use-package eyebrowse
-  :diminish eyebrowse-mode
-  :config (progn
-            (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
-            (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
-            (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
-            (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
-            (eyebrowse-mode t)
-            (setq eyebrowse-new-workspace t)))
-
 (use-package magit
   :bind (("C-c g" . magit) ("H-g" . magit))
 )
@@ -151,6 +141,36 @@ buffer's window as well."
   (setq which-key-idle-delay 0.3))
 
 (require 'org)
+
+(setq +personal-org-roam-files+ (apply (function append)
+				(mapcar
+				 (lambda (directory)
+					(directory-files-recursively directory org-agenda-file-regexp))
+				    '("~/org-roam/"))))
+
+(setq org-refile-targets
+      '((nil :maxlevel . 5)
+	(org-agenda-files :maxlevel . 5)
+	(+personal-org-roam-files+ :maxlevel . 5)
+	)
+      ;; Without this, completers like ivy/helm are only given the first level of
+      ;; each outline candidates. i.e. all the candidates under the "Tasks" heading
+      ;; are just "Tasks/". This is unhelpful. We want the full path to each refile
+      ;; target! e.g. FILE/Tasks/heading/subheading
+      org-refile-use-outline-path 'file
+      org-outline-path-complete-in-steps nil)
+
+(setq org-todo-keywords
+      '((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(s@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
+	(sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")
+	))
+
+(setq org-stuck-projects
+      ;; identify a project with TODO keywords/tags
+      ;; identify non-stuck state with TODO keywords
+      ;; identify non-stuck state with tags
+      ;; regexp match non-stuck projects
+      '("-moyu&-MAYBE" ("TODO" "IN-PROGRESS") nil ""))
 
 (setq org-export-with-toc nil)
 
@@ -242,7 +262,7 @@ buffer's window as well."
 
 	  ("f" "Maybe it would be fun someday..." entry
 	   (file+headline "just-for-fun.org" "Inbox")
-	   "* %U %?" :prepend t)
+	   "* MAYBE %U %?" :prepend t)
 
 	  ;; declare root node j
 	  ("j" "Journal")
@@ -298,6 +318,8 @@ buffer's window as well."
        '("_1" . ?₁)
        '("_2" . ?₂)
        ))
+
+(global-set-key (kbd "H-<return>") #'bookmark-jump)
 
 (use-package company
   :config
@@ -358,6 +380,7 @@ buffer's window as well."
     (setq exwm-input-prefix-keys
 	  '(?\C-x
 	    ?\s-j
+	    ?\s-Cj/
 	    ?\s-k
 	    ?\s-v
 	    ?\C-u
