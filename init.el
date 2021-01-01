@@ -150,7 +150,12 @@ buffer's window as well."
   :config
   (setq which-key-idle-delay 0.3))
 
-(require 'org)
+(use-package org
+  :config
+  (progn
+    (setq org-ellipsis " ▾"
+	  org-hide-emphasis-markers t)
+    (org-indent-mode)))
 
 (setq +personal-org-roam-files+ (apply (function append)
 				(mapcar
@@ -436,15 +441,16 @@ buffer's window as well."
 (display-time-mode)
 (display-battery-mode)
 
+;; After C-q, send key to the window 
+(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+(exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+
 (require 'exwm-systemtray)
 (exwm-systemtray-enable)
 
 (require 'exwm-randr)
 (setq exwm-randr-workspace-monitor-plist '(9 "DP-1-2" 9 "DP-2" 9 "DP-1-1" 9 "DP-1"))
 (exwm-randr-enable)
-
-(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-(exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
 
 (defun efs/run-in-background (command)
   (let ((command-parts (split-string command "[ ]+")))

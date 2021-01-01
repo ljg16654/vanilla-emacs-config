@@ -307,8 +307,16 @@ enhance ivy with ivy-rich:
 
 * org
 #+begin_src emacs-lisp
-(require 'org)
+  (use-package org
+    :config
+    (progn
+      (setq org-ellipsis " ▾"
+	    org-hide-emphasis-markers t)
+      (org-indent-mode)))
 #+end_src
+
+#+RESULTS:
+: t
 ** refile
 #+begin_src emacs-lisp
   (setq +personal-org-roam-files+ (apply (function append)
@@ -762,7 +770,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+RESULTS:
 * experimental 
 ** exwm
-*** the minimum setup
+*** basic
 [[https://github.com/ch11ng/exwm/wiki][exwm wiki]]
 #+begin_src emacs-lisp 
   (use-package exwm
@@ -817,6 +825,11 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
   (display-time-mode)
   (display-battery-mode)
+
+  ;; After C-q, send key to the window 
+  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+  (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+
 #+end_src
 
 #+RESULTS:
@@ -829,7 +842,9 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 #+RESULTS:
 | exwm-systemtray--exit |
-also, make sure xrandr update refresh EXWM frames
+*** workspaces and monitors
+Make sure xrandr update refresh EXWM frames.
+Assign workspaces to monitors.
 #+begin_src emacs-lisp
   (require 'exwm-randr)
   (setq exwm-randr-workspace-monitor-plist '(9 "DP-1-2" 9 "DP-2" 9 "DP-1-1" 9 "DP-1"))
@@ -839,14 +854,6 @@ also, make sure xrandr update refresh EXWM frames
 #+RESULTS:
 | exwm-randr--exit | exwm-systemtray--exit |
 
-After =C-q=, send key to the window 
-#+begin_src emacs-lisp
-(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-(exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-#+end_src
-
-#+RESULTS:
-** autorandr
 #+begin_src emacs-lisp
   (defun efs/run-in-background (command)
     (let ((command-parts (split-string command "[ ]+")))
