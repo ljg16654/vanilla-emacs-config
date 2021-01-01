@@ -154,8 +154,10 @@ buffer's window as well."
   :config
   (progn
     (setq org-ellipsis " ▾"
-	  org-hide-emphasis-markers t)
-    (org-indent-mode)))
+          org-hide-emphasis-markers t)
+    (font-lock-add-keywords 'org-mode
+                            '(("^ *\\([-]\\) "
+                               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
 
 (setq +personal-org-roam-files+ (apply (function append)
 				(mapcar
@@ -177,7 +179,7 @@ buffer's window as well."
 
 (setq org-todo-keywords
       '((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(s@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
-	(sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f)")
+	(sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
 	))
 
 (setq org-stuck-projects
@@ -185,7 +187,7 @@ buffer's window as well."
       ;; identify non-stuck state with TODO keywords
       ;; identify non-stuck state with tags
       ;; regexp match non-stuck projects
-      '("-moyu&-MAYBE" ("TODO" "IN-PROGRESS") nil ""))
+      '("-moyu&-MAYBE" ("TODO" "IN-PROGRESS" "BUG" "KNOWNCAUSE") nil ""))
 
 (setq org-export-with-toc nil)
 
@@ -214,6 +216,8 @@ buffer's window as well."
   :ensure t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(add-hook 'org-mode-hook #'org-indent-mode)
 
 (use-package auctex
   :defer t)
@@ -259,47 +263,51 @@ buffer's window as well."
 
 ;;;; org-journal
 (global-set-key (kbd "C-c j") #'(lambda ()
-				  (interactive)
-				  (find-file
-				   (concat org-directory "/journal.org"))))
+                                  (interactive)
+                                  (find-file
+                                   (concat org-directory "/journal.org"))))
 
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "H-c") #'org-capture)
 
 (setq org-capture-templates
-	'(("t" "Personal todo" entry
-	   (file+headline "todo.org" "Inbox")
-	   "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+        '(("t" "Personal todo" entry
+           (file+headline "todo.org" "Inbox")
+           "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
 
-	  ("n" "Personal notes" entry
-	   (file+headline "notes.org" "Inbox")
-	   "* %U %?\n%i\n%a" :prepend t)
+          ("n" "Personal notes" entry
+           (file+headline "notes.org" "Inbox")
+           "* %U %?\n%i\n%a" :prepend t)
 
-	  ("f" "Maybe it would be fun someday..." entry
-	   (file+headline "just-for-fun.org" "Inbox")
-	   "* MAYBE %U %?" :prepend t)
+          ("f" "Maybe it would be fun someday..." entry
+           (file+headline "just-for-fun.org" "Inbox")
+           "* MAYBE %U %?" :prepend t)
 
-	  ;; declare root node j
-	  ("j" "Journal")
+          ;; declare root node j
+          ("j" "Journal")
 
-	  ("ja" "Journal arbitrary recording" entry
-	   (file+olp+datetree "journal.org")
-	   "* %?\n%U\n%i" :tree-type week)
+          ("ja" "Journal arbitrary recording" entry
+           (file+olp+datetree "journal.org")
+           "* %?\n%U\n%i" :tree-type week)
 
-	  ("jc" "journal clock into something new" entry
-	   (file+olp+datetree "journal.org")
-	   "* %?" :clock-in t :clock-keep t :tree-type week)
+          ("jc" "journal clock into something new" entry
+           (file+olp+datetree "journal.org")
+           "* %?" :clock-in t :clock-keep t :tree-type week)
 
-	  ("jn" "journal edit the task currently clocked in" plain
-	   (clock) "%?" :unnarrowed t)
+          ("jn" "journal edit the task currently clocked in" plain
+           (clock) "%?" :unnarrowed t)
 
-	  ("r" "read later" checkitem
-	   (file+headline "read-later.org" "Inbox")
-	   "[ ] %? ")
+          ("r" "read later" checkitem
+           (file+headline "read-later.org" "Inbox")
+           "[ ] %? ")
 
-	  ("v" "vocabularies" entry
-	   (file+headline "voc.org" "Inbox")
-	   "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n\n")))
+          ("b" "bug" entry
+           (file+headline "bug.org" "Inbox")
+           "* BUG %^{header}\n%U\n#+begin_src\n\n%i\n\n#+end_src\n%?")
+
+          ("v" "vocabularies" entry
+           (file+headline "voc.org" "Inbox")
+           "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n\n")))
 
 (setq org-agenda-files (apply (function append)
 			        (mapcar
@@ -377,6 +385,14 @@ buffer's window as well."
 
 (global-set-key (kbd "s-e") #'eshell)
 
+(setenv "PATH"
+  (concat
+   ;; manually added
+   "/usr/local/cbc/bin" ";"
+   (getenv "PATH") ; inherited from OS
+  )
+)
+
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
@@ -387,6 +403,8 @@ buffer's window as well."
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 
 (use-package racket-mode)
+
+(use-package cmake-mode)
 
 (use-package exwm
   :config
