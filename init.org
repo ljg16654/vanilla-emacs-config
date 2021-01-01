@@ -311,8 +311,11 @@ enhance ivy with ivy-rich:
     :config
     (progn
       (setq org-ellipsis " ▾"
-	    org-hide-emphasis-markers t)
-      (org-indent-mode)))
+            org-hide-emphasis-markers t)
+      (font-lock-add-keywords 'org-mode
+                              '(("^ *\\([-]\\) "
+                                 (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+      (org-indent-mode +1)))
 #+end_src
 
 #+RESULTS:
