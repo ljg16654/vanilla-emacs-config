@@ -768,6 +768,13 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+end_src
 
 #+RESULTS:
+** cmake
+#+begin_src emacs-lisp
+  (use-package cmake-mode)
+#+end_src
+
+#+RESULTS:
+
 * experimental 
 ** exwm
 *** basic
