@@ -49,19 +49,24 @@
   :defer t)
 (load-theme 'spacemacs-light nil)
 
+;; between buffers
 (global-set-key (kbd "s-o") #'ibuffer)
-(global-set-key (kbd "H-a") #'counsel-switch-buffer)
+(global-set-key (kbd "H-a") #'counsel-ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
+
+;; inside a tab
 (setq aw-keys
       (list ?a ?s ?d ?f ?j ?k ?l))
 (global-set-key (kbd "s-j") #'other-window)
 (global-set-key (kbd "s-k") #'(lambda () (interactive)
-		(other-window -1)))
-;; (global-set-key (kbd "s-k") #'(lambda () (interactive)
-;; 				(kill-buffer)))
+                                (other-window -1)))
 (global-set-key (kbd "H-s") #'delete-other-windows)
-(global-unset-key (kbd "C-x C-b"))
-(global-set-key (kbd "C-x C-b") #'ibuffer)
+
+;; between tabs
+(global-set-key (kbd "s-n") #'tab-bar-new-tab)
+(global-set-key (kbd "s-N") #'tab-bar-rename-tab)
+(global-set-key (kbd "s-,") #'tab-bar-switch-to-prev-tab)
+(global-set-key (kbd "s-.") #'tab-bar-switch-to-next-tab)
 
 (defun prot-simple-kill-buffer-current (&optional arg)
   "Kill current buffer or abort recursion when in minibuffer.
@@ -284,7 +289,7 @@ buffer's window as well."
 
 	  ("v" "vocabularies" entry
 	   (file+headline "voc.org" "Inbox")
-	   "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic (and reversed card)\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n\n")))
+	   "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n\n")))
 
 (setq org-agenda-files (apply (function append)
 			        (mapcar
@@ -380,7 +385,7 @@ buffer's window as well."
     (setq exwm-input-prefix-keys
 	  '(?\C-x
 	    ?\s-j
-	    ?\s-Cj/
+	    ?\s-C
 	    ?\s-k
 	    ?\s-v
 	    ?\C-u
