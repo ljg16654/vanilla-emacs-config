@@ -50,23 +50,28 @@
 (load-theme 'spacemacs-light nil)
 
 ;; between buffers
+
 (global-set-key (kbd "s-o") #'ibuffer)
 (global-set-key (kbd "H-a") #'counsel-ibuffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
 
 ;; inside a tab
+
 (setq aw-keys
       (list ?a ?s ?d ?f ?j ?k ?l))
 (global-set-key (kbd "s-j") #'other-window)
 (global-set-key (kbd "s-k") #'(lambda () (interactive)
-                                (other-window -1)))
+				(other-window -1)))
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
 ;; between tabs
+
 (global-set-key (kbd "s-n") #'tab-bar-new-tab)
 (global-set-key (kbd "s-N") #'tab-bar-rename-tab)
 (global-set-key (kbd "s-,") #'tab-bar-switch-to-prev-tab)
 (global-set-key (kbd "s-.") #'tab-bar-switch-to-next-tab)
+;; new tab starts with scratch buffer 
+(setq tab-bar-new-tab-choice "*scratch*")
 
 (defun prot-simple-kill-buffer-current (&optional arg)
   "Kill current buffer or abort recursion when in minibuffer.
@@ -388,6 +393,8 @@ buffer's window as well."
 	    ?\s-C
 	    ?\s-k
 	    ?\s-v
+	    ?\s-,
+	    ?\s-.
 	    ?\C-u
 	    ?\C-h
 	    ?\M-x
