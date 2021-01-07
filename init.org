@@ -606,6 +606,26 @@ in my org-directory.
 
 #+RESULTS:
 : org-agenda
+
+** completion 
+
+#+begin_src emacs-lisp
+
+  (add-to-list 'org-modules 'org-tempo)
+  (setq org-structure-template-alist
+    '(("a" . "export ascii\n")
+      ("c" . "center\n")
+      ("C" . "comment\n")
+      ("e" . "src elisp\n")
+      ("py" . "src python\n")
+      ("E" . "export")
+      ("h" . "export html\n")
+      ("l" . "export latex\n")
+      ("q" . "quote\n")
+      ("s" . "src")
+      ("v" . "verse\n")))
+#+end_src
+
 ** misc
 *** TODO shortkey conflict 
 shortkey of org-mark-ring-goto conflicts with yasnippet.
