@@ -85,7 +85,10 @@ buffer's window as well."
              (not (one-window-p)))
     (delete-window)))
 
-(global-set-key (kbd "s-C") #'prot-simple-kill-buffer-current)
+(global-set-key (kbd "s-c") #'prot-simple-kill-buffer-current)
+(global-set-key (kbd "s-C") #'(lambda ()
+                                (interactive)
+                                (prot-simple-kill-buffer-current 1)))
 
 (use-package dired
   :ensure nil
@@ -318,6 +321,21 @@ buffer's window as well."
 (add-to-list 'org-modules 'org-habit)
 (global-set-key (kbd "s-a") #'org-agenda)
 
+(add-to-list 'org-modules 'org-tempo)
+(setq org-structure-template-alist
+  '(("a" . "export ascii\n")
+    ("c" . "center\n")
+    ("C" . "comment\n")
+    ("e" . "src elisp\n")
+    ("py" . "src python\n")
+    ("sh" . "src shell")
+    ("E" . "export")
+    ("h" . "export html\n")
+    ("l" . "export latex\n")
+    ("q" . "quote\n")
+    ("s" . "src")
+    ("v" . "verse\n")))
+
 (setq browse-url-browser-function 'browse-url-firefox)
 
 (use-package command-log-mode)
@@ -371,8 +389,8 @@ buffer's window as well."
     (emms-all)
     (emms-default-players)
     (setq emms-source-file-default-directory "~/Music")
-    (append emms-player-mplayer-parameters
-	    (list "-novideo"))))
+    (setq emms-player-mplayer-parameters
+	    '("-slave" "-quiet" "-really-quiet" "-novideo"))))
 
 (global-set-key (kbd "C-c m m") #'emms)
 (global-set-key (kbd "C-c m p") #'emms-add-playlist)
@@ -383,7 +401,7 @@ buffer's window as well."
 (use-package vterm
   :bind (("s-v" . vterm)))
 
-(global-set-key (kbd "s-e") #'eshell)
+(global-set-key (kbd "s-E") #'eshell)
 
 (setenv "PATH"
   (concat
@@ -392,6 +410,31 @@ buffer's window as well."
    (getenv "PATH") ; inherited from OS
   )
 )
+
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the
+current buffer's file. The eshell is renamed to match that
+directory to make multiple eshell windows easier."
+  (interactive)
+  (let* ((parent (if (buffer-file-name)
+                     (file-name-directory (buffer-file-name))
+                   default-directory))
+         (height (/ (window-total-height) 3))
+         (name   (car (last (split-string parent "/" t)))))
+    (split-window-vertically (- height))
+    (other-window 1)
+    (eshell "new")
+    (rename-buffer (concat "*eshell: " name "*"))
+
+    (insert (concat "ls"))
+    (eshell-send-input)))
+
+(global-set-key (kbd "s-e") 'eshell-here)
+
+(defun eshell/x ()
+  (insert "exit")
+  (eshell-send-input)
+  (delete-window))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -403,6 +446,7 @@ buffer's window as well."
 
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+(add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
 
 (use-package racket-mode)
 
@@ -420,6 +464,8 @@ buffer's window as well."
 	    ?\s-v
 	    ?\s-\,
 	    ?\s-\.
+      ?\s-n
+      ?\s-e
 	    ?\C-u
 	    ?\C-h
 	    ?\M-x

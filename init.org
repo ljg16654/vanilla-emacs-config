@@ -132,24 +132,27 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 ** kill buffer
 #+begin_src emacs-lisp
 
-(defun prot-simple-kill-buffer-current (&optional arg)
-  "Kill current buffer or abort recursion when in minibuffer.
-With optional prefix ARG (\\[universal-argument]) delete the
-buffer's window as well."
-  (interactive "P")
-  (if (minibufferp)
-      (abort-recursive-edit)
-    (kill-buffer (current-buffer)))
-  (when (and arg
-             (not (one-window-p)))
-    (delete-window)))
+  (defun prot-simple-kill-buffer-current (&optional arg)
+    "Kill current buffer or abort recursion when in minibuffer.
+  With optional prefix ARG (\\[universal-argument]) delete the
+  buffer's window as well."
+    (interactive "P")
+    (if (minibufferp)
+        (abort-recursive-edit)
+      (kill-buffer (current-buffer)))
+    (when (and arg
+               (not (one-window-p)))
+      (delete-window)))
 
-(global-set-key (kbd "s-C") #'prot-simple-kill-buffer-current)
+  (global-set-key (kbd "s-c") #'prot-simple-kill-buffer-current)
+  (global-set-key (kbd "s-C") #'(lambda ()
+                                  (interactive)
+                                  (prot-simple-kill-buffer-current 1)))
 
 #+end_src
 
 #+RESULTS:
-: prot-simple-kill-buffer-current
+| lambda | nil | (interactive) | (prot-simple-kill-buffer-current 1) |
 
 ** dired
 #+begin_src emacs-lisp
@@ -618,6 +621,7 @@ in my org-directory.
       ("C" . "comment\n")
       ("e" . "src elisp\n")
       ("py" . "src python\n")
+      ("sh" . "src shell")
       ("E" . "export")
       ("h" . "export html\n")
       ("l" . "export latex\n")
@@ -625,6 +629,20 @@ in my org-directory.
       ("s" . "src")
       ("v" . "verse\n")))
 #+end_src
+
+#+RESULTS:
+#+begin_example
+((a . export ascii
+) (c . center
+) (C . comment
+) (e . src elisp
+) (py . src python
+) (sh . src shell) (E . export) (h . export html
+) (l . export latex
+) (q . quote
+) (s . src) (v . verse
+))
+#+end_example
 
 ** misc
 *** TODO shortkey conflict 
@@ -710,8 +728,8 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
       (emms-all)
       (emms-default-players)
       (setq emms-source-file-default-directory "~/Music")
-      (append emms-player-mplayer-parameters
-	      (list "-novideo"))))
+      (setq emms-player-mplayer-parameters
+	      '("-slave" "-quiet" "-really-quiet" "-novideo"))))
 
   (global-set-key (kbd "C-c m m") #'emms)
   (global-set-key (kbd "C-c m p") #'emms-add-playlist)
@@ -742,7 +760,7 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+begin_src emacs-lisp
 
-  (global-set-key (kbd "s-e") #'eshell)
+  (global-set-key (kbd "s-E") #'eshell)
 
   (setenv "PATH"
     (concat
@@ -756,6 +774,39 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+RESULTS:
 : /usr/local/cbc/bin;/usr/local/cbc/bin;/home/jigang/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+[[http://www.howardism.org/Technical/Emacs/eshell-fun.html][eshell pop up window]]
+
+#+begin_src emacs-lisp
+  (defun eshell-here ()
+    "Opens up a new shell in the directory associated with the
+  current buffer's file. The eshell is renamed to match that
+  directory to make multiple eshell windows easier."
+    (interactive)
+    (let* ((parent (if (buffer-file-name)
+                       (file-name-directory (buffer-file-name))
+                     default-directory))
+           (height (/ (window-total-height) 3))
+           (name   (car (last (split-string parent "/" t)))))
+      (split-window-vertically (- height))
+      (other-window 1)
+      (eshell "new")
+      (rename-buffer (concat "*eshell: " name "*"))
+
+      (insert (concat "ls"))
+      (eshell-send-input)))
+
+  (global-set-key (kbd "s-e") 'eshell-here)
+
+  (defun eshell/x ()
+    (insert "exit")
+    (eshell-send-input)
+    (delete-window))
+#+end_src
+
+#+RESULTS:
+: eshell/x
+
 
 * modeline config
 [[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
@@ -834,6 +885,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+begin_src emacs-lisp
   (use-package lispy)
   (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+  (add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
 #+end_src
 
 #+RESULTS:
@@ -869,6 +921,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 	      ?\s-\,
 	      ?\s-\.
         ?\s-n
+        ?\s-e
 	      ?\C-u
 	      ?\C-h
 	      ?\M-x
@@ -925,6 +978,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 #+RESULTS:
 | exwm-systemtray--exit |
+|                       |
 *** workspaces and monitors
 Make sure xrandr update refresh EXWM frames.
 Assign workspaces to monitors.
