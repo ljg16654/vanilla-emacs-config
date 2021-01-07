@@ -15,7 +15,7 @@
    '(:foreground default :background default :scale 3.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
 		 ("begin" "$1" "$" "$$" "\\(" "\\[")))
  '(package-selected-packages
-   '(cmake-mode anki-editor ivy-rich doom-modeline exwm racket-mode telephone-line diminish org-roam-server lispy which-key yasnippet vterm pdf-tools powerline dired color-theme-sanityinc-tomorrow spacemacs-theme anti-zenburn-theme eyebrowse flycheck lsp-ui company company-mode lsp-python-ms lsp-mode projectile org-bullets emms olivetti olivette avy counsel ivy magit org-roam cdlatex use-package command-log-mode))
+   '(prescient ivy-prescient cmake-mode anki-editor ivy-rich doom-modeline exwm racket-mode telephone-line diminish org-roam-server lispy which-key yasnippet vterm pdf-tools powerline dired color-theme-sanityinc-tomorrow spacemacs-theme anti-zenburn-theme eyebrowse flycheck lsp-ui company company-mode lsp-python-ms lsp-mode projectile org-bullets emms olivetti olivette avy counsel ivy magit org-roam cdlatex use-package command-log-mode))
  '(pdf-view-midnight-colors '("#232333" . "#c7c7c7")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

@@ -47,12 +47,12 @@
 (use-package anti-zenburn-theme)
 (use-package spacemacs-theme
   :defer t)
-(load-theme 'spacemacs-light nil)
+(load-theme 'modus-vivendi nil)
 
 ;; between buffers
 
 (global-set-key (kbd "s-o") #'ibuffer)
-(global-set-key (kbd "H-a") #'counsel-ibuffer)
+(global-set-key (kbd "H-a") #'counsel-switch-buffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
 
 ;; inside a tab
@@ -179,7 +179,7 @@ buffer's window as well."
 
 (setq org-todo-keywords
       '((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(s@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
-	(sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
+	(sequence "REPORT(r)" "BUG(b/@)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
 	))
 
 (setq org-stuck-projects
@@ -399,6 +399,8 @@ buffer's window as well."
   (progn
     (setq doom-modeline-height 23)))
 
+(global-set-key (kbd "H-r") #'compile)
+
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 
@@ -416,8 +418,8 @@ buffer's window as well."
 	    ?\s-C
 	    ?\s-k
 	    ?\s-v
-	    ?\s-,
-	    ?\s-.
+	    ?\s-\,
+	    ?\s-\.
 	    ?\C-u
 	    ?\C-h
 	    ?\M-x

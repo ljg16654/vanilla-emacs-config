@@ -92,7 +92,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
   (use-package anti-zenburn-theme)
   (use-package spacemacs-theme
     :defer t)
-  (load-theme 'spacemacs-light nil)
+  (load-theme 'modus-vivendi nil)
 #+end_src
 * window and buffer
 ** buffer switch
@@ -102,7 +102,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
   ;; between buffers
 
   (global-set-key (kbd "s-o") #'ibuffer)
-  (global-set-key (kbd "H-a") #'counsel-ibuffer)
+  (global-set-key (kbd "H-a") #'counsel-switch-buffer)
   (global-set-key (kbd "s-O") #'previous-buffer)
 
   ;; inside a tab
@@ -257,8 +257,11 @@ tangling is currently disabled.
 : projectile-command-map
 
 * completion
+
 ** ivy, swiper and counsel
+
 #+begin_src emacs-lisp
+
 (use-package ivy
   :config
   (setq ivy-use-virtual-buffers t
@@ -270,7 +273,25 @@ tangling is currently disabled.
 
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+
 #+end_src
+
+** prescient.el
+
+#+begin_src emacs-lisp :tangle nil
+
+  (use-package prescient)
+  (use-package ivy-prescient
+    :after counsel
+    :config
+    (ivy-prescient-mode 1)
+    (prescient-persist-mode 1))
+
+
+#+end_src
+
+#+RESULTS:
+: t
 
 ** yasnippet
 The snippets are currently stored in DOOMDIR and I may move them to somewhere else later.
@@ -350,13 +371,13 @@ Track state changes.
 #+begin_src emacs-lisp
   (setq org-todo-keywords
 	'((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(s@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
-	  (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
+	  (sequence "REPORT(r)" "BUG(b/@)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
 	  ))
 #+end_src
 
 #+RESULTS:
-| sequence | MAYBE(m@) | TODO(t) | IN-PROGRESS(i@) | STUCK(s@/@) |   |          | DONE(d@) | CANCELLED(c@) |
-| sequence | REPORT(r) | BUG(b)  | KNOWNCAUSE(k@)  |             |   | FIXED(f) |          |               |
+| sequence | MAYBE(m@) | TODO(t)  | IN-PROGRESS(i@) | STUCK(s@/@) |   |          | DONE(d@) | CANCELLED(c@) |
+| sequence | REPORT(r) | BUG(b/@) | KNOWNCAUSE(k@)  |             |   | FIXED(f) |          |               |
 #+begin_src emacs-lisp
   (setq org-stuck-projects
 	;; identify a project with TODO keywords/tags
@@ -422,7 +443,6 @@ the default settings calls python2.7).
 
 import sys
 print(sys.version)
-
 #+end_src
 
 #+RESULTS:
@@ -785,6 +805,11 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 : t
 
 * languages
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "H-r") #'compile)
+#+end_src
+
 ** lisp-general
 #+begin_src emacs-lisp
   (use-package lispy)
@@ -821,8 +846,9 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 	      ?\s-C
 	      ?\s-k
 	      ?\s-v
-	      ?\s-,
-	      ?\s-.
+	      ?\s-\,
+	      ?\s-\.
+        ?\s-n
 	      ?\C-u
 	      ?\C-h
 	      ?\M-x
@@ -871,7 +897,6 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+end_src
 
 #+RESULTS:
-: t
 
 #+begin_src emacs-lisp
 (require 'exwm-systemtray)
