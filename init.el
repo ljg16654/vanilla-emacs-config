@@ -105,10 +105,10 @@ buffer's window as well."
 	 (dired-mode-hook . hl-line-mode)))
 
 (global-set-key (kbd "C-c b r") #'rename-buffer)
-(global-set-key (kbd "H-b") #'rename-buffer)
 
 (use-package avy
-  :bind (("M-g g" . avy-goto-line)))
+  :bind (("M-g g" . avy-goto-line)
+         ("H-d" . avy-goto-char-2)))
 
 (defun langou/goto-config ()
   "go to personal configuration of emacs"
@@ -149,7 +149,7 @@ buffer's window as well."
     (yas-global-mode)))
 
 (use-package which-key
-  :init (which-key-mode)
+  ;; :init (which-key-mode)
   :config
   (setq which-key-idle-delay 0.3))
 
@@ -360,7 +360,7 @@ buffer's window as well."
        '("_2" . ?₂)
        ))
 
-(global-set-key (kbd "H-<return>") #'bookmark-jump)
+(global-set-key (kbd "H-b") #'bookmark-jump)
 
 (use-package company
   :config
@@ -460,6 +460,7 @@ directory to make multiple eshell windows easier."
 	  '(?\C-x
 	    ?\s-j
 	    ?\s-C
+      ?\s-c
 	    ?\s-k
 	    ?\s-v
 	    ?\s-\,

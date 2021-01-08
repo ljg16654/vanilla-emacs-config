@@ -175,8 +175,9 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 | hl-line-mode | dired-hide-details-mode |
 ** naming
 #+begin_src emacs-lisp
+
 (global-set-key (kbd "C-c b r") #'rename-buffer)
-(global-set-key (kbd "H-b") #'rename-buffer)
+
 #+end_src
 
 #+RESULTS:
@@ -186,16 +187,18 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 In buffer or across buffers.
 ** avy and frequently visited files
 #+begin_src emacs-lisp
-(use-package avy
-  :bind (("M-g g" . avy-goto-line)))
 
-(defun langou/goto-config ()
-  "go to personal configuration of emacs"
-  (interactive)
-  (find-file "~/vanilla/init.org"))
+  (use-package avy
+    :bind (("M-g g" . avy-goto-line)
+           ("H-d" . avy-goto-char-2)))
 
-(global-set-key (kbd "C-c f p") #'langou/goto-config)
-(global-set-key (kbd "H-f p") #'langou/goto-config)
+  (defun langou/goto-config ()
+    "go to personal configuration of emacs"
+    (interactive)
+    (find-file "~/vanilla/init.org"))
+
+  (global-set-key (kbd "C-c f p") #'langou/goto-config)
+  (global-set-key (kbd "H-f p") #'langou/goto-config)
 #+end_src
 
 #+RESULTS:
@@ -311,7 +314,7 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
 ** which key
 #+begin_src emacs-lisp
   (use-package which-key
-    :init (which-key-mode)
+    ;; :init (which-key-mode)
     :config
     (setq which-key-idle-delay 0.3))
 #+end_src
@@ -685,9 +688,11 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+RESULTS:
 : ((lambda . 955) (**2 . 178) (sum . 8721) (sigma . 963) (mu . 956) (theta . 952))
+
 ** bookmarks
 #+begin_src emacs-lisp
-(global-set-key (kbd "H-<return>") #'bookmark-jump)
+
+(global-set-key (kbd "H-b") #'bookmark-jump)
 #+end_src
 
 #+RESULTS:
@@ -916,6 +921,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 	    '(?\C-x
 	      ?\s-j
 	      ?\s-C
+        ?\s-c
 	      ?\s-k
 	      ?\s-v
 	      ?\s-\,
