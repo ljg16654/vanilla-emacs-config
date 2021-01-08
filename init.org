@@ -11,7 +11,7 @@
 (setq user-full-name "Jigang Li"
       user-mail-address "ljg16654@sjtu.edu.cn")
 #+end_src
-
+n
 #+RESULTS:
 : Ljg16654@sjtu.edu.cn
 
@@ -89,11 +89,21 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 #+RESULTS:
 : t
 #+begin_src emacs-lisp
-  (use-package anti-zenburn-theme)
+  (use-package anti-zenburn-theme
+    :defer t)
+  (use-package solarized-theme
+    :defer t
+    :config
+    (progn
+      (setq solarized-use-variable-pitch nil)))
   (use-package spacemacs-theme
     :defer t)
-  (load-theme 'modus-vivendi nil)
+  (load-theme 'solarized-dark-high-contrast nil)
 #+end_src
+
+#+RESULTS:
+: t
+
 * window and buffer
 ** buffer switch
 
@@ -102,7 +112,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
   ;; between buffers
 
   (global-set-key (kbd "s-o") #'ibuffer)
-  (global-set-key (kbd "H-a") #'counsel-switch-buffer)
+  (global-set-key (kbd "M-j") #'counsel-switch-buffer)
   (global-set-key (kbd "s-O") #'previous-buffer)
 
   ;; inside a tab
@@ -646,6 +656,23 @@ in my org-directory.
 ) (s . src) (v . verse
 ))
 #+end_example
+** pdf
+#+begin_src emacs-lisp
+
+(use-package org-pdftools
+  :hook (org-mode . org-pdftools-setup-link))
+
+(use-package org-noter)
+
+(use-package org-noter-pdftools
+  :after org-noter
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+#+end_src
+
+#+RESULTS:
+: t
 
 ** misc
 *** TODO shortkey conflict 
@@ -697,6 +724,18 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+RESULTS:
 : bookmark-jump
+
+** dictionary
+#+begin_src elisp
+
+  (use-package define-word
+    :bind
+    (("C-c d" . define-word-at-point)
+     ("C-c D" . define-word)))
+#+end_src
+
+#+RESULTS:
+: define-word
 
 * lsp
 #+begin_src emacs-lisp
