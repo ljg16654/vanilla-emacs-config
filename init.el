@@ -72,10 +72,6 @@
                                 (other-window -1)))
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
-;; between tabs
-
-(global-set-key (kbd "s-,") #'tab-bar-switch-to-prev-tab)
-(global-set-key (kbd "s-.") #'tab-bar-switch-to-next-tab)
 ;; new tab starts with scratch buffer 
 (setq tab-bar-new-tab-choice "*scratch*")
 
@@ -504,7 +500,6 @@ directory to make multiple eshell windows easier."
     (setq exwm-input-global-keys
 	  `(([?\s-r] . exwm-reset)
 	    ([?\s-w] . exwm-workspace-switch)
-	    ([?\s-o] . ibuffer)
 	    ([?\s-\;] . (lambda (command)
 			  (interactive (list (read-shell-command "$ ")))
 			  (start-process-shell-command command nil command)))
@@ -560,6 +555,52 @@ directory to make multiple eshell windows easier."
 
 (use-package general)
 
+(use-package tab-bar
+  :init
+  (setq tab-bar-close-button-show nil)
+  (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
+  (setq tab-bar-close-tab-select 'recent)
+  (setq tab-bar-new-tab-choice t)
+  (setq tab-bar-new-tab-to 'right)
+  (setq tab-bar-position nil)
+  (setq tab-bar-show nil)
+  (setq tab-bar-tab-hints nil)
+  (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
+  :config
+  (tab-bar-mode -1)
+  (tab-bar-history-mode -1))
+
+(defun prot-tab--tab-bar-tabs ()
+  "Return a list of `tab-bar' tabs, minus the current one."
+  (mapcar (lambda (tab)
+            (alist-get 'name tab))
+          (tab-bar--tabs-recent)))
+
+(defun prot-tab-select-tab-dwim ()
+    "Do-What-I-Mean function for getting to a `tab-bar' tab.
+If no other tab exists, create one and switch to it.  If there is
+one other tab (so two in total) switch to it without further
+questions.  Else use completion to select the tab to switch to."
+    (interactive)
+    (let ((tabs (prot-tab--tab-bar-tabs)))
+      (cond ((eq tabs nil)
+             (tab-new))
+            ((eq (length tabs) 1)
+             (tab-next))
+            (t
+             (tab-bar-switch-to-tab
+              (completing-read "Select tab: " tabs nil t))))))
+
+(defun prot-tab-tab-bar-toggle ()
+  "Toggle `tab-bar' presentation."
+  (interactive)
+  (if (bound-and-true-p tab-bar-mode)
+      (progn
+        (setq tab-bar-show nil)
+        (tab-bar-mode -1))
+    (setq tab-bar-show t)
+    (tab-bar-mode 1)))
+
 (global-unset-key (kbd "C-t"))
 (defconst tab-leader "C-t")
 
@@ -570,9 +611,10 @@ directory to make multiple eshell windows easier."
 (tab-leader-def
   "n" 'tab-bar-new-tab
   "r" 'tab-bar-rename-tab
-  "k" 'tab-bar-close-tab)
+  "k" 'tab-bar-close-tab
+  "t" 'prot-tab-select-tab-dwim) 
 
-;; mode hyper leader def
+(global-set-key (kbd "s-<tab>") #'prot-tab-select-tab-dwim)
 
 (use-package define-word
   :bind
