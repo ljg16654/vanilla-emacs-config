@@ -12,6 +12,20 @@
 
 (use-package general)
 
+(global-unset-key (kbd "C-t"))
+(defconst tab-leader "C-t")
+
+(general-create-definer tab-leader-def
+  :prefix tab-leader)
+
+;; global hyper leader def
+(tab-leader-def
+  "n" 'tab-bar-new-tab
+  "r" 'tab-bar-rename-tab
+  "k" 'tab-bar-close-tab)
+
+;; mode hyper leader def
+
 (use-package define-word
   :bind
   (("C-c d" . define-word-at-point)
@@ -31,6 +45,35 @@
  '(lambda ()(interactive) (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer)))))
 ;; OPTIONAL, some users need specify extra flags forwarded to compiler
 (setq cppcm-extra-preprocss-flags-from-user '("-I/usr/src/linux/include" "-DNDEBUG"))
+
+(defun efs/exwm-update-class ()
+  (exwm-workspace-rename-buffer exwm-class-name))
+
+(defun efs/exwm-update-title ()
+  (pcase exwm-class-name
+    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
+
+;; This function isn't currently used, only serves as an example how to
+;; position a window
+(defun efs/position-window ()
+  (let* ((pos (frame-position))
+         (pos-x (car pos))
+          (pos-y (cdr pos)))
+    (exwm-floating-move (- pos-x) (- pos-y))))
+
+(defun efs/configure-window-by-class ()
+  (interactive)
+  (pcase exwm-class-name
+    ("electron-ssr" (exwm-floating-toggle-floating))))
+
+;; When window "class" updates, use it to set the buffer name
+(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+
+;; When window title updates, use it to set the buffer name
+(add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
+
+;; Configure windows as they're created
+(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
 
 (unless (executable-find "feh")
   (display-warning 'wallpaper "External command `feh' not found!"))
@@ -105,22 +148,23 @@
 
 ;; between buffers
 
-(global-set-key (kbd "s-o") #'ibuffer)
-(global-set-key (kbd "s-O") #'previous-buffer)
+(global-set-key (kbd "s-i") #'ibuffer)
+(global-set-key (kbd "s-o") #'switch-to-buffer)
+(global-set-key (kbd "s-N") #'previous-buffer)
+(global-set-key (kbd "s-n") #'next-buffer)
 
 ;; inside a tab
 
 (setq aw-keys
       (list ?a ?s ?d ?f ?j ?k ?l))
+
 (global-set-key (kbd "s-j") #'other-window)
 (global-set-key (kbd "s-k") #'(lambda () (interactive)
-				(other-window -1)))
+                                (other-window -1)))
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
 ;; between tabs
 
-(global-set-key (kbd "s-n") #'tab-bar-new-tab)
-(global-set-key (kbd "s-N") #'tab-bar-rename-tab)
 (global-set-key (kbd "s-,") #'tab-bar-switch-to-prev-tab)
 (global-set-key (kbd "s-.") #'tab-bar-switch-to-next-tab)
 ;; new tab starts with scratch buffer 
@@ -530,13 +574,13 @@ directory to make multiple eshell windows easier."
 	  '(?\C-x
 	    ?\s-j
 	    ?\s-C
-      ?\s-c
+        ?\s-c
 	    ?\s-k
 	    ?\s-v
 	    ?\s-\,
 	    ?\s-\.
-      ?\s-n
-      ?\s-e
+        ?\s-n
+        ?\s-e
 	    ?\C-u
 	    ?\C-h
 	    ?\M-x

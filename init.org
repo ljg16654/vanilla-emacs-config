@@ -66,6 +66,7 @@ n
 *** copy filename 
 From Doom Emacs. Naming is altered to be consistent with Emacs terms
 (yank -> save-to-king-ring).
+
 #+begin_src emacs-lisp
 (defun +default/save-to-king-ring-buffer-filename ()
   "Copy the current buffer's path to the kill ring."
@@ -150,6 +151,26 @@ and home row keys, should be wrapped with =<= and =>=.
 
 #+RESULTS:
 
+** hyper as prefix
+
+#+begin_src elisp
+
+  (global-unset-key (kbd "C-t"))
+  (defconst tab-leader "C-t")
+
+  (general-create-definer tab-leader-def
+    :prefix tab-leader)
+
+  ;; global hyper leader def
+  (tab-leader-def
+    "n" 'tab-bar-new-tab
+    "r" 'tab-bar-rename-tab
+    "k" 'tab-bar-close-tab)
+
+  ;; mode hyper leader def
+#+end_src
+
+#+RESULTS:
 
 * window and buffer
 ** buffer switch
@@ -158,22 +179,23 @@ and home row keys, should be wrapped with =<= and =>=.
 
   ;; between buffers
 
-  (global-set-key (kbd "s-o") #'ibuffer)
-  (global-set-key (kbd "s-O") #'previous-buffer)
+  (global-set-key (kbd "s-i") #'ibuffer)
+  (global-set-key (kbd "s-o") #'switch-to-buffer)
+  (global-set-key (kbd "s-N") #'previous-buffer)
+  (global-set-key (kbd "s-n") #'next-buffer)
 
   ;; inside a tab
 
   (setq aw-keys
-	(list ?a ?s ?d ?f ?j ?k ?l))
+        (list ?a ?s ?d ?f ?j ?k ?l))
+
   (global-set-key (kbd "s-j") #'other-window)
   (global-set-key (kbd "s-k") #'(lambda () (interactive)
-				  (other-window -1)))
+                                  (other-window -1)))
   (global-set-key (kbd "H-s") #'delete-other-windows)
 
   ;; between tabs
 
-  (global-set-key (kbd "s-n") #'tab-bar-new-tab)
-  (global-set-key (kbd "s-N") #'tab-bar-rename-tab)
   (global-set-key (kbd "s-,") #'tab-bar-switch-to-prev-tab)
   (global-set-key (kbd "s-.") #'tab-bar-switch-to-next-tab)
   ;; new tab starts with scratch buffer 
@@ -1042,9 +1064,9 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+RESULTS:
 | -I/usr/src/linux/include | -DNDEBUG |
 
-* experimental 
-** exwm
-*** basic
+
+* exwm
+** basic
 [[https://github.com/ch11ng/exwm/wiki][exwm wiki]]
 #+begin_src emacs-lisp 
   (use-package exwm
@@ -1055,13 +1077,13 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 	    '(?\C-x
 	      ?\s-j
 	      ?\s-C
-        ?\s-c
+          ?\s-c
 	      ?\s-k
 	      ?\s-v
 	      ?\s-\,
 	      ?\s-\.
-        ?\s-n
-        ?\s-e
+          ?\s-n
+          ?\s-e
 	      ?\C-u
 	      ?\C-h
 	      ?\M-x
@@ -1119,7 +1141,47 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+RESULTS:
 | exwm-systemtray--exit |
 |                       |
-*** workspaces and monitors
+
+** buffer naming
+
+#+begin_src elisp
+
+  (defun efs/exwm-update-class ()
+    (exwm-workspace-rename-buffer exwm-class-name))
+
+  (defun efs/exwm-update-title ()
+    (pcase exwm-class-name
+      ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
+
+  ;; This function isn't currently used, only serves as an example how to
+  ;; position a window
+  (defun efs/position-window ()
+    (let* ((pos (frame-position))
+           (pos-x (car pos))
+            (pos-y (cdr pos)))
+      (exwm-floating-move (- pos-x) (- pos-y))))
+
+  (defun efs/configure-window-by-class ()
+    (interactive)
+    (pcase exwm-class-name
+      ("electron-ssr" (exwm-floating-toggle-floating))))
+
+  ;; When window "class" updates, use it to set the buffer name
+  (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+
+  ;; When window title updates, use it to set the buffer name
+  (add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
+
+  ;; Configure windows as they're created
+  (add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
+
+
+#+end_src
+
+#+RESULTS:
+| efs/configure-window-by-class |
+
+** workspaces and monitors
 Make sure xrandr update refresh EXWM frames.
 Assign workspaces to monitors.
 #+begin_src emacs-lisp
@@ -1146,7 +1208,7 @@ Assign workspaces to monitors.
 
 #+end_src
 
-*** wallpaper
+** wallpaper
 #+begin_src elisp
 
   (unless (executable-find "feh")
@@ -1167,7 +1229,7 @@ Assign workspaces to monitors.
 #+RESULTS:
 | wallpaper-cycle-mode | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
 
-** anki
+* anki
 #+begin_src emacs-lisp
 (use-package anki-editor)
 #+end_src
