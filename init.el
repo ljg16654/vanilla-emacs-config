@@ -1,12 +1,53 @@
+;; Automatically tangle this file when we save it
+(defun efs/org-babel-tangle-config ()
+  (when (string-equal (file-name-directory (buffer-file-name))
+                      (expand-file-name user-emacs-directory))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+
+(use-package rg)
+
+(use-package general)
+
+(use-package define-word
+  :bind
+  (("C-c d" . define-word-at-point)
+   ("C-c D" . define-word)))
+
+(use-package cpputils-cmake)
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (if (derived-mode-p 'c-mode 'c++-mode)
+                (cppcm-reload-all)
+              )))
+;; OPTIONAL, somebody reported that they can use this package with Fortran
+(add-hook 'c90-mode-hook (lambda () (cppcm-reload-all)))
+;; OPTIONAL, avoid typing full path when starting gdb
+(global-set-key (kbd "C-c C-g")
+ '(lambda ()(interactive) (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer)))))
+;; OPTIONAL, some users need specify extra flags forwarded to compiler
+(setq cppcm-extra-preprocss-flags-from-user '("-I/usr/src/linux/include" "-DNDEBUG"))
+
+(unless (executable-find "feh")
+  (display-warning 'wallpaper "External command `feh' not found!"))
+
+;; This is an example `use-package' configuration
+;; It is not tangled into wallpaper.el
+(use-package wallpaper
+  :ensure t
+  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+         (after-init . wallpaper-cycle-mode))
+  :custom ((wallpaper-cycle-single t)
+           (wallpaper-scaling 'scale)
+           (wallpaper-cycle-interval 45)
+           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+
 (setq user-full-name "Jigang Li"
       user-mail-address "ljg16654@sjtu.edu.cn")
-
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(setq use-file-dialog nil)
-(setq use-dialog-box t)               ; only for mouse events
-(setq inhibit-splash-screen t)
 
 (setq debug-on-error t)
 ;; (toggle-frame-fullscreen) 
@@ -44,15 +85,27 @@
 
 (set-face-attribute 'default nil :font "iosevka" :height 135)
 
-(use-package anti-zenburn-theme)
+(use-package anti-zenburn-theme
+  :defer t)
+(use-package solarized-theme
+  :defer t
+  :config
+  (progn
+    (setq solarized-use-variable-pitch nil)))
 (use-package spacemacs-theme
   :defer t)
-(load-theme 'modus-vivendi nil)
+(load-theme 'sanityinc-tomorrow-night nil)
+
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(setq use-file-dialog nil)
+(setq use-dialog-box t)               ; only for mouse events
+;; (setq inhibit-splash-screen t)
 
 ;; between buffers
 
 (global-set-key (kbd "s-o") #'ibuffer)
-(global-set-key (kbd "H-a") #'counsel-switch-buffer)
 (global-set-key (kbd "s-O") #'previous-buffer)
 
 ;; inside a tab
@@ -211,6 +264,7 @@ buffer's window as well."
  (org . t)
  (latex . t)
  (haskell . t)
+ (ditaa . t)
  ))
 
 (setq org-babel-python-command "python3")
@@ -336,6 +390,17 @@ buffer's window as well."
     ("s" . "src")
     ("v" . "verse\n")))
 
+(use-package org-pdftools
+  :hook (org-mode . org-pdftools-setup-link))
+
+(use-package org-noter)
+
+(use-package org-noter-pdftools
+  :after org-noter
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
 (setq browse-url-browser-function 'browse-url-firefox)
 
 (use-package command-log-mode)
@@ -361,6 +426,11 @@ buffer's window as well."
        ))
 
 (global-set-key (kbd "H-b") #'bookmark-jump)
+
+(defun transparency (value)
+  "sets the transparency of the frame window. 0=transparent/100=opaque"
+  (interactive "ntransparency value 0 - 100 opaque:")
+  (set-frame-parameter (selected-frame) 'alpha value))
 
 (use-package company
   :config

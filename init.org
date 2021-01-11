@@ -1,11 +1,32 @@
 #+TITLE: init
 #+PROPERTY: header-args :tangle init.el
 #+startup: content
+
 * awesome configs for reference
 + james cash ::  [[file:~/repos/james-cash-dotfiles/emacs.d/eshell][file:~/repos/james-cash-dotfiles/emacs.d/eshell]]
 + prot :: [[file:~/repos/prot-dotfiles/emacs/.emacs.d/emacs-init.org]]
 + Doom Emacs
 + Emacs from scratch series :: [[file:~/repos/emacs-from-scratch/Emacs.org]]
+
+* meta
+
+#+begin_src elisp
+
+  ;; Automatically tangle this file when we save it
+  (defun efs/org-babel-tangle-config ()
+    (when (string-equal (file-name-directory (buffer-file-name))
+                        (expand-file-name user-emacs-directory))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+
+#+end_src
+
+#+RESULTS:
+| (lambda nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | org-tempo-setup | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-pdftools-setup-link | turn-on-org-cdlatex | org-indent-mode | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
 * personal info
 #+begin_src emacs-lisp
 (setq user-full-name "Jigang Li"
@@ -15,19 +36,7 @@ n
 #+RESULTS:
 : Ljg16654@sjtu.edu.cn
 
-* basic
-** remove unused UI components
-#+begin_src emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-file-dialog nil)
-  (setq use-dialog-box t)               ; only for mouse events
-  (setq inhibit-splash-screen t)
-#+end_src
-
-#+RESULTS:
-: t
+ * basic
 ** set debug on error and use-package
 #+begin_src emacs-lisp
   (setq debug-on-error t)
@@ -98,11 +107,49 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
       (setq solarized-use-variable-pitch nil)))
   (use-package spacemacs-theme
     :defer t)
-  (load-theme 'solarized-dark-high-contrast nil)
+  (load-theme 'sanityinc-tomorrow-night nil)
 #+end_src
 
 #+RESULTS:
 : t
+
+** remove unused UI components
+
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-file-dialog nil)
+  (setq use-dialog-box t)               ; only for mouse events
+  ;; (setq inhibit-splash-screen t)
+#+end_src
+
+#+RESULTS:
+: t
+
+* searching
+** rg
+#+begin_src elisp
+
+(use-package rg)
+#+end_src
+
+#+RESULTS:
+
+
+* keybinding
+
+[[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
+/Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
+and home row keys, should be wrapped with =<= and =>=.
+** general
+#+begin_src elisp
+
+  (use-package general)
+#+end_src
+
+#+RESULTS:
+
 
 * window and buffer
 ** buffer switch
@@ -112,7 +159,6 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
   ;; between buffers
 
   (global-set-key (kbd "s-o") #'ibuffer)
-  (global-set-key (kbd "M-j") #'counsel-switch-buffer)
   (global-set-key (kbd "s-O") #'previous-buffer)
 
   ;; inside a tab
@@ -439,6 +485,7 @@ Include languages:
    (org . t)
    (latex . t)
    (haskell . t)
+   (ditaa . t)
    ))
 
 #+end_src
@@ -737,6 +784,33 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 #+RESULTS:
 : define-word
 
+** transparency
+
+Interactively toggle transparency in winframe.
+#+begin_src emacs-lisp
+
+  (defun transparency (value)
+    "sets the transparency of the frame window. 0=transparent/100=opaque"
+    (interactive "ntransparency value 0 - 100 opaque:")
+    (set-frame-parameter (selected-frame) 'alpha value))
+#+end_src
+
+#+RESULTS:
+: transparency
+
+** cursor in =-nw= mode
+
+currently disabled as I'm not using evil.
+#+begin_src emacs-lisp :tangle nil
+
+  (unless (display-graphic-p)
+          (require 'evil-terminal-cursor-changer)
+          (evil-terminal-cursor-changer-activate) ; or (etcc-on)
+          )
+#+end_src
+
+#+RESULTS:
+
 * lsp
 #+begin_src emacs-lisp
   (use-package company
@@ -946,6 +1020,27 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+end_src
 
 #+RESULTS:
+** C-general
+#+begin_src elisp
+
+  (use-package cpputils-cmake)
+
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (if (derived-mode-p 'c-mode 'c++-mode)
+                  (cppcm-reload-all)
+                )))
+  ;; OPTIONAL, somebody reported that they can use this package with Fortran
+  (add-hook 'c90-mode-hook (lambda () (cppcm-reload-all)))
+  ;; OPTIONAL, avoid typing full path when starting gdb
+  (global-set-key (kbd "C-c C-g")
+   '(lambda ()(interactive) (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer)))))
+  ;; OPTIONAL, some users need specify extra flags forwarded to compiler
+  (setq cppcm-extra-preprocss-flags-from-user '("-I/usr/src/linux/include" "-DNDEBUG"))
+#+end_src
+
+#+RESULTS:
+| -I/usr/src/linux/include | -DNDEBUG |
 
 * experimental 
 ** exwm
@@ -1050,6 +1145,28 @@ Assign workspaces to monitors.
   (efs/update-displays)
 
 #+end_src
+
+*** wallpaper
+#+begin_src elisp
+
+  (unless (executable-find "feh")
+    (display-warning 'wallpaper "External command `feh' not found!"))
+
+  ;; This is an example `use-package' configuration
+  ;; It is not tangled into wallpaper.el
+  (use-package wallpaper
+    :ensure t
+    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+           (after-init . wallpaper-cycle-mode))
+    :custom ((wallpaper-cycle-single t)
+             (wallpaper-scaling 'scale)
+             (wallpaper-cycle-interval 45)
+             (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+#+end_src
+
+#+RESULTS:
+| wallpaper-cycle-mode | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
+
 ** anki
 #+begin_src emacs-lisp
 (use-package anki-editor)
