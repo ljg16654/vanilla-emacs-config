@@ -8,25 +8,6 @@
 + Doom Emacs
 + Emacs from scratch series :: [[file:~/repos/emacs-from-scratch/Emacs.org]]
 
-* meta
-
-#+begin_src elisp
-
-  ;; Automatically tangle this file when we save it
-  (defun efs/org-babel-tangle-config ()
-    (when (string-equal (file-name-directory (buffer-file-name))
-                        (expand-file-name user-emacs-directory))
-      ;; Dynamic scoping to the rescue
-      (let ((org-confirm-babel-evaluate nil))
-        (org-babel-tangle))))
-
-  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
-
-#+end_src
-
-#+RESULTS:
-| (lambda nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | org-tempo-setup | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-pdftools-setup-link | turn-on-org-cdlatex | org-indent-mode | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
-
 * personal info
 #+begin_src emacs-lisp
 (setq user-full-name "Jigang Li"
@@ -37,7 +18,7 @@ n
 : Ljg16654@sjtu.edu.cn
 
  * basic
-** set debug on error and use-package
+** set debug on error and use-packagen
 #+begin_src emacs-lisp
   (setq debug-on-error t)
   ;; (toggle-frame-fullscreen) 
@@ -61,6 +42,9 @@ n
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+end_src
+
+#+RESULTS:
+: t
 
 ** common functionallity
 *** copy filename 
@@ -136,7 +120,6 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 #+end_src
 
 #+RESULTS:
-
 
 * keybinding
 
@@ -1072,7 +1055,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   (use-package exwm
     :config
     (progn
-      (setq exwm-workspace-number 10)
+      (setq exwm-workspace-number 3)
       (setq exwm-input-prefix-keys
 	    '(?\C-x
 	      ?\s-j
@@ -1142,16 +1125,50 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 | exwm-systemtray--exit |
 |                       |
 
-** buffer naming
+** window configuring
 
 #+begin_src elisp
+
+  (defun efs/run-in-background (command)
+    (let ((command-parts (split-string command "[ ]+")))
+      (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+  (defun efs/exwm-init-hook ()
+    ;; Make workspace 1 be the one where we land at startup
+    (exwm-workspace-switch-create 0)
+
+    ;; Open eshell by default
+    ;;(eshell)
+
+    ;; NOTE: The next two are disabled because we now use Polybar!
+
+    ;; Show battery status in the mode line
+    ;;(display-battery-mode 1)
+
+    ;; Show the time and date in modeline
+    ;;(setq display-time-day-and-date t)
+    ;;(display-time-mode 1)
+    ;; Also take a look at display-time-format and format-time-string
+
+    ;; Start the Polybar panel
+    ;; (efs/start-panel)
+
+    ;; Launch apps that will run in the background
+    (efs/run-in-background "dunst")
+    (efs/run-in-background "nm-applet")
+    (efs/run-in-background "pasystray")
+    (efs/run-in-background "blueman-applet")
+    (efs/run-in-background "electron-ssr"))
 
   (defun efs/exwm-update-class ()
     (exwm-workspace-rename-buffer exwm-class-name))
 
   (defun efs/exwm-update-title ()
     (pcase exwm-class-name
-      ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
+      ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
+      ("electron-ssr" (progn
+                        (exwm-workspace-rename-buffer "electron-ssr")
+                        (exwm-workspace-move-window 2)))))
 
   ;; This function isn't currently used, only serves as an example how to
   ;; position a window
@@ -1165,6 +1182,9 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
     (interactive)
     (pcase exwm-class-name
       ("electron-ssr" (exwm-floating-toggle-floating))))
+
+  ;; When EXWM starts up, do some extra confifuration
+  (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
 
   ;; When window "class" updates, use it to set the buffer name
   (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
@@ -1186,7 +1206,7 @@ Make sure xrandr update refresh EXWM frames.
 Assign workspaces to monitors.
 #+begin_src emacs-lisp
   (require 'exwm-randr)
-  (setq exwm-randr-workspace-monitor-plist '(9 "DP-1-2" 9 "DP-2" 9 "DP-1-1" 9 "DP-1"))
+  (setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))
   (exwm-randr-enable)
 #+end_src
 
@@ -1235,3 +1255,21 @@ Assign workspaces to monitors.
 #+end_src
 
 #+RESULTS:
+* meta
+
+#+begin_src elisp
+
+  ;; Automatically tangle this file when we save it
+  (defun efs/org-babel-tangle-config ()
+    (when (string-equal (file-name-directory (buffer-file-name))
+                        (expand-file-name user-emacs-directory))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+
+#+end_src
+
+#+RESULTS:
+| (lambda nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | org-tempo-setup | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-pdftools-setup-link | turn-on-org-cdlatex | org-indent-mode | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |

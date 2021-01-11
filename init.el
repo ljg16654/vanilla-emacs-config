@@ -1,94 +1,3 @@
-;; Automatically tangle this file when we save it
-(defun efs/org-babel-tangle-config ()
-  (when (string-equal (file-name-directory (buffer-file-name))
-                      (expand-file-name user-emacs-directory))
-    ;; Dynamic scoping to the rescue
-    (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
-
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
-
-(use-package rg)
-
-(use-package general)
-
-(global-unset-key (kbd "C-t"))
-(defconst tab-leader "C-t")
-
-(general-create-definer tab-leader-def
-  :prefix tab-leader)
-
-;; global hyper leader def
-(tab-leader-def
-  "n" 'tab-bar-new-tab
-  "r" 'tab-bar-rename-tab
-  "k" 'tab-bar-close-tab)
-
-;; mode hyper leader def
-
-(use-package define-word
-  :bind
-  (("C-c d" . define-word-at-point)
-   ("C-c D" . define-word)))
-
-(use-package cpputils-cmake)
-
-(add-hook 'c-mode-common-hook
-          (lambda ()
-            (if (derived-mode-p 'c-mode 'c++-mode)
-                (cppcm-reload-all)
-              )))
-;; OPTIONAL, somebody reported that they can use this package with Fortran
-(add-hook 'c90-mode-hook (lambda () (cppcm-reload-all)))
-;; OPTIONAL, avoid typing full path when starting gdb
-(global-set-key (kbd "C-c C-g")
- '(lambda ()(interactive) (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer)))))
-;; OPTIONAL, some users need specify extra flags forwarded to compiler
-(setq cppcm-extra-preprocss-flags-from-user '("-I/usr/src/linux/include" "-DNDEBUG"))
-
-(defun efs/exwm-update-class ()
-  (exwm-workspace-rename-buffer exwm-class-name))
-
-(defun efs/exwm-update-title ()
-  (pcase exwm-class-name
-    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
-
-;; This function isn't currently used, only serves as an example how to
-;; position a window
-(defun efs/position-window ()
-  (let* ((pos (frame-position))
-         (pos-x (car pos))
-          (pos-y (cdr pos)))
-    (exwm-floating-move (- pos-x) (- pos-y))))
-
-(defun efs/configure-window-by-class ()
-  (interactive)
-  (pcase exwm-class-name
-    ("electron-ssr" (exwm-floating-toggle-floating))))
-
-;; When window "class" updates, use it to set the buffer name
-(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-
-;; When window title updates, use it to set the buffer name
-(add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
-
-;; Configure windows as they're created
-(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
-
-(unless (executable-find "feh")
-  (display-warning 'wallpaper "External command `feh' not found!"))
-
-;; This is an example `use-package' configuration
-;; It is not tangled into wallpaper.el
-(use-package wallpaper
-  :ensure t
-  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-         (after-init . wallpaper-cycle-mode))
-  :custom ((wallpaper-cycle-single t)
-           (wallpaper-scaling 'scale)
-           (wallpaper-cycle-interval 45)
-           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
-
 (setq user-full-name "Jigang Li"
       user-mail-address "ljg16654@sjtu.edu.cn")
 
@@ -569,7 +478,7 @@ directory to make multiple eshell windows easier."
 (use-package exwm
   :config
   (progn
-    (setq exwm-workspace-number 10)
+    (setq exwm-workspace-number 3)
     (setq exwm-input-prefix-keys
 	  '(?\C-x
 	    ?\s-j
@@ -630,7 +539,7 @@ directory to make multiple eshell windows easier."
 (exwm-systemtray-enable)
 
 (require 'exwm-randr)
-(setq exwm-randr-workspace-monitor-plist '(9 "DP-1-2" 9 "DP-2" 9 "DP-1-1" 9 "DP-1"))
+(setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))
 (exwm-randr-enable)
 
 (defun efs/run-in-background (command)
@@ -646,3 +555,131 @@ directory to make multiple eshell windows easier."
 (efs/update-displays)
 
 (use-package anki-editor)
+
+(use-package rg)
+
+(use-package general)
+
+(global-unset-key (kbd "C-t"))
+(defconst tab-leader "C-t")
+
+(general-create-definer tab-leader-def
+  :prefix tab-leader)
+
+;; global hyper leader def
+(tab-leader-def
+  "n" 'tab-bar-new-tab
+  "r" 'tab-bar-rename-tab
+  "k" 'tab-bar-close-tab)
+
+;; mode hyper leader def
+
+(use-package define-word
+  :bind
+  (("C-c d" . define-word-at-point)
+   ("C-c D" . define-word)))
+
+(use-package cpputils-cmake)
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (if (derived-mode-p 'c-mode 'c++-mode)
+                (cppcm-reload-all)
+              )))
+;; OPTIONAL, somebody reported that they can use this package with Fortran
+(add-hook 'c90-mode-hook (lambda () (cppcm-reload-all)))
+;; OPTIONAL, avoid typing full path when starting gdb
+(global-set-key (kbd "C-c C-g")
+ '(lambda ()(interactive) (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer)))))
+;; OPTIONAL, some users need specify extra flags forwarded to compiler
+(setq cppcm-extra-preprocss-flags-from-user '("-I/usr/src/linux/include" "-DNDEBUG"))
+
+(defun efs/run-in-background (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+(defun efs/exwm-init-hook ()
+  ;; Make workspace 1 be the one where we land at startup
+  (exwm-workspace-switch-create 0)
+
+  ;; Open eshell by default
+  ;;(eshell)
+
+  ;; NOTE: The next two are disabled because we now use Polybar!
+
+  ;; Show battery status in the mode line
+  ;;(display-battery-mode 1)
+
+  ;; Show the time and date in modeline
+  ;;(setq display-time-day-and-date t)
+  ;;(display-time-mode 1)
+  ;; Also take a look at display-time-format and format-time-string
+
+  ;; Start the Polybar panel
+  ;; (efs/start-panel)
+
+  ;; Launch apps that will run in the background
+  (efs/run-in-background "dunst")
+  (efs/run-in-background "nm-applet")
+  (efs/run-in-background "pasystray")
+  (efs/run-in-background "blueman-applet")
+  (efs/run-in-background "electron-ssr"))
+
+(defun efs/exwm-update-class ()
+  (exwm-workspace-rename-buffer exwm-class-name))
+
+(defun efs/exwm-update-title ()
+  (pcase exwm-class-name
+    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
+    ("electron-ssr" (progn
+                      (exwm-workspace-rename-buffer "electron-ssr")
+                      (exwm-workspace-move-window 2)))))
+
+;; This function isn't currently used, only serves as an example how to
+;; position a window
+(defun efs/position-window ()
+  (let* ((pos (frame-position))
+         (pos-x (car pos))
+          (pos-y (cdr pos)))
+    (exwm-floating-move (- pos-x) (- pos-y))))
+
+(defun efs/configure-window-by-class ()
+  (interactive)
+  (pcase exwm-class-name
+    ("electron-ssr" (exwm-floating-toggle-floating))))
+
+;; When EXWM starts up, do some extra confifuration
+(add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+
+;; When window "class" updates, use it to set the buffer name
+(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+
+;; When window title updates, use it to set the buffer name
+(add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
+
+;; Configure windows as they're created
+(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
+
+(unless (executable-find "feh")
+  (display-warning 'wallpaper "External command `feh' not found!"))
+
+;; This is an example `use-package' configuration
+;; It is not tangled into wallpaper.el
+(use-package wallpaper
+  :ensure t
+  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+         (after-init . wallpaper-cycle-mode))
+  :custom ((wallpaper-cycle-single t)
+           (wallpaper-scaling 'scale)
+           (wallpaper-cycle-interval 45)
+           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+
+;; Automatically tangle this file when we save it
+(defun efs/org-babel-tangle-config ()
+  (when (string-equal (file-name-directory (buffer-file-name))
+                      (expand-file-name user-emacs-directory))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
