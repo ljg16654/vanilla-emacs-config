@@ -133,7 +133,13 @@ and home row keys, should be wrapped with =<= and =>=.
 #+end_src
 
 #+RESULTS:
+** evil
+#+begin_src emacs-lisp
 
+(use-package evil)
+#+end_src
+
+#+RESULTS:
 
 * window and buffer
 ** buffer switch
@@ -230,6 +236,7 @@ and home row keys, should be wrapped with =<= and =>=.
     "t" 'prot-tab-select-tab-dwim) 
 
   (global-set-key (kbd "s-<tab>") #'prot-tab-select-tab-dwim)
+  (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 #+end_src
 
 #+RESULTS:
@@ -729,7 +736,8 @@ in my org-directory.
     '(("a" . "export ascii\n")
       ("c" . "center\n")
       ("C" . "comment\n")
-      ("e" . "src elisp\n")
+      ("e" . "src emacs-lisp\n")
+      ("cp" . "src cpp\n")
       ("py" . "src python\n")
       ("sh" . "src shell")
       ("E" . "export")
@@ -742,16 +750,17 @@ in my org-directory.
 
 #+RESULTS:
 #+begin_example
-((a . export ascii
-) (c . center
-) (C . comment
-) (e . src elisp
-) (py . src python
-) (sh . src shell) (E . export) (h . export html
-) (l . export latex
-) (q . quote
-) (s . src) (v . verse
-))
+  ((a . export ascii
+  ) (c . center
+  ) (C . comment
+  ) (e . src emacs-lisp
+  ) (cp . src cpp
+  ) (py . src python
+  ) (sh . src shell) (E . export) (h . export html
+  ) (l . export latex
+  ) (q . quote
+  ) (s . src) (v . verse
+  ))
 #+end_example
 ** pdf
 #+begin_src emacs-lisp
@@ -816,7 +825,8 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 ** bookmarks
 #+begin_src emacs-lisp
 
-(global-set-key (kbd "H-b") #'bookmark-jump)
+  (global-set-key (kbd "s-m") #'bookmark-set)
+  (global-set-key (kbd "s-<return>") #'bookmark-jump)
 #+end_src
 
 #+RESULTS:
@@ -1102,50 +1112,47 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
     (progn
       (setq exwm-workspace-number 3)
       (setq exwm-input-prefix-keys
-	    '(?\C-x
-	      ?\s-j
-	      ?\s-C
-          ?\s-c
-	      ?\s-k
-	      ?\s-v
-	      ?\s-\,
-	      ?\s-\.
-          ?\s-n
-          ?\s-e
-	      ?\C-u
-	      ?\C-h
-	      ?\M-x
-	      ?\M-&
-	      ?\M-:
-	      ?\H-a
-	      ?\H-b
-	      ?\H-c
-	      ?\H-f
-	      ?\H-s
-	      ?\C-\ ))
+            '(?\C-x
+              ?\s-j
+              ?\s-c
+              ?\s-k
+              ?\s-v
+              ?\s-n
+              ?\s-e
+              ?\C-u
+              ?\C-h
+              ?\M-x
+              ?\M-&
+              ?\M-:
+              ?\H-a
+              ?\H-b
+              ?\H-c
+              ?\H-f
+              ?\H-s
+              ?\C-\ ))
       (setq exwm-input-global-keys
-	    `(([?\s-r] . exwm-reset)
-	      ([?\s-w] . exwm-workspace-switch)
-	      ([?\s-\;] . (lambda (command)
-			    (interactive (list (read-shell-command "$ ")))
-			    (start-process-shell-command command nil command)))
-	      ,@(mapcar (lambda (i)
-			  `(,(kbd (format "s-%d" i)) .
-			    (lambda ()
-			      (interactive)
-			      (exwm-workspace-switch-create ,i))))
-			(number-sequence 0 9))))
+            `(([?\s-r] . exwm-reset)
+              ([?\s-w] . exwm-workspace-switch)
+              ([?\s-\;] . (lambda (command)
+                            (interactive (list (read-shell-command "$ ")))
+                            (start-process-shell-command command nil command)))
+              ,@(mapcar (lambda (i)
+                          `(,(kbd (format "s-%d" i)) .
+                            (lambda ()
+                              (interactive)
+                              (exwm-workspace-switch-create ,i))))
+                        (number-sequence 0 9))))
       (exwm-input-set-simulation-keys
        '(([?\C-b] . left)
-	 ([?\C-f] . right)
-	 ([?\C-p] . up)
-	 ([?\C-n] . down)
-	 ([?\C-a] . home)
-	 ([?\C-e] . end)
-	 ))
+         ([?\C-f] . right)
+         ([?\C-p] . up)
+         ([?\C-n] . down)
+         ([?\C-a] . home)
+         ([?\C-e] . end)
+         ))
       (setq exwm-workspace-warp-cursor t
-	    mouse-autoselect-window t
-	    focus-follows-mouse t)
+            mouse-autoselect-window t
+            focus-follows-mouse t)
       (exwm-enable)
       ))
 
@@ -1159,6 +1166,14 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+end_src
 
 #+RESULTS:
+
+#+begin_src emacs-lisp
+
+(exwm-input-set-key (kbd "s-<tab>") 'prot-tab-select-tab-dwim)
+#+end_src
+
+#+RESULTS:
+
 
 #+begin_src emacs-lisp
 (require 'exwm-systemtray)

@@ -55,6 +55,8 @@
 (setq use-dialog-box t)               ; only for mouse events
 ;; (setq inhibit-splash-screen t)
 
+(use-package evil)
+
 ;; between buffers
 
 (global-set-key (kbd "s-i") #'ibuffer)
@@ -329,7 +331,8 @@ buffer's window as well."
   '(("a" . "export ascii\n")
     ("c" . "center\n")
     ("C" . "comment\n")
-    ("e" . "src elisp\n")
+    ("e" . "src emacs-lisp\n")
+    ("cp" . "src cpp\n")
     ("py" . "src python\n")
     ("sh" . "src shell")
     ("E" . "export")
@@ -374,7 +377,8 @@ buffer's window as well."
        '("_2" . ?₂)
        ))
 
-(global-set-key (kbd "H-b") #'bookmark-jump)
+(global-set-key (kbd "s-m") #'bookmark-set)
+(global-set-key (kbd "s-<return>") #'bookmark-jump)
 
 (defun transparency (value)
   "sets the transparency of the frame window. 0=transparent/100=opaque"
@@ -476,39 +480,36 @@ directory to make multiple eshell windows easier."
   (progn
     (setq exwm-workspace-number 3)
     (setq exwm-input-prefix-keys
-	  '(?\C-x
-	    ?\s-j
-	    ?\s-C
-        ?\s-c
-	    ?\s-k
-	    ?\s-v
-	    ?\s-\,
-	    ?\s-\.
-        ?\s-n
-        ?\s-e
-	    ?\C-u
-	    ?\C-h
-	    ?\M-x
-	    ?\M-&
-	    ?\M-:
-	    ?\H-a
-	    ?\H-b
-	    ?\H-c
-	    ?\H-f
-	    ?\H-s
-	    ?\C-\ ))
+          '(?\C-x
+            ?\s-j
+            ?\s-c
+            ?\s-k
+            ?\s-v
+            ?\s-n
+            ?\s-e
+            ?\C-u
+            ?\C-h
+            ?\M-x
+            ?\M-&
+            ?\M-:
+            ?\H-a
+            ?\H-b
+            ?\H-c
+            ?\H-f
+            ?\H-s
+            ?\C-\ ))
     (setq exwm-input-global-keys
-	  `(([?\s-r] . exwm-reset)
-	    ([?\s-w] . exwm-workspace-switch)
-	    ([?\s-\;] . (lambda (command)
-			  (interactive (list (read-shell-command "$ ")))
-			  (start-process-shell-command command nil command)))
-	    ,@(mapcar (lambda (i)
-			`(,(kbd (format "s-%d" i)) .
-			  (lambda ()
-			    (interactive)
-			    (exwm-workspace-switch-create ,i))))
-		      (number-sequence 0 9))))
+          `(([?\s-r] . exwm-reset)
+            ([?\s-w] . exwm-workspace-switch)
+            ([?\s-\;] . (lambda (command)
+                          (interactive (list (read-shell-command "$ ")))
+                          (start-process-shell-command command nil command)))
+            ,@(mapcar (lambda (i)
+                        `(,(kbd (format "s-%d" i)) .
+                          (lambda ()
+                            (interactive)
+                            (exwm-workspace-switch-create ,i))))
+                      (number-sequence 0 9))))
     (exwm-input-set-simulation-keys
      '(([?\C-b] . left)
        ([?\C-f] . right)
@@ -518,8 +519,8 @@ directory to make multiple eshell windows easier."
        ([?\C-e] . end)
        ))
     (setq exwm-workspace-warp-cursor t
-	  mouse-autoselect-window t
-	  focus-follows-mouse t)
+          mouse-autoselect-window t
+          focus-follows-mouse t)
     (exwm-enable)
     ))
 
@@ -529,6 +530,8 @@ directory to make multiple eshell windows easier."
 ;; After C-q, send key to the window 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+
+(exwm-input-set-key (kbd "s-<tab>") 'prot-tab-select-tab-dwim)
 
 (require 'exwm-systemtray)
 (exwm-systemtray-enable)
@@ -615,6 +618,7 @@ questions.  Else use completion to select the tab to switch to."
   "t" 'prot-tab-select-tab-dwim) 
 
 (global-set-key (kbd "s-<tab>") #'prot-tab-select-tab-dwim)
+(global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 
 (use-package define-word
   :bind
