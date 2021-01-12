@@ -151,6 +151,35 @@ and home row keys, should be wrapped with =<= and =>=.
 : evil-mode
 
 * window and buffer
+** window rules and management
+*** monocle-window
+From prot's dotEmacs. Defines a monocole layout similar to Tiling
+window managers.  Currently the hyper-key(positioned at right ctrl on
+my xps-15) is used for window operations inside Emacs.
+#+begin_src emacs-lisp
+(use-package emacs
+  :config
+  (defvar prot/window-configuration nil
+    "Current window configuration.
+Intended for use by `prot/window-monocle'.")
+
+  (define-minor-mode prot/window-single-toggle
+    "Toggle between multiple windows and single window.
+This is the equivalent of maximising a window.  Tiling window
+managers such as DWM, BSPWM refer to this state as 'monocle'."
+    :lighter " [M]"
+    :global nil
+    (if (one-window-p)
+        (when prot/window-configuration
+          (set-window-configuration prot/window-configuration))
+      (setq prot/window-configuration (current-window-configuration))
+      (delete-other-windows)))
+  :bind ("s-s" . prot/window-single-toggle))
+#+end_src
+
+#+RESULTS:
+: prot/window-single-toggle
+
 ** buffer switch
 
 #+begin_src emacs-lisp
@@ -311,8 +340,12 @@ In buffer or across buffers.
 #+begin_src emacs-lisp
 
   (use-package avy
-    :bind (("M-g g" . avy-goto-line)
-           ("H-d" . avy-goto-char-2)))
+    :bind (("M-g g" . avy-goto-line)))
+
+  (global-unset-key (kbd "C-'"))
+  (global-set-key (kbd "C-'") #'avy-goto-char-2)
+  (global-set-key (kbd "H-d") #'avy-goto-char-2)
+  (global-set-key (kbd "H-f") #'avy-goto-char)
 
   (defun langou/goto-config ()
     "go to personal configuration of emacs"
@@ -320,7 +353,6 @@ In buffer or across buffers.
     (find-file "~/vanilla/init.org"))
 
   (global-set-key (kbd "C-c f p") #'langou/goto-config)
-  (global-set-key (kbd "H-f p") #'langou/goto-config)
 #+end_src
 
 #+RESULTS:
@@ -425,7 +457,18 @@ tangling is currently disabled.
 
 #+begin_src emacs-lisp
 
-  (use-package embark)
+  (use-package orderless
+    :ensure t
+    :init (icomplete-mode)		; optional but recommended!
+    :custom (completion-styles '(orderless)))
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+
+    (use-package embark)
 #+end_src
 
 #+RESULTS:
@@ -470,6 +513,7 @@ enhance ivy with ivy-rich:
     (progn
       (setq org-ellipsis " ▾"
             org-hide-emphasis-markers t)
+      (local-unset-key (kbd "C-'"))
       (font-lock-add-keywords 'org-mode
                               '(("^ *\\([-]\\) "
                                  (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
@@ -621,23 +665,31 @@ print(sys.version)
 #+end_src
 
 ** org-roam
+
+[[info:org-roam#Directories and Files][info:org-roam#Directories and Files]]
+All org files, *at any level of nesting*, are considered part of the
+org-roam. Hence one doesn't have to include all subdirectories
+recursively as for =org-directory.=
+
 #+begin_src emacs-lisp
-(use-package org-roam
-  :commands org-roam-mode
-  :init (add-hook 'after-init-hook 'org-roam-mode)
-  :config (setq org-roam-directory "~/org-roam")
-  :bind (("C-c r f" . org-roam-find-file)
-         ;("H-r f" . org-roam-find-file)
-	 ("C-c r c" . org-roam-db-build-cache)
-	 ; ("H-r c" . org-roam-db-build-cache)
-	 ("C-c r i" . org-roam-insert)
-	 ;("H-r i" . org-roam-insert)
-	 )
-)
+  (use-package org-roam
+    :commands org-roam-mode
+    :init (add-hook 'after-init-hook 'org-roam-mode)
+    :config
+    (progn (setq org-roam-directory "~/org-roam")
+           (setq org-roam-tag-sources
+                 (list
+                  'prop
+                  'last-directory)))
+    :bind (("C-c r f" . org-roam-find-file)
+           ("C-c r c" . org-roam-db-build-cache)
+           ("C-c r i" . org-roam-insert)
+           ("C-c r t" . org-roam-tag-add)
+           ))
 #+end_src
 
 #+RESULTS:
-: org-roam-insert
+: org-roam-tag-add
 
 #+begin_src emacs-lisp
 (use-package org-roam-server
@@ -1102,7 +1154,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 #+RESULTS:
 ** C-general
-#+begin_src elisp
+#+begin_src elisp :tangle nil
 
   (use-package cpputils-cmake)
 
@@ -1136,8 +1188,10 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
             '(?\C-x
               ?\s-j
               ?\s-c
+              ?\s-C
               ?\s-k
               ?\s-v
+              ?\s-s
               ?\s-n
               ?\s-e
               ?\C-u

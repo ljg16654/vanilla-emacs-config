@@ -64,6 +64,25 @@
 
 (global-set-key (kbd "H-e") #'evil-mode)
 
+(use-package emacs
+  :config
+  (defvar prot/window-configuration nil
+    "Current window configuration.
+Intended for use by `prot/window-monocle'.")
+
+  (define-minor-mode prot/window-single-toggle
+    "Toggle between multiple windows and single window.
+This is the equivalent of maximising a window.  Tiling window
+managers such as DWM, BSPWM refer to this state as 'monocle'."
+    :lighter " [M]"
+    :global nil
+    (if (one-window-p)
+        (when prot/window-configuration
+          (set-window-configuration prot/window-configuration))
+      (setq prot/window-configuration (current-window-configuration))
+      (delete-other-windows)))
+  :bind ("s-s" . prot/window-single-toggle))
+
 ;; between buffers
 
 (global-set-key (kbd "s-i") #'ibuffer)
@@ -118,8 +137,12 @@ buffer's window as well."
 (global-set-key (kbd "C-c b r") #'rename-buffer)
 
 (use-package avy
-  :bind (("M-g g" . avy-goto-line)
-         ("H-d" . avy-goto-char-2)))
+  :bind (("M-g g" . avy-goto-line)))
+
+(global-unset-key (kbd "C-'"))
+(global-set-key (kbd "C-'") #'avy-goto-char-2)
+(global-set-key (kbd "H-d") #'avy-goto-char-2)
+(global-set-key (kbd "H-f") #'avy-goto-char)
 
 (defun langou/goto-config ()
   "go to personal configuration of emacs"
@@ -127,7 +150,6 @@ buffer's window as well."
   (find-file "~/vanilla/init.org"))
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
-(global-set-key (kbd "H-f p") #'langou/goto-config)
 
 (global-set-key (kbd "M-i") 'imenu)
 
@@ -152,6 +174,11 @@ buffer's window as well."
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+(use-package orderless
+  :ensure t
+  :init (icomplete-mode)		; optional but recommended!
+  :custom (completion-styles '(orderless)))
+
 (use-package embark)
 
 (use-package yasnippet
@@ -171,6 +198,7 @@ buffer's window as well."
   (progn
     (setq org-ellipsis " ▾"
           org-hide-emphasis-markers t)
+    (local-unset-key (kbd "C-'"))
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
@@ -249,15 +277,17 @@ buffer's window as well."
 (use-package org-roam
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
-  :config (setq org-roam-directory "~/org-roam")
+  :config
+  (progn (setq org-roam-directory "~/org-roam")
+         (setq org-roam-tag-sources
+               (list
+                'prop
+                'last-directory)))
   :bind (("C-c r f" . org-roam-find-file)
-         ;("H-r f" . org-roam-find-file)
-	 ("C-c r c" . org-roam-db-build-cache)
-	 ; ("H-r c" . org-roam-db-build-cache)
-	 ("C-c r i" . org-roam-insert)
-	 ;("H-r i" . org-roam-insert)
-	 )
-)
+         ("C-c r c" . org-roam-db-build-cache)
+         ("C-c r i" . org-roam-insert)
+         ("C-c r t" . org-roam-tag-add)
+         ))
 
 (use-package org-roam-server
   :ensure t
@@ -493,8 +523,10 @@ directory to make multiple eshell windows easier."
           '(?\C-x
             ?\s-j
             ?\s-c
+            ?\s-C
             ?\s-k
             ?\s-v
+            ?\s-s
             ?\s-n
             ?\s-e
             ?\C-u
@@ -635,21 +667,6 @@ questions.  Else use completion to select the tab to switch to."
   :bind
   (("C-c d" . define-word-at-point)
    ("C-c D" . define-word)))
-
-(use-package cpputils-cmake)
-
-(add-hook 'c-mode-common-hook
-          (lambda ()
-            (if (derived-mode-p 'c-mode 'c++-mode)
-                (cppcm-reload-all)
-              )))
-;; OPTIONAL, somebody reported that they can use this package with Fortran
-(add-hook 'c90-mode-hook (lambda () (cppcm-reload-all)))
-;; OPTIONAL, avoid typing full path when starting gdb
-(global-set-key (kbd "C-c C-g")
- '(lambda ()(interactive) (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer)))))
-;; OPTIONAL, some users need specify extra flags forwarded to compiler
-(setq cppcm-extra-preprocss-flags-from-user '("-I/usr/src/linux/include" "-DNDEBUG"))
 
 (defun efs/run-in-background (command)
   (let ((command-parts (split-string command "[ ]+")))
