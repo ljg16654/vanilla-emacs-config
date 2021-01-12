@@ -523,24 +523,21 @@ directory to make multiple eshell windows easier."
     (setq exwm-workspace-number 3)
     (setq exwm-input-prefix-keys
           '(?\C-x
-            ?\s-j
-            ?\s-c
-            ?\s-C
-            ?\s-k
-            ?\s-v
-            ?\s-s
-            ?\s-n
-            ?\s-e
-            ?\C-u
-            ?\C-h
+            ?\s-i ;; ibuffer
+            ?\s-j ;; window switch
+            ?\s-c ;; kill window
+            ?\s-C ;; kill buffer and window(if not single)
+            ?\s-k ;; window switch
+            ?\s-v ;; vterm
+            ?\s-s ;; single-window-toggle
+            ?\s-e ;; pop-up eshell
+            ?\C-u ;; general command
+            ?\C-h ;; help
             ?\M-x
             ?\M-&
             ?\M-:
-            ?\H-a
-            ?\H-b
-            ?\H-c
-            ?\H-f
-            ?\H-s
+            ?\H-c 			;; org-capture
+            ?\H-s 			;; kill other windows
             ?\C-\ ))
     (setq exwm-input-global-keys
           `(([?\s-r] . exwm-reset)
@@ -561,6 +558,7 @@ directory to make multiple eshell windows easier."
        ([?\C-n] . down)
        ([?\C-a] . home)
        ([?\C-e] . end)
+       ([?\M-w] . [?\C-c])
        ))
     (setq exwm-workspace-warp-cursor t
           mouse-autoselect-window t
