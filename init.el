@@ -56,6 +56,13 @@
 ;; (setq inhibit-splash-screen t)
 
 (use-package evil)
+(use-package evil-escape
+  :config
+  (progn
+    (setq-default evil-escape-key-sequence "jk")
+    (evil-escape-mode)))
+
+(global-set-key (kbd "H-e") #'evil-mode)
 
 ;; between buffers
 
@@ -145,6 +152,8 @@ buffer's window as well."
 (ivy-mode 1)
 (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
 
+(use-package embark)
+
 (use-package yasnippet
   :config
   (progn
@@ -199,6 +208,7 @@ buffer's window as well."
 (setq org-export-with-toc nil)
 
 (setq org-confirm-babel-evaluate nil)
+(setq org-src-window-setup 'current-window)
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -555,6 +565,7 @@ directory to make multiple eshell windows easier."
 (use-package anki-editor)
 
 (use-package rg)
+(use-package ripgrep)
 
 (use-package general)
 

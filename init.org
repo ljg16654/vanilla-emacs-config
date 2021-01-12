@@ -116,7 +116,8 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 ** rg
 #+begin_src elisp
 
-(use-package rg)
+  (use-package rg)
+  (use-package ripgrep)
 #+end_src
 
 #+RESULTS:
@@ -126,7 +127,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
 /Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
 and home row keys, should be wrapped with =<= and =>=.
-** general
+** general.el
 #+begin_src elisp
 
   (use-package general)
@@ -136,10 +137,18 @@ and home row keys, should be wrapped with =<= and =>=.
 ** evil
 #+begin_src emacs-lisp
 
-(use-package evil)
+  (use-package evil)
+  (use-package evil-escape
+    :config
+    (progn
+      (setq-default evil-escape-key-sequence "jk")
+      (evil-escape-mode)))
+
+  (global-set-key (kbd "H-e") #'evil-mode)
 #+end_src
 
 #+RESULTS:
+: evil-mode
 
 * window and buffer
 ** buffer switch
@@ -412,6 +421,15 @@ tangling is currently disabled.
 #+RESULTS:
 : t
 
+** embark, orderless and marginalia
+
+#+begin_src emacs-lisp
+
+  (use-package embark)
+#+end_src
+
+#+RESULTS:
+
 ** yasnippet
 The snippets are currently stored in DOOMDIR and I may move them to somewhere else later.
 #+begin_src emacs-lisp
@@ -518,9 +536,12 @@ Track state changes.
 
 #+begin_src emacs-lisp
 
-(setq org-confirm-babel-evaluate nil)
-
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-src-window-setup 'current-window)
 #+end_src
+
+#+RESULTS:
+: current-window
 
 *** languages
 
