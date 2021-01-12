@@ -174,12 +174,16 @@ read later at the moment.
 /Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
 and home row keys, should be wrapped with =<= and =>=.
 ** general.el
+
+For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding.org][general.el define keybinding]].
+
 #+begin_src elisp
 
   (use-package general)
 #+end_src
 
 #+RESULTS:
+
 ** evil
 #+begin_src emacs-lisp
 
@@ -226,6 +230,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 #+RESULTS:
 : prot/window-single-toggle
+
+*** display-buffer-alist    
 
 ** buffer switch
 
@@ -361,16 +367,31 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
     (setq dired-recursive-deletes 'always)
     (setq delete-by-moving-to-trash t)
     (setq dired-listing-switches
-	  "-AGFhlv --group-directories-first --time-style=long-iso")
+          "-AGFhlv --group-directories-first --time-style=long-iso")
     (setq dired-dwim-target t)
     ;; Hooks' syntax is controlled by the `use-pakage-hook-name-suffix'
     ;; variable.  The "-hook" suffix is intentional
     :hook ((dired-mode-hook . dired-hide-details-mode)
-	   (dired-mode-hook . hl-line-mode)))
+           (dired-mode-hook . hl-line-mode)))
+
 #+end_src
 
 #+RESULTS:
 | hl-line-mode | dired-hide-details-mode |
+
+The default '^' for =dired-up-directory= feels a bit clumsy.  For such
+reason, ';' is binded to the same function in dired-mode using
+general.el.
+
+#+begin_src emacs-lisp
+
+  (general-define-key
+   :keymaps 'dired-mode-map
+   ";" 'dired-up-directory)
+#+end_src
+
+#+RESULTS:
+
 ** naming
 #+begin_src emacs-lisp
 
@@ -870,17 +891,17 @@ in my org-directory.
 
 #+RESULTS:
 #+begin_example
-  ((a . export ascii
-  ) (c . center
-  ) (C . comment
-  ) (e . src emacs-lisp
-  ) (cp . src cpp
-  ) (py . src python
-  ) (sh . src shell) (E . export) (h . export html
-  ) (l . export latex
-  ) (q . quote
-  ) (s . src) (v . verse
-  ))
+((a . export ascii
+) (c . center
+) (C . comment
+) (e . src emacs-lisp
+) (cp . src cpp
+) (py . src python
+) (sh . src shell) (E . export) (h . export html
+) (l . export latex
+) (q . quote
+) (s . src) (v . verse
+))
 #+end_example
 ** pdf
 #+begin_src emacs-lisp
@@ -1447,16 +1468,23 @@ Assign workspaces to monitors.
 | wallpaper-cycle-mode | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
 
 * anki
+
+anki-editor provides anki-integration with org-mode.
+see [[*org-capture]] for capture-templates creating anki entries.
+
 #+begin_src emacs-lisp
-(use-package anki-editor)
+
+  (use-package anki-editor)
 #+end_src
 
 #+RESULTS:
+
 * meta
+
+Automatically tangle /this file/ on save.
 
 #+begin_src elisp
 
-  ;; Automatically tangle this file when we save it
   (defun efs/org-babel-tangle-config ()
     (when (string-equal (file-name-directory (buffer-file-name))
                         (expand-file-name user-emacs-directory))

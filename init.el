@@ -129,12 +129,16 @@ buffer's window as well."
   (setq dired-recursive-deletes 'always)
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches
-	"-AGFhlv --group-directories-first --time-style=long-iso")
+        "-AGFhlv --group-directories-first --time-style=long-iso")
   (setq dired-dwim-target t)
   ;; Hooks' syntax is controlled by the `use-pakage-hook-name-suffix'
   ;; variable.  The "-hook" suffix is intentional
   :hook ((dired-mode-hook . dired-hide-details-mode)
-	 (dired-mode-hook . hl-line-mode)))
+         (dired-mode-hook . hl-line-mode)))
+
+(general-define-key
+ :keymaps 'dired-mode-map
+ ";" 'dired-up-directory)
 
 (global-set-key (kbd "C-c b r") #'rename-buffer)
 
@@ -753,7 +757,6 @@ questions.  Else use completion to select the tab to switch to."
            (wallpaper-cycle-interval 45)
            (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 
-;; Automatically tangle this file when we save it
 (defun efs/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
                       (expand-file-name user-emacs-directory))
