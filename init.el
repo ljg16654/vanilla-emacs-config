@@ -566,17 +566,15 @@ directory to make multiple eshell windows easier."
     (exwm-enable)
     ))
 
-(display-time-mode)
-(display-battery-mode)
-
 ;; After C-q, send key to the window 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-
 (exwm-input-set-key (kbd "s-<tab>") 'prot-tab-select-tab-dwim)
 
 (require 'exwm-systemtray)
 (exwm-systemtray-enable)
+(display-time-mode)
+(display-battery-mode)
 
 (require 'exwm-randr)
 (setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))

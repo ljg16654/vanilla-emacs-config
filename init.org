@@ -1224,8 +1224,22 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 
 * exwm
-** basic
-[[https://github.com/ch11ng/exwm/wiki][exwm wiki]]
+
+** keybinding
+
+Most keys defined in [[*window and buffer]] are configured as prefix-keys
+in exwm windows.  s-<num> switches to <num> th workspace, although
+workspace is never used with single monitor (of xps15).
+
+C-p, C-n, C-b, C-f, C-a, C-e are set to send keys to exwm-windows
+according to Emacs keybindings (similar to what happens in MacOS and
+tweaked gnome).
+
+Firefox provides caret-mode for keyboard-driven text-selection
+(Shift + Movement to select). Together with =M-w= configured to send =C-c=
+to the exwm-windows, a relatively consistent experience of copying is
+achieved.
+
 #+begin_src emacs-lisp 
   (use-package exwm
     :config
@@ -1275,29 +1289,33 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
             focus-follows-mouse t)
       (exwm-enable)
       ))
+#+end_src
 
-  (display-time-mode)
-  (display-battery-mode)
+#+RESULTS:
+
+Ocassionly, key-sequences intercepted by Emacs can be send after C-q.
+s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
+
+#+begin_src emacs-lisp
 
   ;; After C-q, send key to the window 
   (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
   (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-
+  (exwm-input-set-key (kbd "s-<tab>") 'prot-tab-select-tab-dwim)
 #+end_src
 
 #+RESULTS:
 
-#+begin_src emacs-lisp
+** ui tweaks
 
-(exwm-input-set-key (kbd "s-<tab>") 'prot-tab-select-tab-dwim)
-#+end_src
-
-#+RESULTS:
-
+*** systemtray and necessary info
 
 #+begin_src emacs-lisp
-(require 'exwm-systemtray)
-(exwm-systemtray-enable)
+
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+  (display-time-mode)
+  (display-battery-mode)
 #+end_src
 
 #+RESULTS:
