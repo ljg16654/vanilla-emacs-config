@@ -32,9 +32,6 @@
 
 (global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
 
-(use-package olivetti
-  :bind (("C-c f e" . olivetti-mode)))
-
 (set-face-attribute 'default nil :font "iosevka" :height 135)
 
 (use-package anti-zenburn-theme
@@ -146,15 +143,11 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
          (window-height . 0.2)
          ;; (mode . '(eshell-mode shell-mode))
          ))))
+
 (setq window-combination-resize t)
 (setq even-window-sizes 'height-only)
 (setq window-sides-vertical nil)
 (setq switch-to-buffer-in-dedicated-window 'pop)
-
-(use-package winner
-  :hook (after-init-hook . winner-mode)
-  :bind (("s-S-<left>" . winner-redo)
-         ("s-S-<right>" . winner-undo)))
 
 ;; between buffers
 
@@ -502,6 +495,9 @@ buffer's window as well."
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
+(use-package olivetti
+  :bind (("C-c f e" . olivetti-mode)))
+
 (use-package company
   :config
   (setq company-idle-delay 0)
@@ -541,7 +537,7 @@ buffer's window as well."
 (use-package vterm
   :bind (("s-v" . vterm)))
 
-(global-set-key (kbd "s-E") #'eshell)
+(global-set-key (kbd "s-e") #'eshell)
 
 (setenv "PATH"
   (concat
@@ -550,31 +546,6 @@ buffer's window as well."
    (getenv "PATH") ; inherited from OS
   )
 )
-
-(defun eshell-here ()
-  "Opens up a new shell in the directory associated with the
-current buffer's file. The eshell is renamed to match that
-directory to make multiple eshell windows easier."
-  (interactive)
-  (let* ((parent (if (buffer-file-name)
-                     (file-name-directory (buffer-file-name))
-                   default-directory))
-         (height (/ (window-total-height) 3))
-         (name   (car (last (split-string parent "/" t)))))
-    (split-window-vertically (- height))
-    (other-window 1)
-    (eshell "new")
-    (rename-buffer (concat "*eshell: " name "*"))
-
-    (insert (concat "ls"))
-    (eshell-send-input)))
-
-(global-set-key (kbd "s-e") 'eshell-here)
-
-(defun eshell/x ()
-  (insert "exit")
-  (eshell-send-input)
-  (delete-window))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)

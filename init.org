@@ -2,10 +2,14 @@
 #+PROPERTY: header-args :tangle init.el
 #+startup: content
 
-* awesome configs for reference
+Awesome configs for reference:
+
 + james cash ::  [[file:~/repos/james-cash-dotfiles/emacs.d/eshell][file:~/repos/james-cash-dotfiles/emacs.d/eshell]]
+  
 + prot :: [[file:~/repos/prot-dotfiles/emacs/.emacs.d/emacs-init.org]]
+  
 + Doom Emacs
+  
 + Emacs from scratch series :: [[file:~/repos/emacs-from-scratch/Emacs.org]]
 
 * personal info
@@ -64,15 +68,6 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 #+RESULTS:
 : +default/save-to-king-ring-buffer-filename
-
-* editing
-** focused editing
-#+begin_src emacs-lisp
-  (use-package olivetti
-    :bind (("C-c f e" . olivetti-mode)))
-#+end_src
-
-#+RESULTS:
 
 * theme, font
 [[https://stackoverflow.com/questions/21033270/resizing-echoarea-of-emacsclient][related issue on wired space at bottom]]
@@ -233,6 +228,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 *** display-buffer-alist    
 
+[[https://protesilaos.com/dotemacs/#h:3d8ebbb1-f749-412e-9c72-5d65f48d5957][prot window rules]]
+
 #+begin_src emacs-lisp
 
   (setq display-buffer-alist
@@ -296,6 +293,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
            (window-height . 0.2)
            ;; (mode . '(eshell-mode shell-mode))
            ))))
+
   (setq window-combination-resize t)
   (setq even-window-sizes 'height-only)
   (setq window-sides-vertical nil)
@@ -316,7 +314,9 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 *** window-layout history
 
-#+begin_src emacs-lisp
+Waiting for confirmation before tangling.
+
+#+begin_src emacs-lisp :tangle nil
 
   (use-package winner
     :hook (after-init-hook . winner-mode)
@@ -1107,6 +1107,14 @@ currently disabled as I'm not using evil.
 
 #+RESULTS:
 
+** focused editing
+#+begin_src emacs-lisp
+  (use-package olivetti
+    :bind (("C-c f e" . olivetti-mode)))
+#+end_src
+
+#+RESULTS:
+
 * lsp
 #+begin_src emacs-lisp
   (use-package company
@@ -1174,7 +1182,7 @@ currently disabled as I'm not using evil.
 
 #+begin_src emacs-lisp
 
-  (global-set-key (kbd "s-E") #'eshell)
+  (global-set-key (kbd "s-e") #'eshell)
 
   (setenv "PATH"
     (concat
@@ -1191,7 +1199,7 @@ currently disabled as I'm not using evil.
 
 [[http://www.howardism.org/Technical/Emacs/eshell-fun.html][eshell pop up window]]
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
   (defun eshell-here ()
     "Opens up a new shell in the directory associated with the
   current buffer's file. The eshell is renamed to match that
