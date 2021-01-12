@@ -113,11 +113,57 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 : t
 
 * searching
+
+Sometimes, when =lsp= doesn't work for some reasons (for example,
+dependencies are not met on the machine and thus =cmake= cannot be
+performed), it proves necessary to find definitions and references
+through manual search.
+
+Currently I'm experimenting with all kinds of choices in order to find
+
+- best approach to finding symbol under cursor in project.
+- difference between =project.el= (shipped with Emacs) and =projectile=.
+
 ** rg
+
+In default bindings of =rg=, =C-c s= spawns a transient menu
+similar to that of =magit=.
+=s-f= is also bound to =rg-menu=.
+
+Severals notes on the manual pages:
+- =ripgrep= has it own configuration which is not encourage by =rg= as it
+may easily bring about malfunction due to carelessness.
+- The variable =rg-ignore-case= can be customized for case sensitivity.
+- r :: =rg=. Interprets _query_ string as regexp.
+- t :: =rg-literal=. Interprets _query_ string literally.
+- p :: =rg-project=.
+- d :: =rg-dwim=. Search in project by default while search in
+  file/directory can be called with universal arguments.
+
+The package also features isearch integration. While I'm considering
+about migration from ivy to swiper, the integration is appended to
+read later at the moment.
+
 #+begin_src elisp
 
-  (use-package rg)
-  (use-package ripgrep)
+  (use-package rg
+    :config
+    (progn
+      (rg-enable-default-bindings))
+    :bind
+    ("s-f" . rg-menu))
+
+  ;; seems to be dependency for projectile-ripgrep
+  (use-package ripgrep) 
+#+end_src
+
+#+RESULTS:
+
+** ag
+
+#+begin_src emacs-lisp
+
+  (use-package ag)
 #+end_src
 
 #+RESULTS:
@@ -153,9 +199,10 @@ and home row keys, should be wrapped with =<= and =>=.
 * window and buffer
 ** window rules and management
 *** monocle-window
+
 From prot's dotEmacs. Defines a monocole layout similar to Tiling
-window managers.  Currently the hyper-key(positioned at right ctrl on
-my xps-15) is used for window operations inside Emacs.
+window managers.
+
 #+begin_src emacs-lisp
 (use-package emacs
   :config
@@ -188,8 +235,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
   (global-set-key (kbd "s-i") #'ibuffer)
   (global-set-key (kbd "s-o") #'switch-to-buffer)
-  (global-set-key (kbd "s-N") #'previous-buffer)
-  (global-set-key (kbd "s-n") #'next-buffer)
+  (global-set-key (kbd "s-<left>") #'previous-buffer)
+  (global-set-key (kbd "s-<right>") #'next-buffer)
 
   ;; inside a tab
 
@@ -340,7 +387,7 @@ In buffer or across buffers.
 #+begin_src emacs-lisp
 
   (use-package avy
-    :bind (("M-g g" . avy-goto-line)))
+    :bind (("M-l" . avy-goto-line)))
 
   (global-unset-key (kbd "C-'"))
   (global-set-key (kbd "C-'") #'avy-goto-char-2)
@@ -398,7 +445,7 @@ tangling is currently disabled.
 ** version control
 #+begin_src emacs-lisp
 (use-package magit
-  :bind (("C-c g" . magit) ("H-g" . magit))
+  :bind (("C-c g" . magit))
 )
 #+end_src
 

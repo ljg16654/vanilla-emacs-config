@@ -55,6 +55,8 @@
 (setq use-dialog-box t)               ; only for mouse events
 ;; (setq inhibit-splash-screen t)
 
+(use-package ag)
+
 (use-package evil)
 (use-package evil-escape
   :config
@@ -87,8 +89,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 (global-set-key (kbd "s-i") #'ibuffer)
 (global-set-key (kbd "s-o") #'switch-to-buffer)
-(global-set-key (kbd "s-N") #'previous-buffer)
-(global-set-key (kbd "s-n") #'next-buffer)
+(global-set-key (kbd "s-<left>") #'previous-buffer)
+(global-set-key (kbd "s-<right>") #'next-buffer)
 
 ;; inside a tab
 
@@ -137,7 +139,7 @@ buffer's window as well."
 (global-set-key (kbd "C-c b r") #'rename-buffer)
 
 (use-package avy
-  :bind (("M-g g" . avy-goto-line)))
+  :bind (("M-l" . avy-goto-line)))
 
 (global-unset-key (kbd "C-'"))
 (global-set-key (kbd "C-'") #'avy-goto-char-2)
@@ -154,7 +156,7 @@ buffer's window as well."
 (global-set-key (kbd "M-i") 'imenu)
 
 (use-package magit
-  :bind (("C-c g" . magit) ("H-g" . magit))
+  :bind (("C-c g" . magit))
 )
 
 (use-package projectile)
@@ -596,7 +598,14 @@ directory to make multiple eshell windows easier."
 
 (use-package anki-editor)
 
-(use-package rg)
+(use-package rg
+  :config
+  (progn
+    (rg-enable-default-bindings))
+  :bind
+  ("s-f" . rg-menu))
+
+;; seems to be dependency for projectile-ripgrep
 (use-package ripgrep)
 
 (use-package general)
