@@ -85,6 +85,77 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
       (delete-other-windows)))
   :bind ("s-s" . prot/window-single-toggle))
 
+(setq display-buffer-alist
+      '(
+        ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
+         (display-buffer-in-side-window)
+         (window-height . 0.16)
+         (side . top)
+         (slot . 0)
+         (window-parameters . ((no-other-window . t))))
+        ("\\*Messages.*"
+         (display-buffer-in-side-window)
+         (window-height . 0.16)
+         (side . top)
+         (slot . 1)
+         (window-parameters . ((no-other-window . t))))
+        ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\)\\*"
+         (display-buffer-in-side-window)
+         (window-height . 0.16)
+         (side . top)
+         (slot . 2)
+         (window-parameters . ((no-other-window . t))))
+        ;; bottom side window
+        ("\\*\\(Completions\\|Embark Collect Live\\).*"
+         (display-buffer-in-side-window)
+         (window-height . 0.16)
+         (side . bottom)
+         (slot . 0)
+         (window-parameters . ((no-other-window . t))))
+        ;; left side window
+        ("\\*Help.*"
+         (display-buffer-in-side-window)
+         (window-width . 0.20)       ; See the :hook
+         (side . left)
+         (slot . 0)
+         (window-parameters . ((no-other-window . t))))
+        ;; right side window
+        ("\\*Faces\\*"
+         (display-buffer-in-side-window)
+         (window-width . 0.25)
+         (side . right)
+         (slot . 0)
+         (window-parameters
+          . ((mode-line-format
+              . (" "
+                 mode-line-buffer-identification)))))
+        ("\\*Custom.*"
+         (display-buffer-in-side-window)
+         (window-width . 0.25)
+         (side . right)
+         (slot . 1)
+         (window-parameters . ((no-other-window . t))))
+        ;; bottom buffer (NOT side window)
+        ("\\*\\vc-\\(incoming\\|outgoing\\).*"
+         (display-buffer-at-bottom))
+        ("\\*\\(Output\\|Register Preview\\).*"
+         (display-buffer-at-bottom)
+         (window-parameters . ((no-other-window . t))))
+        ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
+         (display-buffer-reuse-mode-window display-buffer-at-bottom)
+         (window-height . 0.2)
+         ;; (mode . '(eshell-mode shell-mode))
+         ))))
+(setq window-combination-resize t)
+(setq even-window-sizes 'height-only)
+(setq window-sides-vertical nil)
+(setq switch-to-buffer-in-dedicated-window 'pop)
+
+(use-package winner
+  :hook (after-init-hook . winner-mode)
+  :bind (("s-S-<left>" . winner-redo)
+         ("s-S-<right>" . winner-undo)))
+
 ;; between buffers
 
 (global-set-key (kbd "s-i") #'ibuffer)
@@ -527,6 +598,7 @@ directory to make multiple eshell windows easier."
     (setq exwm-workspace-number 3)
     (setq exwm-input-prefix-keys
           '(?\C-x
+            ?\s-o	      ;; switch-to-buffer
             ?\s-i ;; ibuffer
             ?\s-j ;; window switch
             ?\s-c ;; kill window
@@ -540,8 +612,8 @@ directory to make multiple eshell windows easier."
             ?\M-x
             ?\M-&
             ?\M-:
-            ?\H-c 			;; org-capture
-            ?\H-s 			;; kill other windows
+            ?\H-c ;; org-capture
+            ?\H-s ;; kill other windows
             ?\C-\ ))
     (setq exwm-input-global-keys
           `(([?\s-r] . exwm-reset)
