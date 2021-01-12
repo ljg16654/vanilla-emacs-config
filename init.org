@@ -13,17 +13,22 @@ Awesome configs for reference:
 + Emacs from scratch series :: [[file:~/repos/emacs-from-scratch/Emacs.org]]
 
 * personal info
+
 #+begin_src emacs-lisp
-(setq user-full-name "Jigang Li"
-      user-mail-address "ljg16654@sjtu.edu.cn")
+
+  (setq user-full-name "Jigang Li"
+        user-mail-address "ljg16654@sjtu.edu.cn")
 #+end_src
 n
 #+RESULTS:
 : Ljg16654@sjtu.edu.cn
 
- * basic
+* basic
+
 ** set debug on error and use-packagen
+
 #+begin_src emacs-lisp
+
   (setq debug-on-error t)
   ;; (toggle-frame-fullscreen) 
   ;;; custom
@@ -35,7 +40,7 @@ n
 
   (setq package-enable-at-startup nil)
   (add-to-list 'package-archives
-	       '("melpa" . "https://melpa.org/packages/"))
+               '("melpa" . "https://melpa.org/packages/"))
 
   (package-initialize)
 
@@ -51,25 +56,29 @@ n
 : t
 
 ** common functionallity
-*** copy filename 
+
+*** copy filename
+
 From Doom Emacs. Naming is altered to be consistent with Emacs terms
 (yank -> save-to-king-ring).
 
 #+begin_src emacs-lisp
-(defun +default/save-to-king-ring-buffer-filename ()
-  "Copy the current buffer's path to the kill ring."
-  (interactive)
-  (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
-      (message (kill-new (abbreviate-file-name filename)))
-    (error "Couldn't find filename in current buffer")))
 
-(global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
+  (defun +default/save-to-king-ring-buffer-filename ()
+    "Copy the current buffer's path to the kill ring."
+    (interactive)
+    (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
+        (message (kill-new (abbreviate-file-name filename)))
+      (error "Couldn't find filename in current buffer")))
+
+  (global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
 #+end_src
 
 #+RESULTS:
 : +default/save-to-king-ring-buffer-filename
 
 * theme, font
+
 [[https://stackoverflow.com/questions/21033270/resizing-echoarea-of-emacsclient][related issue on wired space at bottom]]
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :font "iosevka" :height 135)
@@ -168,6 +177,7 @@ read later at the moment.
 [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
 /Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
 and home row keys, should be wrapped with =<= and =>=.
+
 ** general.el
 
 For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding.org][general.el define keybinding]].
@@ -196,6 +206,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 : evil-mode
 
 * window and buffer
+
 ** window rules and management
 *** monocle-window
 
@@ -498,6 +509,7 @@ general.el.
 : rename-buffer
 
 * movement
+
 In buffer or across buffers.
 ** avy and frequently visited files
 #+begin_src emacs-lisp
@@ -530,6 +542,7 @@ In buffer or across buffers.
 : imenu
 
 * project
+
 ** eyebrowse
 |-----------+-----------------------|
 | key       | Doom Emacs equivalent |
@@ -670,7 +683,9 @@ enhance ivy with ivy-rich:
 : t
 
 * org
+
 #+begin_src emacs-lisp
+
   (use-package org
     :config
     (progn
@@ -1019,7 +1034,8 @@ in my org-directory.
 ** misc
 *** TODO shortkey conflict 
 shortkey of org-mark-ring-goto conflicts with yasnippet.
-* miscellaneous 
+* miscellaneous
+
 ** default browser
 #+begin_src emacs-lisp
 (setq browse-url-browser-function 'browse-url-firefox)
@@ -1116,6 +1132,7 @@ currently disabled as I'm not using evil.
 #+RESULTS:
 
 * lsp
+
 #+begin_src emacs-lisp
   (use-package company
     :config
@@ -1142,6 +1159,7 @@ currently disabled as I'm not using evil.
 | lambda | nil | (require 'lsp-python-ms) | (lsp) |
 
 * music
+
 ** basic setup
 #+begin_src emacs-lisp
   (use-package emms
@@ -1170,6 +1188,7 @@ currently disabled as I'm not using evil.
 #+RESULTS:
 : t
 * shell and term
+
 ** vterm
 #+begin_src emacs-lisp
   (use-package vterm
@@ -1229,8 +1248,8 @@ currently disabled as I'm not using evil.
 #+RESULTS:
 : eshell/x
 
-
 * modeline config
+
 [[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
 [[info:emacs#Mode Line][info:emacs#Mode Line]]
 [[help:mode-line-format]]
