@@ -2,14 +2,11 @@
 #+PROPERTY: header-args :tangle init.el
 #+startup: content
 
-Awesome configs for reference:
+Some of the awesome configurations used as reference:
 
 + james cash ::  [[file:~/repos/james-cash-dotfiles/emacs.d/eshell][file:~/repos/james-cash-dotfiles/emacs.d/eshell]]
-  
 + prot :: [[file:~/repos/prot-dotfiles/emacs/.emacs.d/emacs-init.org]]
-  
 + Doom Emacs
-  
 + Emacs from scratch series :: [[file:~/repos/emacs-from-scratch/Emacs.org]]
 
 * personal info
@@ -23,37 +20,39 @@ n
 #+RESULTS:
 : Ljg16654@sjtu.edu.cn
 
-* basic
-
-** set debug on error and use-packagen
+* straight.el
 
 #+begin_src emacs-lisp
 
-  (setq debug-on-error t)
-  ;; (toggle-frame-fullscreen) 
-  ;;; custom
-  (setq custom-file (concat user-emacs-directory "custom.el"))
-  (load custom-file)
-
-  ;;; use-package setup
-  (require 'package)
-
-  (setq package-enable-at-startup nil)
-  (add-to-list 'package-archives
-               '("melpa" . "https://melpa.org/packages/"))
-
-  (package-initialize)
-
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-
-  (require 'use-package)
-  (setq use-package-always-ensure t)
+  ;; each use-package form also invoke straight.el to install the package
+  (setq straight-use-package-by-default t)
 #+end_src
 
-#+RESULTS:
-: t
+#+begin_src emacs-lisp
+
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+#+end_src
+
+then, install =use-package= with straight.el:
+
+#+begin_src emacs-lisp
+
+  (straight-use-package 'use-package)
+#+end_src
+
+* basic
 
 ** common functionallity
 
@@ -96,21 +95,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
       (setq solarized-use-variable-pitch nil)))
   (use-package spacemacs-theme
     :defer t)
-  (load-theme 'sanityinc-tomorrow-night nil)
-#+end_src
 
-#+RESULTS:
-: t
-
-** remove unused UI components
-
-#+begin_src emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq use-file-dialog nil)
-  (setq use-dialog-box t)               ; only for mouse events
-  ;; (setq inhibit-splash-screen t)
 #+end_src
 
 #+RESULTS:
@@ -237,9 +222,10 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 #+RESULTS:
 : prot/window-single-toggle
 
-*** display-buffer-alist    
+*** display-buffer-alist
 
 [[https://protesilaos.com/dotemacs/#h:3d8ebbb1-f749-412e-9c72-5d65f48d5957][prot window rules]]
+[[info:emacs#Window Choice][info:emacs#Window Choice]]
 
 #+begin_src emacs-lisp
 
@@ -303,25 +289,19 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . 0.2)
            ;; (mode . '(eshell-mode shell-mode))
-           ))))
+           )))
 
   (setq window-combination-resize t)
   (setq even-window-sizes 'height-only)
   (setq window-sides-vertical nil)
   (setq switch-to-buffer-in-dedicated-window 'pop)
+  (global-set-key (kbd "s-q") #'window-toggle-side-windows)
+  (add-hook 'help-mode-hook #'visual-line-mode)
+  (add-hook 'custom-mode-hook #'visual-line-mode)
 #+end_src
 
 #+RESULTS:
-| \*\(Flymake\      | Package-Lint\                   | vc-git :\).*                    | (display-buffer-in-side-window)                             | (window-height . 0.16) | (side . top)                                                             | (slot . 0)                                | (window-parameters (no-other-window . t)) |
-| \*Messages.*      | (display-buffer-in-side-window) | (window-height . 0.16)          | (side . top)                                                | (slot . 1)             | (window-parameters (no-other-window . t))                                |                                           |                                           |
-| \*\(Backtrace\    | Warnings\                       | Compile-Log\)\*                 | (display-buffer-in-side-window)                             | (window-height . 0.16) | (side . top)                                                             | (slot . 2)                                | (window-parameters (no-other-window . t)) |
-| \*\(Completions\  | Embark Collect Live\).*         | (display-buffer-in-side-window) | (window-height . 0.16)                                      | (side . bottom)        | (slot . 0)                                                               | (window-parameters (no-other-window . t)) |                                           |
-| \*Help.*          | (display-buffer-in-side-window) | (window-width . 0.2)            | (side . left)                                               | (slot . 0)             | (window-parameters (no-other-window . t))                                |                                           |                                           |
-| \*Faces\*         | (display-buffer-in-side-window) | (window-width . 0.25)           | (side . right)                                              | (slot . 0)             | (window-parameters (mode-line-format   mode-line-buffer-identification)) |                                           |                                           |
-| \*Custom.*        | (display-buffer-in-side-window) | (window-width . 0.25)           | (side . right)                                              | (slot . 1)             | (window-parameters (no-other-window . t))                                |                                           |                                           |
-| \*\vc-\(incoming\ | outgoing\).*                    | (display-buffer-at-bottom)      |                                                             |                        |                                                                          |                                           |                                           |
-| \*\(Output\       | Register Preview\).*            | (display-buffer-at-bottom)      | (window-parameters (no-other-window . t))                   |                        |                                                                          |                                           |                                           |
-| \*.*\([^E]eshell\ | shell\                          | v?term\).*                      | (display-buffer-reuse-mode-window display-buffer-at-bottom) | (window-height . 0.2)  |                                                                          |                                           |                                           |
+| visual-line-mode |
 
 *** window-layout history
 
@@ -346,9 +326,13 @@ Waiting for confirmation before tangling.
   ;; between buffers
 
   (global-set-key (kbd "s-i") #'ibuffer)
-  (global-set-key (kbd "s-o") #'switch-to-buffer)
+  ;; (global-set-key (kbd "s-o") #'switch-to-buffer)
   (global-set-key (kbd "s-<left>") #'previous-buffer)
   (global-set-key (kbd "s-<right>") #'next-buffer)
+  (global-set-key (kbd "C-x <return> r")
+                  ;; originally bound to
+                  ;; revert-buffer-with-coding-system
+                  #'revert-buffer)
 
   ;; inside a tab
 
@@ -360,9 +344,9 @@ Waiting for confirmation before tangling.
                                   (other-window -1)))
   (global-set-key (kbd "H-s") #'delete-other-windows)
 
-  ;; new tab starts with scratch buffer 
-  (setq tab-bar-new-tab-choice "*scratch*")
+  ;; new tab starts with scratch buffer
 
+  (setq tab-bar-new-tab-choice "*scratch*")
 
 #+end_src
 
@@ -464,45 +448,11 @@ Waiting for confirmation before tangling.
 #+RESULTS:
 | lambda | nil | (interactive) | (prot-simple-kill-buffer-current 1) |
 
-** dired
-#+begin_src emacs-lisp
-  (use-package dired
-    :ensure nil
-    :config
-    (setq dired-recursive-copies 'always)
-    (setq dired-recursive-deletes 'always)
-    (setq delete-by-moving-to-trash t)
-    (setq dired-listing-switches
-          "-AGFhlv --group-directories-first --time-style=long-iso")
-    (setq dired-dwim-target t)
-    ;; Hooks' syntax is controlled by the `use-pakage-hook-name-suffix'
-    ;; variable.  The "-hook" suffix is intentional
-    :hook ((dired-mode-hook . dired-hide-details-mode)
-           (dired-mode-hook . hl-line-mode)))
-
-#+end_src
-
-#+RESULTS:
-| hl-line-mode | dired-hide-details-mode |
-
-The default '^' for =dired-up-directory= feels a bit clumsy.  For such
-reason, ';' is binded to the same function in dired-mode using
-general.el.
+** buffer naming
 
 #+begin_src emacs-lisp
 
-  (general-define-key
-   :keymaps 'dired-mode-map
-   ";" 'dired-up-directory)
-#+end_src
-
-#+RESULTS:
-
-** naming
-#+begin_src emacs-lisp
-
-(global-set-key (kbd "C-c b r") #'rename-buffer)
-
+  (global-set-key (kbd "C-c b r") #'rename-buffer)
 #+end_src
 
 #+RESULTS:
@@ -544,6 +494,7 @@ In buffer or across buffers.
 * project
 
 ** eyebrowse
+
 |-----------+-----------------------|
 | key       | Doom Emacs equivalent |
 |-----------+-----------------------|
@@ -556,26 +507,30 @@ In buffer or across buffers.
 The shortkeys conflict with org-refile. Since I'm now using EXWM and
 considering to use tab-bar-mode for managment of window layout,
 tangling is currently disabled.
+
 #+begin_src emacs-lisp :tangle nil
-(use-package eyebrowse
-  :diminish eyebrowse-mode
-  :config (progn
-            (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
-            (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
-            (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
-            (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
-            (eyebrowse-mode t)
-            (setq eyebrowse-new-workspace t)))
+
+  (use-package eyebrowse
+    :diminish eyebrowse-mode
+    :config (progn
+              (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+              (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+              (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+              (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+              (eyebrowse-mode t)
+              (setq eyebrowse-new-workspace t)))
 #+end_src
 
 #+RESULTS:
 : t
 
 ** version control
+
 #+begin_src emacs-lisp
-(use-package magit
-  :bind (("C-c g" . magit))
-)
+
+  (use-package magit
+    :bind (("C-c g" . magit))
+  )
 #+end_src
 
 #+RESULTS:
@@ -594,9 +549,29 @@ tangling is currently disabled.
 
 * completion
 
-** ivy, swiper and counsel
+** helm
 
 #+begin_src emacs-lisp
+
+  (use-package helm
+    :config
+    (progn
+      (helm-mode 1)
+      ))
+#+end_src
+
+#+RESULTS:
+
+#+begin_src emacs-lisp
+
+  (global-set-key (kbd "M-x") #'helm-M-x)
+  (global-set-key (kbd "C-x C-f") #'helm-find-files)
+  (global-set-key (kbd "s-o") #'helm-buffers-list)
+#+end_src
+
+** ivy, swiper and counsel
+
+#+begin_src emacs-lisp :tangle nil
 
 (use-package ivy
   :config
@@ -682,6 +657,52 @@ enhance ivy with ivy-rich:
 #+RESULTS:
 : t
 
+* dired
+
+*** basic
+
+#+begin_src emacs-lisp
+
+  (use-package dired
+    :straight nil
+    :ensure nil
+    :config
+    (setq dired-recursive-copies 'always)
+    (setq dired-recursive-deletes 'always)
+    (setq delete-by-moving-to-trash t)
+    (setq dired-listing-switches
+          "-AGFhlv --group-directories-first --time-style=long-iso")
+    (setq dired-dwim-target t))
+
+#+end_src
+
+#+RESULTS:
+: t
+
+#+begin_src emacs-lisp
+
+  (add-hook 'dired-mode
+            #'(lambda ()
+                (progn
+                  (dired-hide-details-mode +1))))
+#+end_src
+
+#+RESULTS:
+| lambda | nil | (progn (dired-hide-details-mode 1)) |
+
+*** keybinding
+
+The default '^' for =dired-up-directory= feels a bit clumsy.  For such
+reason, ';' is binded to the same function in dired-mode using
+general.el.
+
+*** TODO improve
+- hide-detail not working
+- working with compress files
+- dired-subtree
+- pipe to shell, group operation
+- filtering
+
 * org
 
 #+begin_src emacs-lisp
@@ -699,6 +720,21 @@ enhance ivy with ivy-rich:
 
 #+RESULTS:
 : t
+** appearance
+
+#+RESULTS:
+| org-indent-mode | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | turn-on-org-cdlatex | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
+#+begin_src emacs-lisp
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(add-hook 'org-mode-hook #'org-indent-mode)
+#+end_src
+
 ** refile
 #+begin_src emacs-lisp
   (setq +personal-org-roam-files+ (apply (function append)
@@ -811,21 +847,6 @@ print(sys.version)
 #+RESULTS:
 : 3.8.5 (default, Jul 28 2020, 12:59:40) 
 : [GCC 9.3.0]
-
-** appearance
-
-#+begin_src emacs-lisp
-
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-(add-hook 'org-mode-hook #'org-indent-mode)
-#+end_src
-
-#+RESULTS:
-| org-indent-mode | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | turn-on-org-cdlatex | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
 ** latex
 #+begin_src emacs-lisp
@@ -1036,6 +1057,19 @@ in my org-directory.
 shortkey of org-mark-ring-goto conflicts with yasnippet.
 * miscellaneous
 
+** set debug on error, load custom
+
+#+begin_src emacs-lisp
+
+  (setq debug-on-error t)
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file)
+
+#+end_src
+
+#+RESULTS:
+: t
+
 ** default browser
 #+begin_src emacs-lisp
 (setq browse-url-browser-function 'browse-url-firefox)
@@ -1124,12 +1158,34 @@ currently disabled as I'm not using evil.
 #+RESULTS:
 
 ** focused editing
+
 #+begin_src emacs-lisp
+
   (use-package olivetti
+    :config
+    (progn
+      ;; occupies 7/10 of the window width  
+      (setq-default olivetti-body-width 0.7)
+      )
     :bind (("C-c f e" . olivetti-mode)))
 #+end_src
 
 #+RESULTS:
+: olivetti-mode
+
+** remove unused UI components
+
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq use-file-dialog nil)
+  (setq use-dialog-box t)               ; only for mouse events
+  ;; (setq inhibit-splash-screen t)
+#+end_src
+
+#+RESULTS:
+: t
 
 * lsp
 
@@ -1179,6 +1235,9 @@ currently disabled as I'm not using evil.
 : emms-add-playlist
 ** TODO improve config
 + block mplayer from poping up
+
+* e-books and documents
+
 ** pdf
 #+begin_src emacs-lisp
   (use-package pdf-tools
@@ -1187,6 +1246,9 @@ currently disabled as I'm not using evil.
 
 #+RESULTS:
 : t
+
+** TODO epub, djvu, mobi
+
 * shell and term
 
 ** vterm
@@ -1199,17 +1261,12 @@ currently disabled as I'm not using evil.
 : vterm
 ** eshell
 
+*** keybinding
+
 #+begin_src emacs-lisp
 
   (global-set-key (kbd "s-e") #'eshell)
 
-  (setenv "PATH"
-    (concat
-     ;; manually added
-     "/usr/local/cbc/bin" ";"
-     (getenv "PATH") ; inherited from OS
-    )
-  )
 
 #+end_src
 
@@ -1248,12 +1305,28 @@ currently disabled as I'm not using evil.
 #+RESULTS:
 : eshell/x
 
+*** PATH
+
+#+begin_src emacs-lisp
+
+  (setenv "PATH"
+    (concat
+     ;; manually added
+     "/usr/local/cbc/bin" ";"
+     (getenv "PATH") ; inherited from OS
+    )
+  )
+
+#+end_src
+
+*** TODO alias
 * modeline config
 
 [[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
 [[info:emacs#Mode Line][info:emacs#Mode Line]]
 [[help:mode-line-format]]
-** COMMENT the default
+** the default
+
 CS:CH-FR BUF  POS LINE (MAJOR MODE)
 + CS :: coding system.
 + ':' :: eol convention. Unix by default (on my XPS15 9500 running
@@ -1264,21 +1337,24 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 + FR :: only appears on text terminals
 + BUFF :: name of buffer.
 + POS :: position in the buffer.
+  
 #+begin_src emacs-lisp
+
   (defun mode-line-format-raw ()
     (interactive)
 
     (setq mode-line-format
-	    '("%e" mode-line-front-space mode-line-mule-info mode-line-client
-	      mode-line-modified mode-line-remote
-	      mode-line-frame-identification
-	      mode-line-buffer-identification " " mode-line-position
-	      (vc-mode vc-mode)
-	      "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
+            '("%e" mode-line-front-space mode-line-mule-info mode-line-client
+              mode-line-modified mode-line-remote
+              mode-line-frame-identification
+              mode-line-buffer-identification " " mode-line-position
+              (vc-mode vc-mode)
+              "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
   ))
 #+end_src
 
 #+begin_src emacs-lisp :tangle nil
+
   (use-package diminish)
   (diminish 'ivy-mode)
   (diminish 'auto-revert-mode)
@@ -1292,19 +1368,23 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+RESULTS:
 |   |
 #+begin_src emacs-lisp :tangle nil
+
   (use-package telephone-line
     :config (progn (setq telephone-line-primary-left-separator 'telephone-line-cubed-left
-			 telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
-			 telephone-line-primary-right-separator 'telephone-line-cubed-right
-			 telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right
-			 telephone-line-height 24)
-		   (telephone-line-mode +1)))
+                         telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
+                         telephone-line-primary-right-separator 'telephone-line-cubed-right
+                         telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right
+                         telephone-line-height 24)
+                   (telephone-line-mode +1)))
 #+end_src
 
 #+RESULTS:
 : t
+
 ** doom modeline
+
 #+begin_src emacs-lisp
+
   (use-package doom-modeline
     :init (doom-modeline-mode 1)
     :config
@@ -1343,7 +1423,10 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+end_src
 
 #+RESULTS:
-** C-general
+** C/C++
+
+*** cpputils-cmake
+
 #+begin_src elisp :tangle nil
 
   (use-package cpputils-cmake)
@@ -1365,8 +1448,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+RESULTS:
 | -I/usr/src/linux/include | -DNDEBUG |
 
-
-* exwm
+* EXWM
 
 ** keybinding
 
@@ -1453,7 +1535,7 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
 
 ** ui tweaks
 
-*** systemtray and necessary info
+*** systemtray, time&battery display  
 
 #+begin_src emacs-lisp
 

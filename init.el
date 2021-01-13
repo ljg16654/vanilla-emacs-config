@@ -1,27 +1,23 @@
 (setq user-full-name "Jigang Li"
       user-mail-address "ljg16654@sjtu.edu.cn")
 
-(setq debug-on-error t)
-;; (toggle-frame-fullscreen) 
-;;; custom
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(load custom-file)
+;; each use-package form also invoke straight.el to install the package
+(setq straight-use-package-by-default t)
 
-;;; use-package setup
-(require 'package)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
-
-(package-initialize)
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-always-ensure t)
+(straight-use-package 'use-package)
 
 (defun +default/save-to-king-ring-buffer-filename ()
   "Copy the current buffer's path to the kill ring."
@@ -43,14 +39,6 @@
     (setq solarized-use-variable-pitch nil)))
 (use-package spacemacs-theme
   :defer t)
-(load-theme 'sanityinc-tomorrow-night nil)
-
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(setq use-file-dialog nil)
-(setq use-dialog-box t)               ; only for mouse events
-;; (setq inhibit-splash-screen t)
 
 (use-package ag)
 
@@ -142,19 +130,26 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
          (window-height . 0.2)
          ;; (mode . '(eshell-mode shell-mode))
-         ))))
+         )))
 
 (setq window-combination-resize t)
 (setq even-window-sizes 'height-only)
 (setq window-sides-vertical nil)
 (setq switch-to-buffer-in-dedicated-window 'pop)
+(global-set-key (kbd "s-q") #'window-toggle-side-windows)
+(add-hook 'help-mode-hook #'visual-line-mode)
+(add-hook 'custom-mode-hook #'visual-line-mode)
 
 ;; between buffers
 
 (global-set-key (kbd "s-i") #'ibuffer)
-(global-set-key (kbd "s-o") #'switch-to-buffer)
+;; (global-set-key (kbd "s-o") #'switch-to-buffer)
 (global-set-key (kbd "s-<left>") #'previous-buffer)
 (global-set-key (kbd "s-<right>") #'next-buffer)
+(global-set-key (kbd "C-x <return> r")
+                ;; originally bound to
+                ;; revert-buffer-with-coding-system
+                #'revert-buffer)
 
 ;; inside a tab
 
@@ -166,7 +161,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
                                 (other-window -1)))
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
-;; new tab starts with scratch buffer 
+;; new tab starts with scratch buffer
+
 (setq tab-bar-new-tab-choice "*scratch*")
 
 (defun prot-simple-kill-buffer-current (&optional arg)
@@ -185,24 +181,6 @@ buffer's window as well."
 (global-set-key (kbd "s-C") #'(lambda ()
                                 (interactive)
                                 (prot-simple-kill-buffer-current 1)))
-
-(use-package dired
-  :ensure nil
-  :config
-  (setq dired-recursive-copies 'always)
-  (setq dired-recursive-deletes 'always)
-  (setq delete-by-moving-to-trash t)
-  (setq dired-listing-switches
-        "-AGFhlv --group-directories-first --time-style=long-iso")
-  (setq dired-dwim-target t)
-  ;; Hooks' syntax is controlled by the `use-pakage-hook-name-suffix'
-  ;; variable.  The "-hook" suffix is intentional
-  :hook ((dired-mode-hook . dired-hide-details-mode)
-         (dired-mode-hook . hl-line-mode)))
-
-(general-define-key
- :keymaps 'dired-mode-map
- ";" 'dired-up-directory)
 
 (global-set-key (kbd "C-c b r") #'rename-buffer)
 
@@ -232,17 +210,15 @@ buffer's window as well."
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
-(use-package ivy
+(use-package helm
   :config
-  (setq ivy-use-virtual-buffers t
-	enable-recursive-minibuffers t)
-  :bind (("C-s" . swiper)
-	 ("C-c C-r" . ivy-resume)
-	 ("M-x" . counsel-M-x)
-	 ("C-x C-f" . counsel-find-file)))
+  (progn
+    (helm-mode 1)
+    ))
 
-(ivy-mode 1)
-(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+(global-set-key (kbd "M-x") #'helm-M-x)
+(global-set-key (kbd "C-x C-f") #'helm-find-files)
+(global-set-key (kbd "s-o") #'helm-buffers-list)
 
 (use-package orderless
   :ensure t
@@ -263,6 +239,22 @@ buffer's window as well."
   :config
   (setq which-key-idle-delay 0.3))
 
+(use-package dired
+  :straight nil
+  :ensure nil
+  :config
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always)
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+        "-AGFhlv --group-directories-first --time-style=long-iso")
+  (setq dired-dwim-target t))
+
+(add-hook 'dired-mode
+          #'(lambda ()
+              (progn
+                (dired-hide-details-mode +1))))
+
 (use-package org
   :config
   (progn
@@ -272,6 +264,13 @@ buffer's window as well."
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
+
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(add-hook 'org-mode-hook #'org-indent-mode)
 
 (setq +personal-org-roam-files+ (apply (function append)
 				(mapcar
@@ -327,13 +326,6 @@ buffer's window as well."
  ))
 
 (setq org-babel-python-command "python3")
-
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-(add-hook 'org-mode-hook #'org-indent-mode)
 
 (use-package auctex
   :defer t)
@@ -463,6 +455,10 @@ buffer's window as well."
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
+(setq debug-on-error t)
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file)
+
 (setq browse-url-browser-function 'browse-url-firefox)
 
 (use-package command-log-mode)
@@ -496,7 +492,19 @@ buffer's window as well."
   (set-frame-parameter (selected-frame) 'alpha value))
 
 (use-package olivetti
+  :config
+  (progn
+    ;; occupies 7/10 of the window width  
+    (setq-default olivetti-body-width 0.7)
+    )
   :bind (("C-c f e" . olivetti-mode)))
+
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(setq use-file-dialog nil)
+(setq use-dialog-box t)               ; only for mouse events
+;; (setq inhibit-splash-screen t)
 
 (use-package company
   :config
@@ -546,6 +554,18 @@ buffer's window as well."
    (getenv "PATH") ; inherited from OS
   )
 )
+
+(defun mode-line-format-raw ()
+  (interactive)
+
+  (setq mode-line-format
+          '("%e" mode-line-front-space mode-line-mule-info mode-line-client
+            mode-line-modified mode-line-remote
+            mode-line-frame-identification
+            mode-line-buffer-identification " " mode-line-position
+            (vc-mode vc-mode)
+            "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
+))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
