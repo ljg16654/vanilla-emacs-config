@@ -126,6 +126,11 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
         ("\\*\\(Output\\|Register Preview\\).*"
          (display-buffer-at-bottom)
          (window-parameters . ((no-other-window . t))))
+        ("\\*WordNet*"
+         (display-buffer-in-side-window
+          (window-height . 0.5)
+          (side . top)
+          (slot . 3)))
         ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
          (window-height . 0.2)
@@ -230,7 +235,28 @@ buffer's window as well."
 (global-set-key (kbd "H-SPC") #'helm-projectile)
 
 (straight-use-package
-  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
+ '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
+
+(global-set-key (kbd "s-K") #'helm-wordnut)
+
+(defun helm-wordnet-at-point ()
+  "Use `helm-wordnut--persistent-action' to define word at point.
+When the region is active, define the marked phrase."
+  (interactive)
+  ;; the extraction of word is copied from
+  ;; package define-word
+  (let ((word
+         (cond
+          ((eq major-mode 'pdf-view-mode)
+           (car (pdf-view-active-region-text)))
+          ((use-region-p)
+           (buffer-substring-no-properties
+            (region-beginning)
+            (region-end)))
+          (t
+           (substring-no-properties
+            (thing-at-point 'word))))))
+    (helm-wordnut--persistent-action word))))
 
 (use-package helm-swoop)
 (global-unset)
@@ -275,7 +301,9 @@ buffer's window as well."
   :config
   (progn
     (setq org-ellipsis " ▾"
-          org-hide-emphasis-markers t)
+          org-hide-emphasis-markers t
+          org-imenu-depth 7
+          )
     (local-unset-key (kbd "C-'"))
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "

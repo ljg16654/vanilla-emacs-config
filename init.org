@@ -285,6 +285,11 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
           ("\\*\\(Output\\|Register Preview\\).*"
            (display-buffer-at-bottom)
            (window-parameters . ((no-other-window . t))))
+          ("\\*WordNet*"
+           (display-buffer-in-side-window
+            (window-height . 0.5)
+            (side . top)
+            (slot . 3)))
           ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . 0.2)
@@ -588,21 +593,51 @@ tangling is currently disabled.
 : helm-projectile
 
 [[https://www.manueluberti.eu/emacs/2020/06/13/helm-wordnut/][blog post on helm-wordnut]]
+see [[*window rules and management]] for configuration of relevent windows.
 
 #+begin_src emacs-lisp
 
   (straight-use-package
-    '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
-#+end_src
+   '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
-#+RESULTS:
-: t
+  (global-set-key (kbd "s-K") #'helm-wordnut)
+#+end_src
 
 #+begin_src emacs-lisp
 
-  (use-package helm-swoop)
-  (global-unset)
-  (global-set-key (kbd "C-s") #'helm-swoop)
+  (defun helm-wordnet-at-point ()
+    "Use `helm-wordnut--persistent-action' to define word at point.
+  When the region is active, define the marked phrase."
+    (interactive)
+    ;; the extraction of word is copied from
+    ;; package define-word
+    (let ((word
+           (cond
+            ((eq major-mode 'pdf-view-mode)
+             (car (pdf-view-active-region-text)))
+            ((use-region-p)
+             (buffer-substring-no-properties
+              (region-beginning)
+              (region-end)))
+            (t
+             (substring-no-properties
+              (thing-at-point 'word))))))
+      (helm-wordnut--persistent-action word))))
+
+#+end_src
+
+#+RESULTS:
+: helm-wordnet-at-point
+
+  ,#+RESULTS:
+  : t
+
+#+begin_src emacs-lisp
+
+    (use-package helm-swoop)
+    (global-unset)
+    (global-set-key (kbd "C-s") #'helm-swoop)
+
 #+end_src
 
 ** ivy, swiper and counsel
@@ -747,7 +782,9 @@ general.el.
     :config
     (progn
       (setq org-ellipsis " ▾"
-            org-hide-emphasis-markers t)
+            org-hide-emphasis-markers t
+            org-imenu-depth 7
+            )
       (local-unset-key (kbd "C-'"))
       (font-lock-add-keywords 'org-mode
                               '(("^ *\\([-]\\) "
@@ -1155,6 +1192,7 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 In addition, s-<return> is bound to =helm-filtered-bookmarks= in [[*helm]].
 
 ** dictionary
+
 #+begin_src elisp
 
   (use-package define-word
