@@ -483,13 +483,6 @@ In buffer or across buffers.
 #+RESULTS:
 : langou/goto-config
 
-** imenu
-#+begin_src emacs-lisp
-(global-set-key (kbd "M-i") 'imenu)
-#+end_src
-
-#+RESULTS:
-: imenu
 
 * project
 
@@ -551,6 +544,8 @@ tangling is currently disabled.
 
 ** helm
 
+*** setup
+
 #+begin_src emacs-lisp
 
   (use-package helm
@@ -567,6 +562,47 @@ tangling is currently disabled.
   (global-set-key (kbd "M-x") #'helm-M-x)
   (global-set-key (kbd "C-x C-f") #'helm-find-files)
   (global-set-key (kbd "s-o") #'helm-buffers-list)
+  (global-set-key (kbd "M-i") #'helm-imenu)
+  (global-set-key (kbd "C-h a") #'helm-apropos)
+  (global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
+
+#+end_src
+
+#+RESULTS:
+: helm-imenu
+
+*** helm extensions
+
+#+begin_src emacs-lisp
+
+   (use-package helm-projectile
+     :config
+     (progn
+       (helm-projectile-on)
+       ))
+
+  (global-set-key (kbd "H-SPC") #'helm-projectile)
+#+end_src
+
+#+RESULTS:
+: helm-projectile
+
+[[https://www.manueluberti.eu/emacs/2020/06/13/helm-wordnut/][blog post on helm-wordnut]]
+
+#+begin_src emacs-lisp
+
+  (straight-use-package
+    '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
+#+end_src
+
+#+RESULTS:
+: t
+
+#+begin_src emacs-lisp
+
+  (use-package helm-swoop)
+  (global-unset)
+  (global-set-key (kbd "C-s") #'helm-swoop)
 #+end_src
 
 ** ivy, swiper and counsel
@@ -1109,14 +1145,14 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 : ((lambda . 955) (**2 . 178) (sum . 8721) (sigma . 963) (mu . 956) (theta . 952))
 
 ** bookmarks
+
 #+begin_src emacs-lisp
 
   (global-set-key (kbd "s-m") #'bookmark-set)
-  (global-set-key (kbd "s-<return>") #'bookmark-jump)
+
 #+end_src
 
-#+RESULTS:
-: bookmark-jump
+In addition, s-<return> is bound to =helm-filtered-bookmarks= in [[*helm]].
 
 ** dictionary
 #+begin_src elisp
@@ -1172,6 +1208,20 @@ currently disabled as I'm not using evil.
 
 #+RESULTS:
 : olivetti-mode
+
+** expand-region.el
+
+#+begin_src emacs-lisp
+
+  (use-package expand-region
+    :config
+    (progn
+      (global-set-key (kbd "C-=") #'er/expand-region)
+      ))
+#+end_src
+
+#+RESULTS:
+: t
 
 ** remove unused UI components
 

@@ -199,8 +199,6 @@ buffer's window as well."
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
 
-(global-set-key (kbd "M-i") 'imenu)
-
 (use-package magit
   :bind (("C-c g" . magit))
 )
@@ -219,6 +217,24 @@ buffer's window as well."
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 (global-set-key (kbd "s-o") #'helm-buffers-list)
+(global-set-key (kbd "M-i") #'helm-imenu)
+(global-set-key (kbd "C-h a") #'helm-apropos)
+(global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
+
+(use-package helm-projectile
+   :config
+   (progn
+     (helm-projectile-on)
+     ))
+
+(global-set-key (kbd "H-SPC") #'helm-projectile)
+
+(straight-use-package
+  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
+
+(use-package helm-swoop)
+(global-unset)
+(global-set-key (kbd "C-s") #'helm-swoop)
 
 (use-package orderless
   :ensure t
@@ -484,7 +500,6 @@ buffer's window as well."
        ))
 
 (global-set-key (kbd "s-m") #'bookmark-set)
-(global-set-key (kbd "s-<return>") #'bookmark-jump)
 
 (defun transparency (value)
   "sets the transparency of the frame window. 0=transparent/100=opaque"
@@ -498,6 +513,12 @@ buffer's window as well."
     (setq-default olivetti-body-width 0.7)
     )
   :bind (("C-c f e" . olivetti-mode)))
+
+(use-package expand-region
+  :config
+  (progn
+    (global-set-key (kbd "C-=") #'er/expand-region)
+    ))
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
