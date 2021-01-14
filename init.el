@@ -736,16 +736,17 @@ When the region is active, define the marked phrase."
 ;; It is not tangled into wallpaper.el
 (use-package wallpaper
   :ensure t
-     (use-package wallpaper
-       :ensure t
-       :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-              (after-init . wallpaper-cycle-mode))
-       :custom ((wallpaper-cycle-single t)
-                (wallpaper-scaling 'fill)
-                (wallpaper-cycle-interval 45)
-                (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+         (after-init . wallpaper-cycle-mode))
+  :custom ((wallpaper-cycle-single t)
+           (wallpaper-scaling 'fill)
+           (wallpaper-cycle-interval 45)
+           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 
 (desktop-save-mode 1)
+
+(add-to-list 'load-path "~/vanilla/site-lisp/emacs-application-framework/")
+(require 'eaf)
 
 (use-package anki-editor)
 

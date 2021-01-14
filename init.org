@@ -1816,16 +1816,17 @@ Assign workspaces to monitors.
   ;; It is not tangled into wallpaper.el
   (use-package wallpaper
     :ensure t
-       (use-package wallpaper
-         :ensure t
-         :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-                (after-init . wallpaper-cycle-mode))
-         :custom ((wallpaper-cycle-single t)
-                  (wallpaper-scaling 'fill)
-                  (wallpaper-cycle-interval 45)
-                  (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+           (after-init . wallpaper-cycle-mode))
+    :custom ((wallpaper-cycle-single t)
+             (wallpaper-scaling 'fill)
+             (wallpaper-cycle-interval 45)
+             (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 
 #+end_src
+
+#+RESULTS:
+| wallpaper-cycle-mode | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
 
 * save sessions
 
@@ -1850,11 +1851,53 @@ Assign workspaces to monitors.
 #+RESULTS:
 : t
 
+* eaf
+
+#+begin_src emacs-lisp
+
+  (add-to-list 'load-path "~/vanilla/site-lisp/emacs-application-framework/")
+  (require 'eaf)
+#+end_src
+
+#+begin_src emacs-lisp :tangle nil :eval never
+
+(use-package eaf
+  :custom
+  (eaf-browser-continue-where-left-off t)
+  :config
+  (eaf-setq eaf-browser-enable-adblocker "true")
+  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+#+end_src
+
+#+RESULTS:
+: t
+
 * workflow
 
 This is a special section dedicated to describe the ideal workflow
 that this configuration seeks to provide. For easier maintenance it
 shall not contain any source block to tangle.
+
+** switch buffer
+
+In EXWM, emacs buffer and application presented in X windows are
+treated equally in buffer lists.
+
+in =helm-buffer-list=, the list can be quickly narrowed with
+
+- name of the buffer
+- major mode via =*[major mode]= or =*![major mode]=
+- include? text via = @[text]= (notice the space!)
+
+Notice the versatility of major mode matching: the full name of the
+major mode is /not/ required.  For example =*v @rostopic= narrows the list
+to buffers with major mode /matching/ =v= and having the content matching
+=rostopic=.  This will probably result in vterm buffers running =rostopic=
+command, although other major mode, such as =Magit Rev= or =VC dir=, also
+match the same major mode predicate as vterm-mode.
 
 ** maintenance
 
