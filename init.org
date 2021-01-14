@@ -101,6 +101,38 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 #+RESULTS:
 : t
 
+* keybinding
+
+[[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
+/Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
+and home row keys, should be wrapped with =<= and =>=.
+
+** general.el
+
+For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding.org][general.el define keybinding]].
+
+#+begin_src emacs-lisp
+
+  (use-package general)
+#+end_src
+
+#+RESULTS:
+
+** evil
+#+begin_src emacs-lisp
+
+  (use-package evil)
+  (use-package evil-escape
+    :config
+    (progn
+      (setq-default evil-escape-key-sequence "jk")
+      (evil-escape-mode)))
+
+  (global-set-key (kbd "H-e") #'evil-mode)
+#+end_src
+
+#+RESULTS:
+: evil-mode
 * searching
 
 Sometimes, when =lsp= doesn't work for some reasons (for example,
@@ -156,39 +188,6 @@ read later at the moment.
 #+end_src
 
 #+RESULTS:
-
-* keybinding
-
-[[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
-/Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
-and home row keys, should be wrapped with =<= and =>=.
-
-** general.el
-
-For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding.org][general.el define keybinding]].
-
-#+begin_src elisp
-
-  (use-package general)
-#+end_src
-
-#+RESULTS:
-
-** evil
-#+begin_src emacs-lisp
-
-  (use-package evil)
-  (use-package evil-escape
-    :config
-    (progn
-      (setq-default evil-escape-key-sequence "jk")
-      (evil-escape-mode)))
-
-  (global-set-key (kbd "H-e") #'evil-mode)
-#+end_src
-
-#+RESULTS:
-: evil-mode
 
 * window and buffer
 
@@ -408,7 +407,7 @@ Waiting for confirmation before tangling.
       (setq tab-bar-show t)
       (tab-bar-mode 1)))
 
-  (defconst tab-leader "s-<tab>")
+  (defconst tab-leader "C-x t")
 
   (general-create-definer tab-leader-def
     :prefix tab-leader)
@@ -419,7 +418,7 @@ Waiting for confirmation before tangling.
     "r" 'tab-bar-rename-tab
     "k" 'tab-bar-close-tab
     "t" 'prot-tab-tab-bar-toggle
-    "<tab>" 'prot-tab-select-tab-dwim) 
+    "<tab>" 'prot-tab-select-tab-dwim)
 
   (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 #+end_src
@@ -639,7 +638,6 @@ see [[*window rules and management]] for configuration of relevent windows.
 #+begin_src emacs-lisp
 
     (use-package helm-swoop)
-    (global-unset)
     (global-set-key (kbd "C-s") #'helm-swoop)
 
 #+end_src
@@ -681,7 +679,7 @@ see [[*window rules and management]] for configuration of relevent windows.
 
 ** embark, orderless and marginalia
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 
   (use-package orderless
     :ensure t
@@ -692,7 +690,7 @@ see [[*window rules and management]] for configuration of relevent windows.
 
 #+RESULTS:
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 
     (use-package embark)
 #+end_src
@@ -1261,6 +1259,13 @@ Interactively toggle transparency in winframe.
 #+RESULTS:
 : transparency
 
+Transparency at start:
+
+#+begin_src emacs-lisp
+
+  (transparency 0.9)
+#+end_src
+
 ** cursor in =-nw= mode
 
 currently disabled as I'm not using evil.
@@ -1603,7 +1608,7 @@ achieved.
       (setq exwm-workspace-number 3)
       (setq exwm-input-prefix-keys
             '(?\C-x
-              ?\s-o	      ;; switch-to-buffer
+              ?\s-o ;; switch-to-buffer
               ?\s-i ;; ibuffer
               ?\s-j ;; window switch
               ?\s-c ;; kill window
@@ -1612,8 +1617,10 @@ achieved.
               ?\s-v ;; vterm
               ?\s-s ;; single-window-toggle
               ?\s-e ;; pop-up eshell
+              ?\s-q ;; toggle side windows
               ?\C-u ;; general command
               ?\C-h ;; help
+              (kbd "s-TAB")
               ?\M-x
               ?\M-&
               ?\M-:
@@ -1659,7 +1666,6 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
   ;; After C-q, send key to the window 
   (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
   (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-  (exwm-input-set-key (kbd "s-<tab>") 'prot-tab-select-tab-dwim)
 #+end_src
 
 #+RESULTS:
@@ -1803,6 +1809,39 @@ Assign workspaces to monitors.
 
 #+RESULTS:
 | wallpaper-cycle-mode | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
+
+* save sessions
+
+- desktop-save :: manual save
+- desktop-save-mode :: non nil if the /mode/ is enabled
+- desktop-change-dir :: save current desktop and reload one saved in
+  another directory.
+- desktop-revert :: reverts to the desktop /previously reloaded/.
+- desktop-path :: list of directories to search for the desktop file.
+- desktop-clear :: kills all buffers except internal ones, and clears
+  the global variables listed in ‘desktop-globals-to-clear’. Variable
+  can be set to preserve some buffers matching certain regexp.
+
+  The =--no-desktop= option can be passed
+  so that no saved desktop wouldn't be reloaded.
+
+#+begin_src emacs-lisp
+
+(desktop-save-mode 1)
+#+end_src
+
+#+RESULTS:
+: t
+
+* workflow
+
+This is a special section dedicated to describe the ideal workflow
+that this configuration seeks to provide. For easier maintenance it
+shall not contain any source block to tangle.
+
+** code reading
+
+** note taking 
 
 * anki
 

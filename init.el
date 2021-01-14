@@ -40,7 +40,7 @@
 (use-package spacemacs-theme
   :defer t)
 
-(use-package ag)
+(use-package general)
 
 (use-package evil)
 (use-package evil-escape
@@ -50,6 +50,8 @@
     (evil-escape-mode)))
 
 (global-set-key (kbd "H-e") #'evil-mode)
+
+(use-package ag)
 
 (use-package emacs
   :config
@@ -261,15 +263,7 @@ When the region is active, define the marked phrase."
 (global-set-key (kbd "s-L") #'helm-wordnet-at-point)
 
 (use-package helm-swoop)
-(global-unset)
 (global-set-key (kbd "C-s") #'helm-swoop)
-
-(use-package orderless
-  :ensure t
-  :init (icomplete-mode)		; optional but recommended!
-  :custom (completion-styles '(orderless)))
-
-(use-package embark)
 
 (use-package yasnippet
   :config
@@ -558,6 +552,8 @@ When the region is active, define the marked phrase."
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
+(transparency 0.9)
+
 (use-package olivetti
   :config
   (progn
@@ -662,7 +658,7 @@ When the region is active, define the marked phrase."
     (setq exwm-workspace-number 3)
     (setq exwm-input-prefix-keys
           '(?\C-x
-            ?\s-o	      ;; switch-to-buffer
+            ?\s-o ;; switch-to-buffer
             ?\s-i ;; ibuffer
             ?\s-j ;; window switch
             ?\s-c ;; kill window
@@ -671,8 +667,10 @@ When the region is active, define the marked phrase."
             ?\s-v ;; vterm
             ?\s-s ;; single-window-toggle
             ?\s-e ;; pop-up eshell
+            ?\s-q ;; toggle side windows
             ?\C-u ;; general command
             ?\C-h ;; help
+            (kbd "s-TAB")
             ?\M-x
             ?\M-&
             ?\M-:
@@ -709,7 +707,6 @@ When the region is active, define the marked phrase."
 ;; After C-q, send key to the window 
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-(exwm-input-set-key (kbd "s-<tab>") 'prot-tab-select-tab-dwim)
 
 (require 'exwm-systemtray)
 (exwm-systemtray-enable)
@@ -732,6 +729,8 @@ When the region is active, define the marked phrase."
 (add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
 (efs/update-displays)
 
+(desktop-save-mode 1)
+
 (use-package anki-editor)
 
 (use-package rg
@@ -743,8 +742,6 @@ When the region is active, define the marked phrase."
 
 ;; seems to be dependency for projectile-ripgrep
 (use-package ripgrep)
-
-(use-package general)
 
 (use-package tab-bar
   :init
@@ -792,7 +789,7 @@ questions.  Else use completion to select the tab to switch to."
     (setq tab-bar-show t)
     (tab-bar-mode 1)))
 
-(defconst tab-leader "s-<tab>")
+(defconst tab-leader "C-x t")
 
 (general-create-definer tab-leader-def
   :prefix tab-leader)
@@ -803,7 +800,7 @@ questions.  Else use completion to select the tab to switch to."
   "r" 'tab-bar-rename-tab
   "k" 'tab-bar-close-tab
   "t" 'prot-tab-tab-bar-toggle
-  "<tab>" 'prot-tab-select-tab-dwim) 
+  "<tab>" 'prot-tab-select-tab-dwim)
 
 (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 
