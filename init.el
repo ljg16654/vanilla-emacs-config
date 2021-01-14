@@ -222,6 +222,7 @@ buffer's window as well."
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 (global-set-key (kbd "s-o") #'helm-buffers-list)
+(global-set-key (kbd "s-O") #'helm-recentf)
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
 (global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
@@ -236,8 +237,6 @@ buffer's window as well."
 
 (straight-use-package
  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
-
-(global-set-key (kbd "s-K") #'helm-wordnut)
 
 (defun helm-wordnet-at-point ()
   "Use `helm-wordnut--persistent-action' to define word at point.
@@ -256,7 +255,10 @@ When the region is active, define the marked phrase."
           (t
            (substring-no-properties
             (thing-at-point 'word))))))
-    (helm-wordnut--persistent-action word))))
+    (helm-wordnut--persistent-action word)))
+
+(global-set-key (kbd "s-K") #'helm-wordnut)
+(global-set-key (kbd "s-L") #'helm-wordnet-at-point)
 
 (use-package helm-swoop)
 (global-unset)
@@ -296,6 +298,18 @@ When the region is active, define the marked phrase."
           #'(lambda ()
               (progn
                 (dired-hide-details-mode +1))))
+
+(use-package dired-subtree
+  :after dired
+  :config
+  (progn
+    (setq dired-subtree-use-backgrounds nil)
+    )
+  :bind
+  (:map dired-mode-map
+        ("<tab>" . dired-subtree-toggle)
+        ("C-<tab>" . dired-subtree-cycle)
+        ))
 
 (use-package org
   :config

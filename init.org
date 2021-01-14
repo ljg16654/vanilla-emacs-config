@@ -466,7 +466,7 @@ Waiting for confirmation before tangling.
 * movement
 
 In buffer or across buffers.
-** avy and frequently visited files
+** avy
 #+begin_src emacs-lisp
 
   (use-package avy
@@ -477,17 +477,23 @@ In buffer or across buffers.
   (global-set-key (kbd "H-d") #'avy-goto-char-2)
   (global-set-key (kbd "H-f") #'avy-goto-char)
 
+#+end_src
+
+#+RESULTS:
+: langou/goto-config
+
+** frequently visited files
+
+#+begin_src emacs-lisp
+
   (defun langou/goto-config ()
     "go to personal configuration of emacs"
     (interactive)
     (find-file "~/vanilla/init.org"))
 
   (global-set-key (kbd "C-c f p") #'langou/goto-config)
+
 #+end_src
-
-#+RESULTS:
-: langou/goto-config
-
 
 * project
 
@@ -567,6 +573,7 @@ tangling is currently disabled.
   (global-set-key (kbd "M-x") #'helm-M-x)
   (global-set-key (kbd "C-x C-f") #'helm-find-files)
   (global-set-key (kbd "s-o") #'helm-buffers-list)
+  (global-set-key (kbd "s-O") #'helm-recentf)
   (global-set-key (kbd "M-i") #'helm-imenu)
   (global-set-key (kbd "C-h a") #'helm-apropos)
   (global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
@@ -574,7 +581,7 @@ tangling is currently disabled.
 #+end_src
 
 #+RESULTS:
-: helm-imenu
+: helm-filtered-bookmarks
 
 *** helm extensions
 
@@ -600,11 +607,6 @@ see [[*window rules and management]] for configuration of relevent windows.
   (straight-use-package
    '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
 
-  (global-set-key (kbd "s-K") #'helm-wordnut)
-#+end_src
-
-#+begin_src emacs-lisp
-
   (defun helm-wordnet-at-point ()
     "Use `helm-wordnut--persistent-action' to define word at point.
   When the region is active, define the marked phrase."
@@ -622,7 +624,10 @@ see [[*window rules and management]] for configuration of relevent windows.
             (t
              (substring-no-properties
               (thing-at-point 'word))))))
-      (helm-wordnut--persistent-action word))))
+      (helm-wordnut--persistent-action word)))
+
+  (global-set-key (kbd "s-K") #'helm-wordnut)
+  (global-set-key (kbd "s-L") #'helm-wordnet-at-point)
 
 #+end_src
 
@@ -773,6 +778,24 @@ general.el.
 - dired-subtree
 - pipe to shell, group operation
 - filtering
+
+#+begin_src emacs-lisp
+
+  (use-package dired-subtree
+    :after dired
+    :config
+    (progn
+      (setq dired-subtree-use-backgrounds nil)
+      )
+    :bind
+    (:map dired-mode-map
+          ("<tab>" . dired-subtree-toggle)
+          ("C-<tab>" . dired-subtree-cycle)
+          ))
+#+end_src
+
+#+RESULTS:
+: dired-subtree-cycle
 
 * org
 
