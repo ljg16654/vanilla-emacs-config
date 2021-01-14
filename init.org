@@ -797,6 +797,18 @@ general.el.
 #+RESULTS:
 : dired-subtree-cycle
 
+#+begin_src emacs-lisp
+
+  (use-package peep-dired
+    :bind
+    (:map dired-mode-map
+     ("`" . peep-dired)
+     ))
+#+end_src
+
+#+RESULTS:
+: peep-dired
+
 * org
 
 #+begin_src emacs-lisp

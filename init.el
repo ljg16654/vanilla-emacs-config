@@ -311,6 +311,12 @@ When the region is active, define the marked phrase."
         ("C-<tab>" . dired-subtree-cycle)
         ))
 
+(use-package peep-dired
+  :bind
+  (:map dired-mode-map
+   ("`" . peep-dired)
+   ))
+
 (use-package org
   :config
   (progn
