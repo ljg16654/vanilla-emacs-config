@@ -299,6 +299,10 @@ When the region is active, define the marked phrase."
               (progn
                 (dired-hide-details-mode +1))))
 
+(general-define-key
+ :keymaps 'dired-mode-map
+ ";" #'dired-up-directory)
+
 (use-package dired-subtree
   :after dired
   :config
@@ -788,8 +792,7 @@ questions.  Else use completion to select the tab to switch to."
     (setq tab-bar-show t)
     (tab-bar-mode 1)))
 
-(global-unset-key (kbd "C-t"))
-(defconst tab-leader "C-t")
+(defconst tab-leader "s-<tab>")
 
 (general-create-definer tab-leader-def
   :prefix tab-leader)
@@ -799,9 +802,9 @@ questions.  Else use completion to select the tab to switch to."
   "n" 'tab-bar-new-tab
   "r" 'tab-bar-rename-tab
   "k" 'tab-bar-close-tab
-  "t" 'prot-tab-select-tab-dwim) 
+  "t" 'prot-tab-tab-bar-toggle
+  "<tab>" 'prot-tab-select-tab-dwim) 
 
-(global-set-key (kbd "s-<tab>") #'prot-tab-select-tab-dwim)
 (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 
 (use-package define-word

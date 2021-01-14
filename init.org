@@ -408,8 +408,7 @@ Waiting for confirmation before tangling.
       (setq tab-bar-show t)
       (tab-bar-mode 1)))
 
-  (global-unset-key (kbd "C-t"))
-  (defconst tab-leader "C-t")
+  (defconst tab-leader "s-<tab>")
 
   (general-create-definer tab-leader-def
     :prefix tab-leader)
@@ -419,9 +418,9 @@ Waiting for confirmation before tangling.
     "n" 'tab-bar-new-tab
     "r" 'tab-bar-rename-tab
     "k" 'tab-bar-close-tab
-    "t" 'prot-tab-select-tab-dwim) 
+    "t" 'prot-tab-tab-bar-toggle
+    "<tab>" 'prot-tab-select-tab-dwim) 
 
-  (global-set-key (kbd "s-<tab>") #'prot-tab-select-tab-dwim)
   (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 #+end_src
 
@@ -771,6 +770,15 @@ enhance ivy with ivy-rich:
 The default '^' for =dired-up-directory= feels a bit clumsy.  For such
 reason, ';' is binded to the same function in dired-mode using
 general.el.
+
+#+begin_src emacs-lisp
+
+  (general-define-key
+   :keymaps 'dired-mode-map
+   ";" #'dired-up-directory)
+#+end_src
+
+#+RESULTS:
 
 *** TODO improve
 - hide-detail not working
