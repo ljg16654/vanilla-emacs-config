@@ -284,9 +284,9 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
           ("\\*\\(Output\\|Register Preview\\).*"
            (display-buffer-at-bottom)
            (window-parameters . ((no-other-window . t))))
-          ("\\*WordNet*"
+          ("\\*WordNet.*"
            (display-buffer-in-side-window
-            (window-height . 0.5)
+            (window-height . 0.7)
             (side . top)
             (slot . 3)))
           ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
@@ -1334,8 +1334,7 @@ currently disabled as I'm not using evil.
   (use-package company
     :config
     (setq company-idle-delay 0)
-    :bind
-    (("TAB" . company-indent-or-complete-common)))
+    )
   (add-hook 'after-init-hook 'global-company-mode)
   (use-package lsp-mode)
   (use-package flycheck)
@@ -1343,17 +1342,17 @@ currently disabled as I'm not using evil.
     :demand flycheck
     :config
     (setq lsp-ui-sideline-show-diagnostics t
-	  lsp-ui-sideline-show-hover t))
+          lsp-ui-sideline-show-hover t))
   (use-package lsp-python-ms
     :ensure t
     :init (setq lsp-python-ms-auto-install-server t
-		read-process-output-max 1048576)
+                read-process-output-max 1048576)
     :hook (python-mode . (lambda ()
-			    (require 'lsp-python-ms)
-			    (lsp))))
+                            (require 'lsp-python-ms)
+                            (lsp))))
 #+end_src
 #+RESULTS:
-| lambda | nil | (require 'lsp-python-ms) | (lsp) |
+| doom-modeline-env-setup-python | (lambda nil (require 'lsp-python-ms) (lsp)) | er/add-python-mode-expansions |
 
 * music
 
@@ -1808,25 +1807,25 @@ Assign workspaces to monitors.
     (center "--bg-center ")))
 #+end_src
 
-#+begin_src elisp
+#+begin_src emacs-lisp
 
-     (unless (executable-find "feh")
-       (display-warning 'wallpaper "External command `feh' not found!"))
+  (unless (executable-find "feh")
+    (display-warning 'wallpaper "External command `feh' not found!"))
 
-     ;; This is an example `use-package' configuration
-     ;; It is not tangled into wallpaper.el
-     (use-package wallpaper
-       :ensure t
-       :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-              (after-init . wallpaper-cycle-mode))
-       :custom ((wallpaper-cycle-single t)
-                (wallpaper-scaling 'fill)
-                (wallpaper-cycle-interval 45)
-                (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+  ;; This is an example `use-package' configuration
+  ;; It is not tangled into wallpaper.el
+  (use-package wallpaper
+    :ensure t
+       (use-package wallpaper
+         :ensure t
+         :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+                (after-init . wallpaper-cycle-mode))
+         :custom ((wallpaper-cycle-single t)
+                  (wallpaper-scaling 'fill)
+                  (wallpaper-cycle-interval 45)
+                  (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+
 #+end_src
-
-#+RESULTS:
-| wallpaper-cycle-mode | #[0 \303\211\235\203 \304"\301\305!\210\210	\205 \306 \210\307\211\207 [command-line-args desktop-save-mode inhibit-startup-screen --no-desktop delete 0 desktop-read t] 4] | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
 
 * save sessions
 
@@ -1857,9 +1856,36 @@ This is a special section dedicated to describe the ideal workflow
 that this configuration seeks to provide. For easier maintenance it
 shall not contain any source block to tangle.
 
+** maintenance
+
+Periodic activities that clears whatever impedes progress along a
+clean workflow. It remains to observe whether dedicatin into
+maintenance could defy the meaning of its own existence.
+
+- bookmark cleaning
+- check agenda
+
 ** code reading
 
+- peep-dired + dired-subtree :: for brief grasp of file structure
+- ? :: take note on file structure
+- s-m :: bookmark
+- ? :: capture template for specific code
+
+- s-p f :: helm-projectile-find-file
+- s-f d :: rg-dwim
+- s-f r :: regexp search in chosen directory
+
+** debug
+
+- ? :: solution from br
+- H-c b / C-c c b :: capture bug from command line (requires manual
+  selection)
+
 ** note taking 
+
+explicate how objects of note-taking are classified and
+located/refiled/archived.
 
 * anki
 

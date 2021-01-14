@@ -128,9 +128,9 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
         ("\\*\\(Output\\|Register Preview\\).*"
          (display-buffer-at-bottom)
          (window-parameters . ((no-other-window . t))))
-        ("\\*WordNet*"
+        ("\\*WordNet.*"
          (display-buffer-in-side-window
-          (window-height . 0.5)
+          (window-height . 0.7)
           (side . top)
           (slot . 3)))
         ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
@@ -579,8 +579,7 @@ When the region is active, define the marked phrase."
 (use-package company
   :config
   (setq company-idle-delay 0)
-  :bind
-  (("TAB" . company-indent-or-complete-common)))
+  )
 (add-hook 'after-init-hook 'global-company-mode)
 (use-package lsp-mode)
 (use-package flycheck)
@@ -588,14 +587,14 @@ When the region is active, define the marked phrase."
   :demand flycheck
   :config
   (setq lsp-ui-sideline-show-diagnostics t
-	lsp-ui-sideline-show-hover t))
+        lsp-ui-sideline-show-hover t))
 (use-package lsp-python-ms
   :ensure t
   :init (setq lsp-python-ms-auto-install-server t
-	      read-process-output-max 1048576)
+              read-process-output-max 1048576)
   :hook (python-mode . (lambda ()
-			  (require 'lsp-python-ms)
-			  (lsp))))
+                          (require 'lsp-python-ms)
+                          (lsp))))
 
 (use-package emms
   :config
@@ -729,6 +728,22 @@ When the region is active, define the marked phrase."
 
 (add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
 (efs/update-displays)
+
+(unless (executable-find "feh")
+  (display-warning 'wallpaper "External command `feh' not found!"))
+
+;; This is an example `use-package' configuration
+;; It is not tangled into wallpaper.el
+(use-package wallpaper
+  :ensure t
+     (use-package wallpaper
+       :ensure t
+       :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+              (after-init . wallpaper-cycle-mode))
+       :custom ((wallpaper-cycle-single t)
+                (wallpaper-scaling 'fill)
+                (wallpaper-cycle-interval 45)
+                (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 
 (desktop-save-mode 1)
 
@@ -875,20 +890,6 @@ questions.  Else use completion to select the tab to switch to."
 
 ;; Configure windows as they're created
 (add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
-
-(unless (executable-find "feh")
-  (display-warning 'wallpaper "External command `feh' not found!"))
-
-;; This is an example `use-package' configuration
-;; It is not tangled into wallpaper.el
-(use-package wallpaper
-  :ensure t
-  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-         (after-init . wallpaper-cycle-mode))
-  :custom ((wallpaper-cycle-single t)
-           (wallpaper-scaling 'fill)
-           (wallpaper-cycle-interval 45)
-           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 
 (defun efs/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
