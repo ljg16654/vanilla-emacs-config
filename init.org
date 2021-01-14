@@ -1263,8 +1263,13 @@ Transparency at start:
 
 #+begin_src emacs-lisp
 
-  (transparency 0.9)
+  (defvar +frame-transparency+ '(90 . 90))
+  (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
+
 #+end_src
+
+#+RESULTS:
+: ((alpha 90 . 90) (tool-bar-lines . 0) (menu-bar-lines . 0) (vertical-scroll-bars) (buffer-predicate . exwm-layout--other-buffer-predicate))
 
 ** cursor in =-nw= mode
 
@@ -1790,25 +1795,38 @@ Assign workspaces to monitors.
 #+end_src
 
 ** wallpaper
+
+#+begin_src emacs-lisp :tangle nil :eval never 
+
+(defun wallpaper--scaling ()
+  "Return the wallpaper scaling style to use."
+  (cl-case wallpaper-scaling
+    (scale "--bg-scale ")
+    (max "--bg-max ")
+    (fill "--bg-fill ")
+    (tile "--bg-tile ")
+    (center "--bg-center ")))
+#+end_src
+
 #+begin_src elisp
 
-  (unless (executable-find "feh")
-    (display-warning 'wallpaper "External command `feh' not found!"))
+     (unless (executable-find "feh")
+       (display-warning 'wallpaper "External command `feh' not found!"))
 
-  ;; This is an example `use-package' configuration
-  ;; It is not tangled into wallpaper.el
-  (use-package wallpaper
-    :ensure t
-    :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-           (after-init . wallpaper-cycle-mode))
-    :custom ((wallpaper-cycle-single t)
-             (wallpaper-scaling 'scale)
-             (wallpaper-cycle-interval 45)
-             (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+     ;; This is an example `use-package' configuration
+     ;; It is not tangled into wallpaper.el
+     (use-package wallpaper
+       :ensure t
+       :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+              (after-init . wallpaper-cycle-mode))
+       :custom ((wallpaper-cycle-single t)
+                (wallpaper-scaling 'fill)
+                (wallpaper-cycle-interval 45)
+                (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 #+end_src
 
 #+RESULTS:
-| wallpaper-cycle-mode | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
+| wallpaper-cycle-mode | #[0 \303\211\235\203 \304"\301\305!\210\210	\205 \306 \210\307\211\207 [command-line-args desktop-save-mode inhibit-startup-screen --no-desktop delete 0 desktop-read t] 4] | global-company-mode | org-roam-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
 
 * save sessions
 

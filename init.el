@@ -552,7 +552,8 @@ When the region is active, define the marked phrase."
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(transparency 0.9)
+(defvar +frame-transparency+ '(90 . 90))
+(add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
   :config
@@ -885,7 +886,7 @@ questions.  Else use completion to select the tab to switch to."
   :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
          (after-init . wallpaper-cycle-mode))
   :custom ((wallpaper-cycle-single t)
-           (wallpaper-scaling 'scale)
+           (wallpaper-scaling 'fill)
            (wallpaper-cycle-interval 45)
            (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 
