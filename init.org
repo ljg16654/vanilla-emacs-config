@@ -52,6 +52,18 @@ then, install =use-package= with straight.el:
   (straight-use-package 'use-package)
 #+end_src
 
+On usage of defer:
+#+begin_quote
+
+In almost all cases you don't need to manually specify :defer t. This
+is implied whenever :bind or :mode or :interpreter is used. Typically,
+you only need to specify :defer if you know for a fact that some other
+package will do something to cause your package to load at the
+appropriate time, and thus you would like to defer loading even though
+use-package isn't creating any autoloads for you.
+#+end_quote
+
+
 * basic
 
 ** common functionallity
@@ -286,9 +298,9 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
            (window-parameters . ((no-other-window . t))))
           ("\\*WordNet.*"
            (display-buffer-in-side-window
-            (window-height . 0.7)
-            (side . top)
-            (slot . 3)))
+            (window-width . 0.4)
+            (side . right)
+            (slot . 2)))
           ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . 0.2)
@@ -559,6 +571,7 @@ tangling is currently disabled.
       (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
       (setq dumb-jump-debug t)
       (setq dumb-jump-aggressive t)
+      (setq dumb-jump-selector 'helm)
       ))
 
 #+end_src
@@ -615,6 +628,7 @@ tangling is currently disabled.
 : helm-projectile
 
 [[https://www.manueluberti.eu/emacs/2020/06/13/helm-wordnut/][blog post on helm-wordnut]]
+[[https://github.com/emacs-helm/helm-wordnut/tree/30ead8d9a4046e45b4188bfbd9d4049020ebd6b2][github repo]]
 see [[*window rules and management]] for configuration of relevent windows.
 
 #+begin_src emacs-lisp
@@ -1476,7 +1490,22 @@ currently disabled as I'm not using evil.
 
 #+end_src
 
-*** TODO alias
+*** alias
+
+The 'alias' command in eshell defines aliases sotre in
+=eshell-alias-file=, which is inside the =user-emacs-directory= by
+default.
+
+#+begin_quote
+
+   Note that unlike aliases in Bash, arguments must be handled
+explicitly.  Typically the alias definition would end in ‘$*’ to pass
+all arguments along.  More selective use of arguments via ‘$1’, ‘$2’,
+etc., is also possible.  For example, ‘alias mcd 'mkdir $1 && cd $1'’
+would cause ‘mcd foo’ to create and switch to a directory called
+‘foo’.
+#+end_quote
+
 * modeline config
 
 [[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
@@ -1668,6 +1697,8 @@ achieved.
          ([?\C-a] . home)
          ([?\C-e] . end)
          ([?\M-w] . [?\C-c])
+         ;; ([?\M-b] . [?\C-?\<left>])
+         ;; ([?\M-f] . [?\C-?\<left>])
          ))
       (setq exwm-workspace-warp-cursor t
             mouse-autoselect-window t
@@ -1870,7 +1901,11 @@ Assign workspaces to monitors.
 
 * eaf
 
-#+begin_src emacs-lisp
+experimental.  By default it override some tools that I've been
+familiar with (like pdf-tools).  Only used after manual execution of
+code block.
+
+#+begin_src emacs-lisp :tangle nil
 
   (add-to-list 'load-path "~/vanilla/site-lisp/emacs-application-framework/")
   (require 'eaf)
@@ -1906,18 +1941,20 @@ treated equally in buffer lists.
 in =helm-buffer-list=, the list can be quickly narrowed with
 
 - name of the buffer
-- major mode via =*[major mode]= or =*![major mode]=
-- include? text via = @[text]= (notice the space!)
+- major mode via =*[pattern to match major mode]= or =*![pattern to match major mode]=
+- directory with =/[pattern to match directory]= or '!' after '/' for negation
+- include? text via '@[pattern to match text]' or '!' after '@' for negation
 
-Notice the versatility of major mode matching: the full name of the
-major mode is /not/ required.  For example =*v @rostopic= narrows the list
-to buffers with major mode /matching/ =v= and having the content matching
-=rostopic=.  This will probably result in vterm buffers running =rostopic=
-command, although other major mode, such as =Magit Rev= or =VC dir=, also
-match the same major mode predicate as vterm-mode.
+#+begin_quote
+
+‘helm-buffers-fuzzy-matching’ turns on fuzzy matching on buffer names, but not
+on directory names or major modes.  A pattern starting with "^" disables fuzzy
+matching and matches by exact regexp.
+
+#+end_quote
 
 Unfortunately, the content of other applications is not accessible to
-emacs. Even for eaf buffer, the content of webpage is not accessible
+emacs. Even for [[*eaf]] buffer, the content of webpage/pdf(?) is not accessible
 to helm.
 
 ** maintenance

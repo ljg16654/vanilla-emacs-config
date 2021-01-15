@@ -130,9 +130,9 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
          (window-parameters . ((no-other-window . t))))
         ("\\*WordNet.*"
          (display-buffer-in-side-window
-          (window-height . 0.7)
-          (side . top)
-          (slot . 3)))
+          (window-width . 0.4)
+          (side . right)
+          (slot . 2)))
         ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
          (window-height . 0.2)
@@ -221,6 +221,7 @@ buffer's window as well."
     (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
     (setq dumb-jump-debug t)
     (setq dumb-jump-aggressive t)
+    (setq dumb-jump-selector 'helm)
     ))
 
 (use-package helm
@@ -705,6 +706,8 @@ When the region is active, define the marked phrase."
        ([?\C-a] . home)
        ([?\C-e] . end)
        ([?\M-w] . [?\C-c])
+       ;; ([?\M-b] . [?\C-?\<left>])
+       ;; ([?\M-f] . [?\C-?\<left>])
        ))
     (setq exwm-workspace-warp-cursor t
           mouse-autoselect-window t
@@ -752,9 +755,6 @@ When the region is active, define the marked phrase."
            (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
 
 (desktop-save-mode 1)
-
-(add-to-list 'load-path "~/vanilla/site-lisp/emacs-application-framework/")
-(require 'eaf)
 
 (use-package anki-editor)
 
