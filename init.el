@@ -215,6 +215,14 @@ buffer's window as well."
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
+(use-package dumb-jump
+  :config
+  (progn
+    (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+    (setq dumb-jump-debug t)
+    (setq dumb-jump-aggressive t)
+    ))
+
 (use-package helm
   :config
   (progn

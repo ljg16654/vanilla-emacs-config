@@ -549,6 +549,23 @@ tangling is currently disabled.
 #+RESULTS:
 : projectile-command-map
 
+** dumb-jump
+
+#+begin_src emacs-lisp
+
+  (use-package dumb-jump
+    :config
+    (progn
+      (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+      (setq dumb-jump-debug t)
+      (setq dumb-jump-aggressive t)
+      ))
+
+#+end_src
+
+#+RESULTS:
+: t
+
 * completion
 
 ** helm
@@ -1898,6 +1915,10 @@ to buffers with major mode /matching/ =v= and having the content matching
 =rostopic=.  This will probably result in vterm buffers running =rostopic=
 command, although other major mode, such as =Magit Rev= or =VC dir=, also
 match the same major mode predicate as vterm-mode.
+
+Unfortunately, the content of other applications is not accessible to
+emacs. Even for eaf buffer, the content of webpage is not accessible
+to helm.
 
 ** maintenance
 
