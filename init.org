@@ -992,7 +992,7 @@ print(sys.version)
 : 3.8.5 (default, Jul 28 2020, 12:59:40) 
 : [GCC 9.3.0]
 
-** latex
+n** latex
 #+begin_src emacs-lisp
 (use-package auctex
   :defer t)
@@ -1913,6 +1913,14 @@ Assign workspaces to monitors.
   (defun efs/send-polybar-hook (module-name hook-index)
     (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
 
+  (defun efs/polybar-exwm-workspace ()
+    (pcase exwm-workspace-current-index
+      (0 "")
+      (1 "")
+      (2 "")
+      (3 "")
+      (4 "")))
+
   (defun efs/send-polybar-exwm-workspace ()
     (efs/send-polybar-hook "exwm-workspace" 1))
 
@@ -2076,7 +2084,6 @@ Assign workspaces to monitors.
 
 #+end_src
 
-
 * save sessions
 
 - desktop-save :: manual save
@@ -2223,3 +2230,4 @@ Automatically tangle /this file/ on save.
 
 #+RESULTS:
 | (lambda nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | org-tempo-setup | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-pdftools-setup-link | turn-on-org-cdlatex | org-indent-mode | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+

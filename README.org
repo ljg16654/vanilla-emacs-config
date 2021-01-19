@@ -1,7 +1,7 @@
 #+title: README
 
-The configuration is used on a daily basis on Ubuntu20.04, Arch Linux
-and occasionally on Ubuntu18.04 LTS. With dependencies met, it's
+The configuration is used on a daily basis on Ubuntu 20.04, Arch Linux
+and occasionally on Ubuntu 18.04 LTS. With dependencies met, it's
 supposed to work well with branch =native-comp=.
 
 * TODO dependencies

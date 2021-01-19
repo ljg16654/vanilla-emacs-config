@@ -913,6 +913,14 @@ When the region is active, define the marked phrase."
 (defun efs/send-polybar-hook (module-name hook-index)
   (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
 
+(defun efs/polybar-exwm-workspace ()
+  (pcase exwm-workspace-current-index
+    (0 "")
+    (1 "")
+    (2 "")
+    (3 "")
+    (4 "")))
+
 (defun efs/send-polybar-exwm-workspace ()
   (efs/send-polybar-hook "exwm-workspace" 1))
 
