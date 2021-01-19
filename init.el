@@ -51,6 +51,16 @@
 
 (global-set-key (kbd "H-e") #'evil-mode)
 
+(use-package rg
+  :config
+  (progn
+    (rg-enable-default-bindings))
+  :bind
+  ("s-f" . rg-menu))
+
+;; seems to be dependency for projectile-ripgrep
+(use-package ripgrep)
+
 (use-package ag)
 
 (use-package emacs
@@ -128,11 +138,11 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
         ("\\*\\(Output\\|Register Preview\\).*"
          (display-buffer-at-bottom)
          (window-parameters . ((no-other-window . t))))
-        ("\\*WordNet.*"
-         (display-buffer-in-side-window
-          (window-width . 0.4)
-          (side . right)
-          (slot . 2)))
+        ;; ("\\*WordNet.*"
+        ;;  (display-buffer-reuse-mode-window display-buffer-at-right)
+        ;;  (slot . 0)
+        ;;  (window-width . 0.4)
+        ;;  )
         ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
          (window-height . 0.2)
@@ -171,6 +181,67 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 ;; new tab starts with scratch buffer
 
 (setq tab-bar-new-tab-choice "*scratch*")
+
+(use-package tab-bar
+  :init
+  (setq tab-bar-close-button-show nil)
+  (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
+  (setq tab-bar-close-tab-select 'recent)
+  (setq tab-bar-new-tab-choice t)
+  (setq tab-bar-new-tab-to 'right)
+  (setq tab-bar-position nil)
+  (setq tab-bar-show nil)
+  (setq tab-bar-tab-hints nil)
+  (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
+  :config
+  (tab-bar-mode -1)
+  (tab-bar-history-mode -1))
+
+(defun prot-tab--tab-bar-tabs ()
+  "Return a list of `tab-bar' tabs, minus the current one."
+  (mapcar (lambda (tab)
+            (alist-get 'name tab))
+          (tab-bar--tabs-recent)))
+
+(defun prot-tab-select-tab-dwim ()
+    "Do-What-I-Mean function for getting to a `tab-bar' tab.
+If no other tab exists, create one and switch to it.  If there is
+one other tab (so two in total) switch to it without further
+questions.  Else use completion to select the tab to switch to."
+    (interactive)
+    (let ((tabs (prot-tab--tab-bar-tabs)))
+      (cond ((eq tabs nil)
+             (tab-new))
+            ((eq (length tabs) 1)
+             (tab-next))
+            (t
+             (tab-bar-switch-to-tab
+              (completing-read "Select tab: " tabs nil t))))))
+
+(defun prot-tab-tab-bar-toggle ()
+  "Toggle `tab-bar' presentation."
+  (interactive)
+  (if (bound-and-true-p tab-bar-mode)
+      (progn
+        (setq tab-bar-show nil)
+        (tab-bar-mode -1))
+    (setq tab-bar-show t)
+    (tab-bar-mode 1)))
+
+(defconst tab-leader "C-x t")
+
+(general-create-definer tab-leader-def
+  :prefix tab-leader)
+
+;; global hyper leader def
+(tab-leader-def
+  "n" 'tab-bar-new-tab
+  "r" 'tab-bar-rename-tab
+  "k" 'tab-bar-close-tab
+  "t" 'prot-tab-tab-bar-toggle
+  "<tab>" 'prot-tab-select-tab-dwim)
+
+(global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 
 (defun prot-simple-kill-buffer-current (&optional arg)
   "Kill current buffer or abort recursion when in minibuffer.
@@ -268,8 +339,8 @@ When the region is active, define the marked phrase."
             (thing-at-point 'word))))))
     (helm-wordnut--persistent-action word)))
 
-(global-set-key (kbd "s-K") #'helm-wordnut)
-(global-set-key (kbd "s-L") #'helm-wordnet-at-point)
+(global-set-key (kbd "s-d") #'helm-wordnut)
+(global-set-key (kbd "s-D") #'helm-wordnet-at-point)
 
 (use-package helm-swoop)
 (global-set-key (kbd "C-s") #'helm-swoop)
@@ -488,7 +559,8 @@ When the region is active, define the marked phrase."
 
           ("v" "vocabularies" entry
            (file+headline "voc.org" "Inbox")
-           "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n\n")))
+           "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")
+          ))
 
 (setq org-agenda-files (apply (function append)
 			        (mapcar
@@ -556,12 +628,17 @@ When the region is active, define the marked phrase."
 
 (global-set-key (kbd "s-m") #'bookmark-set)
 
+(use-package define-word
+  :bind
+  (("C-c d" . define-word-at-point)
+   ("C-c D" . define-word)))
+
 (defun transparency (value)
   "sets the transparency of the frame window. 0=transparent/100=opaque"
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(defvar +frame-transparency+ '(90 . 90))
+(defvar +frame-transparency+ '(80 80))
 (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
@@ -677,9 +754,10 @@ When the region is active, define the marked phrase."
             ?\s-s ;; single-window-toggle
             ?\s-e ;; pop-up eshell
             ?\s-q ;; toggle side windows
+            ?\s-D
+            ?\s-d ;; helm-wordnut
             ?\C-u ;; general command
             ?\C-h ;; help
-            (kbd "s-TAB")
             ?\M-x
             ?\M-&
             ?\M-:
@@ -723,116 +801,6 @@ When the region is active, define the marked phrase."
 (exwm-systemtray-enable)
 (display-time-mode)
 (display-battery-mode)
-
-(require 'exwm-randr)
-(setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))
-(exwm-randr-enable)
-
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/update-displays ()
-  (efs/run-in-background "autorandr --change --force")
-  (message "Display config: %s"
-	   (string-trim (shell-command-to-string "autorandr --current"))))
-
-(add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
-(efs/update-displays)
-
-(unless (executable-find "feh")
-  (display-warning 'wallpaper "External command `feh' not found!"))
-
-;; This is an example `use-package' configuration
-;; It is not tangled into wallpaper.el
-(use-package wallpaper
-  :ensure t
-  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-         (after-init . wallpaper-cycle-mode))
-  :custom ((wallpaper-cycle-single t)
-           (wallpaper-scaling 'fill)
-           (wallpaper-cycle-interval 45)
-           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
-
-(desktop-save-mode 1)
-
-(use-package anki-editor)
-
-(use-package rg
-  :config
-  (progn
-    (rg-enable-default-bindings))
-  :bind
-  ("s-f" . rg-menu))
-
-;; seems to be dependency for projectile-ripgrep
-(use-package ripgrep)
-
-(use-package tab-bar
-  :init
-  (setq tab-bar-close-button-show nil)
-  (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
-  (setq tab-bar-close-tab-select 'recent)
-  (setq tab-bar-new-tab-choice t)
-  (setq tab-bar-new-tab-to 'right)
-  (setq tab-bar-position nil)
-  (setq tab-bar-show nil)
-  (setq tab-bar-tab-hints nil)
-  (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
-  :config
-  (tab-bar-mode -1)
-  (tab-bar-history-mode -1))
-
-(defun prot-tab--tab-bar-tabs ()
-  "Return a list of `tab-bar' tabs, minus the current one."
-  (mapcar (lambda (tab)
-            (alist-get 'name tab))
-          (tab-bar--tabs-recent)))
-
-(defun prot-tab-select-tab-dwim ()
-    "Do-What-I-Mean function for getting to a `tab-bar' tab.
-If no other tab exists, create one and switch to it.  If there is
-one other tab (so two in total) switch to it without further
-questions.  Else use completion to select the tab to switch to."
-    (interactive)
-    (let ((tabs (prot-tab--tab-bar-tabs)))
-      (cond ((eq tabs nil)
-             (tab-new))
-            ((eq (length tabs) 1)
-             (tab-next))
-            (t
-             (tab-bar-switch-to-tab
-              (completing-read "Select tab: " tabs nil t))))))
-
-(defun prot-tab-tab-bar-toggle ()
-  "Toggle `tab-bar' presentation."
-  (interactive)
-  (if (bound-and-true-p tab-bar-mode)
-      (progn
-        (setq tab-bar-show nil)
-        (tab-bar-mode -1))
-    (setq tab-bar-show t)
-    (tab-bar-mode 1)))
-
-(defconst tab-leader "C-x t")
-
-(general-create-definer tab-leader-def
-  :prefix tab-leader)
-
-;; global hyper leader def
-(tab-leader-def
-  "n" 'tab-bar-new-tab
-  "r" 'tab-bar-rename-tab
-  "k" 'tab-bar-close-tab
-  "t" 'prot-tab-tab-bar-toggle
-  "<tab>" 'prot-tab-select-tab-dwim)
-
-(global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
-
-(use-package define-word
-  :bind
-  (("C-c d" . define-word-at-point)
-   ("C-c D" . define-word)))
 
 (defun efs/run-in-background (command)
   (let ((command-parts (split-string command "[ ]+")))
@@ -899,6 +867,51 @@ questions.  Else use completion to select the tab to switch to."
 
 ;; Configure windows as they're created
 (add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
+
+(straight-use-package
+ '(exwm-outer-gaps :host github :repo "lucasgruss/exwm-outer-gaps")
+ :config
+ (progn
+   (setq exwm-outer-gaps-width [25 25 25 25])
+   )
+ )
+
+(global-set-key (kbd "H-G") #'exwm-outer-gaps-mode)
+(global-set-key (kbd "C-c 1") #'exwm-outer-gaps-mode)
+
+(require 'exwm-randr)
+(setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))
+(exwm-randr-enable)
+
+(defun efs/run-in-background (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+(defun efs/update-displays ()
+  (efs/run-in-background "autorandr --change --force")
+  (message "Display config: %s"
+	   (string-trim (shell-command-to-string "autorandr --current"))))
+
+(add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
+(efs/update-displays)
+
+(unless (executable-find "feh")
+  (display-warning 'wallpaper "External command `feh' not found!"))
+
+;; This is an example `use-package' configuration
+;; It is not tangled into wallpaper.el
+(use-package wallpaper
+  :ensure t
+  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
+         (after-init . wallpaper-cycle-mode))
+  :custom ((wallpaper-cycle-single t)
+           (wallpaper-scaling 'fill)
+           (wallpaper-cycle-interval 45)
+           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+
+(desktop-save-mode 1)
+
+(use-package anki-editor)
 
 (defun efs/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
