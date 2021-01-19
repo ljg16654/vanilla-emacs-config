@@ -638,7 +638,7 @@ When the region is active, define the marked phrase."
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(defvar +frame-transparency+ '(80 80))
+(defvar +frame-transparency+ '(90 90))
 (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
@@ -754,6 +754,7 @@ When the region is active, define the marked phrase."
             ?\s-s ;; single-window-toggle
             ?\s-e ;; pop-up eshell
             ?\s-q ;; toggle side windows
+            ?\s-t ;; toggle touchpad
             ?\s-D
             ?\s-d ;; helm-wordnut
             ?\C-u ;; general command
@@ -797,11 +798,6 @@ When the region is active, define the marked phrase."
 (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
 
-(require 'exwm-systemtray)
-(exwm-systemtray-enable)
-(display-time-mode)
-(display-battery-mode)
-
 (defun efs/run-in-background (command)
   (let ((command-parts (split-string command "[ ]+")))
     (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
@@ -810,21 +806,8 @@ When the region is active, define the marked phrase."
   ;; Make workspace 1 be the one where we land at startup
   (exwm-workspace-switch-create 0)
 
-  ;; Open eshell by default
-  ;;(eshell)
-
-  ;; NOTE: The next two are disabled because we now use Polybar!
-
-  ;; Show battery status in the mode line
-  ;;(display-battery-mode 1)
-
-  ;; Show the time and date in modeline
-  ;;(setq display-time-day-and-date t)
-  ;;(display-time-mode 1)
-  ;; Also take a look at display-time-format and format-time-string
-
   ;; Start the Polybar panel
-  ;; (efs/start-panel)
+  (efs/start-panel)
 
   ;; Launch apps that will run in the background
   (efs/run-in-background "dunst")
@@ -870,14 +853,13 @@ When the region is active, define the marked phrase."
 
 (straight-use-package
  '(exwm-outer-gaps :host github :repo "lucasgruss/exwm-outer-gaps")
- :config
- (progn
-   (setq exwm-outer-gaps-width [25 25 25 25])
-   )
  )
-
+(setq exwm-outer-gaps-width [25 25 25 25])
 (global-set-key (kbd "H-G") #'exwm-outer-gaps-mode)
 (global-set-key (kbd "C-c 1") #'exwm-outer-gaps-mode)
+
+(use-package desktop-environment)
+(desktop-environment-mode)
 
 (require 'exwm-randr)
 (setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))
@@ -908,6 +890,40 @@ When the region is active, define the marked phrase."
            (wallpaper-scaling 'fill)
            (wallpaper-cycle-interval 45)
            (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
+
+;; Make sure the server is started (better to do this in your
+;;  main Emacs config!)
+(server-start)
+
+(defvar efs/polybar-process nil
+  "Holds the process of the running Polybar instance, if any")
+
+(defun efs/kill-panel ()
+  (interactive)
+  (when efs/polybar-process
+    (ignore-errors
+      (kill-process efs/polybar-process)))
+  (setq efs/polybar-process nil))
+
+(defun efs/start-panel ()
+  (interactive)
+  (efs/kill-panel)
+  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
+
+(defun efs/send-polybar-hook (module-name hook-index)
+  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
+
+(defun efs/send-polybar-exwm-workspace ()
+  (efs/send-polybar-hook "exwm-workspace" 1))
+
+(defun langou/toggle-touchpad ()
+  (interactive)
+  (start-process-shell-command "exec" nil "exec ~/.dwm/toggleTouchpad.sh"))
+
+(global-set-key (kbd "s-t") #'langou/toggle-touchpad)
+
+;; Update panel indicator when workspace changes
+(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
 
 (desktop-save-mode 1)
 
