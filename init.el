@@ -19,26 +19,21 @@
 
 (straight-use-package 'use-package)
 
-(defun +default/save-to-king-ring-buffer-filename ()
-  "Copy the current buffer's path to the kill ring."
-  (interactive)
-  (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
-      (message (kill-new (abbreviate-file-name filename)))
-    (error "Couldn't find filename in current buffer")))
-
-(global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
-
 (set-face-attribute 'default nil :font "iosevka" :height 135)
 
 (use-package anti-zenburn-theme
   :defer t)
+
 (use-package solarized-theme
   :defer t
   :config
   (progn
     (setq solarized-use-variable-pitch nil)))
+
 (use-package spacemacs-theme
   :defer t)
+
+(load-theme 'spacemacs-dark t)
 
 (use-package general)
 
@@ -270,6 +265,9 @@ buffer's window as well."
 (global-set-key (kbd "H-d") #'avy-goto-char-2)
 (global-set-key (kbd "H-f") #'avy-goto-char)
 
+;;   (global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
+(global-set-key (kbd "s-(") #'check-parens)
+
 (defun langou/goto-config ()
   "go to personal configuration of emacs"
   (interactive)
@@ -319,6 +317,8 @@ buffer's window as well."
 
 (straight-use-package
  '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
+
+(require 'helm-wordnut)
 
 (defun helm-wordnet-at-point ()
   "Use `helm-wordnut--persistent-action' to define word at point.
@@ -372,6 +372,8 @@ When the region is active, define the marked phrase."
           #'(lambda ()
               (progn
                 (dired-hide-details-mode +1))))
+
+(require 'general)
 
 (general-define-key
  :keymaps 'dired-mode-map
@@ -558,7 +560,7 @@ When the region is active, define the marked phrase."
            "* BUG %^{header}\n%U\n#+begin_src\n\n%i\n\n#+end_src\n%?")
 
           ("v" "vocabularies" entry
-           (file+headline "voc.org" "Inbox")
+           (file+headline "voc.org" "inbox")
            "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")
           ))
 
@@ -649,6 +651,11 @@ When the region is active, define the marked phrase."
     )
   :bind (("C-c f e" . olivetti-mode)))
 
+
+(add-hook 'org-mode-hook
+          #'(lambda () (interactive)
+              (olivetti-mode +1)))
+
 (use-package expand-region
   :config
   (progn
@@ -661,6 +668,17 @@ When the region is active, define the marked phrase."
 (setq use-file-dialog nil)
 (setq use-dialog-box t)               ; only for mouse events
 ;; (setq inhibit-splash-screen t)
+
+(defun +default/save-to-king-ring-buffer-filename ()
+  "Copy the current buffer's path to the kill ring."
+  (interactive)
+  (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
+      (message (kill-new (abbreviate-file-name filename)))
+    (error "Couldn't find filename in current buffer")))
+
+(global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
+
+(fset 'yes-or-no-p 'y-or-n-p)
 
 (use-package company
   :config
@@ -743,7 +761,7 @@ When the region is active, define the marked phrase."
   (progn
     (setq exwm-workspace-number 3)
     (setq exwm-input-prefix-keys
-          '(?\C-x
+          `(?\C-x
             ?\s-o ;; switch-to-buffer
             ?\s-i ;; ibuffer
             ?\s-j ;; window switch
@@ -752,10 +770,9 @@ When the region is active, define the marked phrase."
             ?\s-k ;; window switch
             ?\s-v ;; vterm
             ?\s-s ;; single-window-toggle
-            ?\s-e ;; pop-up eshell
+            ?\s-e ;; eshell
             ?\s-q ;; toggle side windows
             ?\s-t ;; toggle touchpad
-            ?\s-D
             ?\s-d ;; helm-wordnut
             ?\C-u ;; general command
             ?\C-h ;; help
@@ -776,7 +793,7 @@ When the region is active, define the marked phrase."
                           (lambda ()
                             (interactive)
                             (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 9))))
+                      (number-sequence 0 2))))
     (exwm-input-set-simulation-keys
      '(([?\C-b] . left)
        ([?\C-f] . right)
@@ -804,7 +821,7 @@ When the region is active, define the marked phrase."
 
 (defun efs/exwm-init-hook ()
   ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 0)
+  (exwm-workspace-switch-create 1)
 
   ;; Start the Polybar panel
   (efs/start-panel)
@@ -932,8 +949,6 @@ When the region is active, define the marked phrase."
 
 ;; Update panel indicator when workspace changes
 (add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
-
-(desktop-save-mode 1)
 
 (use-package anki-editor)
 

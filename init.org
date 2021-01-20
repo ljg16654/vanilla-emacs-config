@@ -4,10 +4,10 @@
 
 Some of the awesome configurations used as reference:
 
-+ james cash ::  [[file:~/repos/james-cash-dotfiles/emacs.d/eshell][file:~/repos/james-cash-dotfiles/emacs.d/eshell]]
-+ prot :: [[file:~/repos/prot-dotfiles/emacs/.emacs.d/emacs-init.org]]
-+ Doom Emacs
-+ Emacs from scratch series :: [[file:~/repos/emacs-from-scratch/Emacs.org]]
++ james cash :: [[https://github.com/jamesnvc/dotfiles]]
++ Protesilaos Stavrou :: https://protesilaos.com/dotemacs/
++ Doom Emacs :: [[https://github.com/hlissner/doom-emacs]]
++ Emacs from scratch series :: [[https://github.com/daviwil/emacs-from-scratch]]
 
 * personal info
 
@@ -63,30 +63,6 @@ appropriate time, and thus you would like to defer loading even though
 use-package isn't creating any autoloads for you.
 #+end_quote
 
-* basic
-
-** common functionallity
-
-*** copy filename
-
-From Doom Emacs. Naming is altered to be consistent with Emacs terms
-(yank -> save-to-king-ring).
-
-#+begin_src emacs-lisp
-
-  (defun +default/save-to-king-ring-buffer-filename ()
-    "Copy the current buffer's path to the kill ring."
-    (interactive)
-    (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
-        (message (kill-new (abbreviate-file-name filename)))
-      (error "Couldn't find filename in current buffer")))
-
-  (global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
-#+end_src
-
-#+RESULTS:
-: +default/save-to-king-ring-buffer-filename
-
 * theme, font
 
 [[https://stackoverflow.com/questions/21033270/resizing-echoarea-of-emacsclient][related issue on wired space at bottom]]
@@ -97,16 +73,20 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 #+RESULTS:
 : t
 #+begin_src emacs-lisp
+
   (use-package anti-zenburn-theme
     :defer t)
+
   (use-package solarized-theme
     :defer t
     :config
     (progn
       (setq solarized-use-variable-pitch nil)))
+
   (use-package spacemacs-theme
     :defer t)
 
+  (load-theme 'spacemacs-dark t)
 #+end_src
 
 #+RESULTS:
@@ -491,6 +471,18 @@ In buffer or across buffers.
 #+RESULTS:
 : langou/goto-config
 
+jump to left parenthesis/check parens:
+
+#+begin_src emacs-lisp ()
+
+  (global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
+  (global-set-key (kbd "s-(") #'check-parens)
+
+#+end_src
+
+#+RESULTS:
+: check-parens
+
 ** frequently visited files
 
 #+begin_src emacs-lisp
@@ -634,6 +626,8 @@ see [[*window rules and management]] for configuration of relevent windows.
 
   (straight-use-package
    '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
+
+  (require 'helm-wordnut)
 
   (defun helm-wordnet-at-point ()
     "Use `helm-wordnut--persistent-action' to define word at point.
@@ -800,6 +794,7 @@ reason, ';' is binded to the same function in dired-mode using
 general.el.
 
 #+begin_src emacs-lisp
+  (require 'general)
 
   (general-define-key
    :keymaps 'dired-mode-map
@@ -930,9 +925,12 @@ Track state changes.
 | -moyu&-MAYBE | (TODO IN-PROGRESS BUG KNOWNCAUSE) | nil |   |
 
 ** export
+
 #+begin_src emacs-lisp
-(setq org-export-with-toc nil)
+
+  (setq org-export-with-toc nil)
 #+end_src
+
 ** babel
 *** basic settings
 
@@ -1117,7 +1115,7 @@ in my org-directory.
                 "* BUG %^{header}\n%U\n#+begin_src\n\n%i\n\n#+end_src\n%?")
 
                ("v" "vocabularies" entry
-                (file+headline "voc.org" "Inbox")
+                (file+headline "voc.org" "inbox")
                 "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")
                ))
    #+end_src
@@ -1224,9 +1222,12 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 : browse-url-firefox
 
 ** command-log
+
   #+begin_src emacs-lisp
-  (use-package command-log-mode)
+
+    (use-package command-log-mode)
   #+end_src
+  
 ** ligature
 #+begin_src emacs-lisp
     (defconst lisp--prettify-symbols-alist
@@ -1294,13 +1295,13 @@ Transparency at start:
 
 #+begin_src emacs-lisp
 
-  (defvar +frame-transparency+ '(90 90))
+  (defvar +frame-transparency+ '(85 85))
   (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 #+end_src
 
 #+RESULTS:
-: ((tool-bar-lines . 0) (menu-bar-lines . 0) (alpha 80 80) (vertical-scroll-bars) (buffer-predicate . exwm-layout--other-buffer-predicate))
+: ((tool-bar-lines . 0) (menu-bar-lines . 0) (alpha 90 90) (vertical-scroll-bars) (buffer-predicate . exwm-layout--other-buffer-predicate))
 
 ** cursor in =-nw= mode
 
@@ -1326,6 +1327,11 @@ currently disabled as I'm not using evil.
       (setq-default olivetti-body-width 0.7)
       )
     :bind (("C-c f e" . olivetti-mode)))
+
+
+  (add-hook 'org-mode-hook
+            #'(lambda () (interactive)
+                (olivetti-mode +1)))
 #+end_src
 
 #+RESULTS:
@@ -1359,6 +1365,33 @@ currently disabled as I'm not using evil.
 #+RESULTS:
 : t
 
+** copy filename
+
+From Doom Emacs. Naming is altered to be consistent with Emacs terms
+(yank -> save-to-king-ring).
+
+#+begin_src emacs-lisp
+
+  (defun +default/save-to-king-ring-buffer-filename ()
+    "Copy the current buffer's path to the kill ring."
+    (interactive)
+    (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
+        (message (kill-new (abbreviate-file-name filename)))
+      (error "Couldn't find filename in current buffer")))
+
+  (global-set-key (kbd "C-c k f")  #'+default/save-to-king-ring-buffer-filename)
+#+end_src
+
+#+RESULTS:
+: +default/save-to-king-ring-buffer-filename
+
+** make all prompts y or n
+
+#+begin_src emacs-lisp
+
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
 * lsp
 
 #+begin_src emacs-lisp
@@ -1387,7 +1420,11 @@ currently disabled as I'm not using evil.
 
 * music
 
-** basic setup
+** basic setup for emms
+
+- s :: stop
+- n :: next
+
 #+begin_src emacs-lisp
   (use-package emms
     :config
@@ -1404,6 +1441,7 @@ currently disabled as I'm not using evil.
 
 #+RESULTS:
 : emms-add-playlist
+
 ** TODO improve config
 + block mplayer from poping up
 
@@ -1589,7 +1627,9 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+end_src
 
 ** lisp-general
+
 #+begin_src emacs-lisp
+
   (use-package lispy)
   (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
   (add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
@@ -1597,18 +1637,23 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 #+RESULTS:
 | lambda | nil | (lispy-mode 1) |
+
 ** racket
+
 #+begin_src emacs-lisp
 (use-package racket-mode)
 #+end_src
 
 #+RESULTS:
+
 ** cmake
+
 #+begin_src emacs-lisp
   (use-package cmake-mode)
 #+end_src
 
 #+RESULTS:
+
 ** C/C++
 
 *** cpputils-cmake
@@ -1657,7 +1702,7 @@ achieved.
     (progn
       (setq exwm-workspace-number 3)
       (setq exwm-input-prefix-keys
-            '(?\C-x
+            `(?\C-x
               ?\s-o ;; switch-to-buffer
               ?\s-i ;; ibuffer
               ?\s-j ;; window switch
@@ -1666,10 +1711,9 @@ achieved.
               ?\s-k ;; window switch
               ?\s-v ;; vterm
               ?\s-s ;; single-window-toggle
-              ?\s-e ;; pop-up eshell
+              ?\s-e ;; eshell
               ?\s-q ;; toggle side windows
               ?\s-t ;; toggle touchpad
-              ?\s-D
               ?\s-d ;; helm-wordnut
               ?\C-u ;; general command
               ?\C-h ;; help
@@ -1690,7 +1734,7 @@ achieved.
                             (lambda ()
                               (interactive)
                               (exwm-workspace-switch-create ,i))))
-                        (number-sequence 0 9))))
+                        (number-sequence 0 2))))
       (exwm-input-set-simulation-keys
        '(([?\C-b] . left)
          ([?\C-f] . right)
@@ -1720,6 +1764,7 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
   ;; After C-q, send key to the window 
   (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
   (exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
+
 #+end_src
 
 #+RESULTS:
@@ -1734,7 +1779,7 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
 
   (defun efs/exwm-init-hook ()
     ;; Make workspace 1 be the one where we land at startup
-    (exwm-workspace-switch-create 0)
+    (exwm-workspace-switch-create 1)
 
     ;; Start the Polybar panel
     (efs/start-panel)
@@ -1780,7 +1825,6 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
 
   ;; Configure windows as they're created
   (add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
-
 
 #+end_src
 
@@ -2101,7 +2145,7 @@ Assign workspaces to monitors.
 
 #+begin_src emacs-lisp
 
-(desktop-save-mode 1)
+(desktop-save-mode nil)
 #+end_src
 
 #+RESULTS:
@@ -2167,7 +2211,7 @@ to helm.
 
 frequently used actions on buffer:
 - C-c o :: open in other window
-
+  
 ** maintenance
 
 Periodic activities that clears whatever impedes progress along a
