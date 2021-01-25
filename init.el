@@ -1,6 +1,8 @@
 (setq user-full-name "Jigang Li"
       user-mail-address "ljg16654@sjtu.edu.cn")
 
+(server-start)
+
 ;; each use-package form also invoke straight.el to install the package
 (setq straight-use-package-by-default t)
 
@@ -33,7 +35,7 @@
 (use-package spacemacs-theme
   :defer t)
 
-(load-theme 'modus-vivendi t)
+(load-theme 'spacemacs-light t)
 
 (use-package general)
 
@@ -149,13 +151,14 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 (setq window-sides-vertical nil)
 (setq switch-to-buffer-in-dedicated-window 'pop)
 (global-set-key (kbd "s-q") #'window-toggle-side-windows)
+(global-set-key (kbd "C-c 2") #'window-toggle-side-windows)
 (add-hook 'help-mode-hook #'visual-line-mode)
 (add-hook 'custom-mode-hook #'visual-line-mode)
 
 ;; between buffers
 
 (global-set-key (kbd "s-i") #'ibuffer)
-;; (global-set-key (kbd "s-o") #'switch-to-buffer)
+(global-set-key (kbd "M-j") #'helm-buffers-list)
 (global-set-key (kbd "s-<left>") #'previous-buffer)
 (global-set-key (kbd "s-<right>") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
@@ -261,7 +264,7 @@ buffer's window as well."
   :bind (("M-l" . avy-goto-line)))
 
 (global-unset-key (kbd "C-'"))
-(global-set-key (kbd "C-'") #'avy-goto-char-2)
+(global-set-key (kbd "C-'") #'ace-window)
 (global-set-key (kbd "H-d") #'avy-goto-char-2)
 (global-set-key (kbd "H-f") #'avy-goto-char)
 
@@ -306,6 +309,7 @@ buffer's window as well."
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
 (global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
+(global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
 
 (use-package helm-projectile
    :config
@@ -408,6 +412,10 @@ When the region is active, define the marked phrase."
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
+
+(general-define-key
+ :keymaps 'org-mode-map
+ "C-'" #'ace-window)
 
 (use-package org-bullets
   :ensure t
@@ -640,7 +648,7 @@ When the region is active, define the marked phrase."
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(defvar +frame-transparency+ '(85 85))
+(defvar +frame-transparency+ '(100 100))
 (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
@@ -680,6 +688,8 @@ When the region is active, define the marked phrase."
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
+(use-package yaml-mode)
+
 (use-package company
   :config
   (setq company-idle-delay 0)
@@ -712,8 +722,11 @@ When the region is active, define the marked phrase."
 (global-set-key (kbd "C-c m m") #'emms)
 (global-set-key (kbd "C-c m p") #'emms-add-playlist)
 
-(use-package pdf-tools
-  :config (pdf-tools-install))
+(general-define-key
+ :keymaps 'pdf-view-mode-map
+ "o" #'pdf-outline
+ "j" #'pdf-view-next-line-or-next-page
+ "k" #'pdf-view-previous-line-or-previous-page)
 
 (use-package vterm
   :bind (("s-v" . vterm)))
@@ -724,8 +737,9 @@ When the region is active, define the marked phrase."
   (concat
    ;; manually added
    "/usr/local/cbc/bin" ";"
-   (getenv "PATH") ; inherited from OS
-  )
+   "~/.local/bin" ";"
+   (getenv "PATH")			; inherited from OS
+   )
 )
 
 (defun mode-line-format-raw ()
@@ -739,6 +753,15 @@ When the region is active, define the marked phrase."
             (vc-mode vc-mode)
             "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
 ))
+
+(use-package diminish)
+(diminish 'ivy-mode)
+(diminish 'auto-revert-mode)
+(diminish 'yas-minor-mode)
+(diminish 'org-cdlatex-mode)
+(diminish 'which-key-mode)
+(diminish 'org-roam-mode)
+(diminish 'company-mode)
 
 (use-package doom-modeline
   ;; :init (doom-modeline-mode 1)
@@ -755,199 +778,6 @@ When the region is active, define the marked phrase."
 (use-package racket-mode)
 
 (use-package cmake-mode)
-
-(use-package exwm
-  :config
-  (progn
-    (setq exwm-workspace-number 3)
-    (setq exwm-input-prefix-keys
-          `(?\C-x
-            ?\s-o ;; switch-to-buffer
-            ?\s-i ;; ibuffer
-            ?\s-j ;; window switch
-            ?\s-c ;; kill window
-            ?\s-C ;; kill buffer and window(if not single)
-            ?\s-k ;; window switch
-            ?\s-v ;; vterm
-            ?\s-s ;; single-window-toggle
-            ?\s-e ;; eshell
-            ?\s-q ;; toggle side windows
-            ?\s-t ;; toggle touchpad
-            ?\s-d ;; helm-wordnut
-            ?\C-u ;; general command
-            ?\C-h ;; help
-            ?\M-x
-            ?\M-&
-            ?\M-:
-            ?\H-c ;; org-capture
-            ?\H-s ;; kill other windows
-            ?\C-\ ))
-    (setq exwm-input-global-keys
-          `(([?\s-r] . exwm-reset)
-            ([?\s-w] . exwm-workspace-switch)
-            ([?\s-\;] . (lambda (command)
-                          (interactive (list (read-shell-command "$ ")))
-                          (start-process-shell-command command nil command)))
-            ,@(mapcar (lambda (i)
-                        `(,(kbd (format "s-%d" i)) .
-                          (lambda ()
-                            (interactive)
-                            (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 2))))
-    (exwm-input-set-simulation-keys
-     '(([?\C-b] . left)
-       ([?\C-f] . right)
-       ([?\C-p] . up)
-       ([?\C-n] . down)
-       ([?\C-a] . home)
-       ([?\C-e] . end)
-       ([?\M-w] . [?\C-c])
-       ;; ([?\M-b] . [?\C-?\<left>])
-       ;; ([?\M-f] . [?\C-?\<left>])
-       ))
-    (setq exwm-workspace-warp-cursor t
-          mouse-autoselect-window t
-          focus-follows-mouse t)
-    (exwm-enable)
-    ))
-
-;; After C-q, send key to the window 
-(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-(exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/exwm-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
-
-  ;; Start the Polybar panel
-  (exwm-outer-gaps-mode)
-  (efs/start-panel)
-
-  ;; Launch apps that will run in the background
-  ;; (efs/run-in-background "dunst")
-  ;; (efs/run-in-background "nm-applet")
-  ;; (efs/run-in-background "pasystray")
-  ;; (efs/run-in-background "blueman-applet")
-
-(defun efs/exwm-update-class ()
-  (exwm-workspace-rename-buffer exwm-class-name))
-
-(defun efs/exwm-update-title ()
-  (pcase exwm-class-name
-    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-    )))
-
-;; This function isn't currently used, only serves as an example how to
-;; position a window
-(defun efs/position-window ()
-  (let* ((pos (frame-position))
-	 (pos-x (car pos))
-	  (pos-y (cdr pos)))
-    (exwm-floating-move (- pos-x) (- pos-y))))
-
-(defun efs/configure-window-by-class ()
-  (interactive)
-  (pcase exwm-class-name
-    ("electron-ssr" (exwm-floating-toggle-floating))))
-
-;; When EXWM starts up, do some extra confifuration
-(add-hook 'exwm-init-hook #'efs/exwm-init-hook)
-
-;; When window "class" updates, use it to set the buffer name
-(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-
-;; When window title updates, use it to set the buffer name
-(add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
-
-;; Configure windows as they're created
-(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
-
-(straight-use-package
- '(exwm-outer-gaps :host github :repo "lucasgruss/exwm-outer-gaps")
- )
-
-(setq exwm-outer-gaps-width [25 25 25 25])
-(global-set-key (kbd "H-G") #'exwm-outer-gaps-mode)
-(global-set-key (kbd "C-c 1") #'exwm-outer-gaps-mode)
-
-(use-package desktop-environment)
-(desktop-environment-mode)
-
-(require 'exwm-randr)
-(setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))
-(exwm-randr-enable)
-
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/update-displays ()
-  (efs/run-in-background "autorandr --change --force")
-  (message "Display config: %s"
-	   (string-trim (shell-command-to-string "autorandr --current"))))
-
-(add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
-(efs/update-displays)
-
-(unless (executable-find "feh")
-  (display-warning 'wallpaper "External command `feh' not found!"))
-
-;; This is an example `use-package' configuration
-;; It is not tangled into wallpaper.el
-(use-package wallpaper
-  :ensure t
-  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-         (after-init . wallpaper-cycle-mode))
-  :custom ((wallpaper-cycle-single t)
-           (wallpaper-scaling 'fill)
-           (wallpaper-cycle-interval 45)
-           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
-
-;; Make sure the server is started (better to do this in your
-;;  main Emacs config!)
-(server-start)
-
-(defvar efs/polybar-process nil
-  "Holds the process of the running Polybar instance, if any")
-
-(defun efs/kill-panel ()
-  (interactive)
-  (when efs/polybar-process
-    (ignore-errors
-      (kill-process efs/polybar-process)))
-  (setq efs/polybar-process nil))
-
-(defun efs/start-panel ()
-  (interactive)
-  (efs/kill-panel)
-  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
-
-(defun efs/send-polybar-hook (module-name hook-index)
-  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
-
-(defun efs/polybar-exwm-workspace ()
-  (pcase exwm-workspace-current-index
-    (0 "")
-    (1 "")
-    (2 "")
-    (3 "")
-    (4 "")))
-
-(defun efs/send-polybar-exwm-workspace ()
-  (efs/send-polybar-hook "exwm-workspace" 1))
-
-(defun langou/toggle-touchpad ()
-  (interactive)
-  (start-process-shell-command "exec" nil "exec ~/.dwm/toggleTouchpad.sh"))
-
-(global-set-key (kbd "s-t") #'langou/toggle-touchpad)
-
-;; Update panel indicator when workspace changes
-(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
 
 (desktop-save-mode nil)
 

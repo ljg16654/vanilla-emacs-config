@@ -20,6 +20,15 @@ n
 #+RESULTS:
 : Ljg16654@sjtu.edu.cn
 
+* server
+
+#+begin_src emacs-lisp
+
+(server-start)
+#+end_src
+
+#+RESULTS:
+
 * straight.el
 
 #+begin_src emacs-lisp
@@ -86,7 +95,11 @@ use-package isn't creating any autoloads for you.
   (use-package spacemacs-theme
     :defer t)
 
-  (load-theme 'modus-vivendi t)
+  (load-theme 'spacemacs-light t)
+#+end_src
+
+#+RESULTS:
+: t
 
 #+end_src
     
@@ -104,7 +117,6 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 
   (use-package general)
 #+end_src
-
 
 ** evil
 #+begin_src emacs-lisp
@@ -286,6 +298,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (setq window-sides-vertical nil)
   (setq switch-to-buffer-in-dedicated-window 'pop)
   (global-set-key (kbd "s-q") #'window-toggle-side-windows)
+  (global-set-key (kbd "C-c 2") #'window-toggle-side-windows)
   (add-hook 'help-mode-hook #'visual-line-mode)
   (add-hook 'custom-mode-hook #'visual-line-mode)
 #+end_src
@@ -316,7 +329,7 @@ Waiting for confirmation before tangling.
   ;; between buffers
 
   (global-set-key (kbd "s-i") #'ibuffer)
-  ;; (global-set-key (kbd "s-o") #'switch-to-buffer)
+  (global-set-key (kbd "M-j") #'helm-buffers-list)
   (global-set-key (kbd "s-<left>") #'previous-buffer)
   (global-set-key (kbd "s-<right>") #'next-buffer)
   (global-set-key (kbd "C-x <return> r")
@@ -457,14 +470,14 @@ In buffer or across buffers.
     :bind (("M-l" . avy-goto-line)))
 
   (global-unset-key (kbd "C-'"))
-  (global-set-key (kbd "C-'") #'avy-goto-char-2)
+  (global-set-key (kbd "C-'") #'ace-window)
   (global-set-key (kbd "H-d") #'avy-goto-char-2)
   (global-set-key (kbd "H-f") #'avy-goto-char)
 
 #+end_src
 
 #+RESULTS:
-: langou/goto-config
+: avy-goto-char
 
 jump to left parenthesis/check parens:
 
@@ -591,6 +604,7 @@ tangling is currently disabled.
   (global-set-key (kbd "M-i") #'helm-imenu)
   (global-set-key (kbd "C-h a") #'helm-apropos)
   (global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
 
 #+end_src
 
@@ -849,10 +863,13 @@ general.el.
       (font-lock-add-keywords 'org-mode
                               '(("^ *\\([-]\\) "
                                  (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
+
+  (general-define-key
+   :keymaps 'org-mode-map
+   "C-'" #'ace-window)
 #+end_src
 
 #+RESULTS:
-: t
 ** appearance
 
 #+RESULTS:
@@ -1289,13 +1306,15 @@ Transparency at start:
 
 #+begin_src emacs-lisp
 
-  (defvar +frame-transparency+ '(85 85))
+  (defvar +frame-transparency+ '(100 100))
   (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 #+end_src
 
 #+RESULTS:
-: ((tool-bar-lines . 0) (menu-bar-lines . 0) (alpha 90 90) (vertical-scroll-bars) (buffer-predicate . exwm-layout--other-buffer-predicate))
+| alpha                | 100 | 100 |
+| alpha                |  85 |  85 |
+| vertical-scroll-bars |     |     |
 
 ** cursor in =-nw= mode
 
@@ -1386,6 +1405,33 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
+** yaml
+
+#+begin_src emacs-lisp
+
+(use-package yaml-mode)
+#+end_src
+
+#+RESULTS:
+
+** integration with pywal
+
+#+begin_src emacs-lisp :tangle nil
+
+  (straight-use-package
+   '(theme-magic
+     :host github
+     :repo "jcaw/theme-magic"
+     :branch "wal-theme-template"))
+
+  (straight-use-package
+   '(xresources-theme
+     :host github
+     :repo "cqql/xresources-theme"))
+#+end_src
+
+#+RESULTS:
+: t
 
 * lsp
 
@@ -1443,13 +1489,25 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 * e-books and documents
 
 ** pdf
-#+begin_src emacs-lisp
-  (use-package pdf-tools
-    :config (pdf-tools-install))
+#+begin_src emacs-lisp :tangle nil
+  (straight-use-package
+   '(pdf-tools :host github :repo "flatwhatson/pdf-tools" :branch "fix-macros")
+   )
+
+  (pdf-tools-install)
 #+end_src
 
 #+RESULTS:
-: t
+
+#+begin_src emacs-lisp
+  (general-define-key
+   :keymaps 'pdf-view-mode-map
+   "o" #'pdf-outline
+   "j" #'pdf-view-next-line-or-next-page
+   "k" #'pdf-view-previous-line-or-previous-page)
+#+end_src
+
+#+RESULTS:
 
 ** TODO epub, djvu, mobi
 
@@ -1517,11 +1575,15 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
     (concat
      ;; manually added
      "/usr/local/cbc/bin" ";"
-     (getenv "PATH") ; inherited from OS
-    )
+     "~/.local/bin" ";"
+     (getenv "PATH")			; inherited from OS
+     )
   )
 
 #+end_src
+
+#+RESULTS:
+: /usr/local/cbc/bin;~/.local/bin;/usr/local/cbc/bin;~/.local/bin;/usr/local/cbc/bin;~/.local/bin;/usr/local/cbc/bin;~/.local/bin;/usr/local/cbc/bin;~/.local/bin/usr/local/cbc/bin;/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
 
 *** alias
 
@@ -1572,7 +1634,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   ))
 #+end_src
 
-#+begin_src emacs-lisp :tangle nil
+#+begin_src emacs-lisp
 
   (use-package diminish)
   (diminish 'ivy-mode)
@@ -1583,22 +1645,6 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   (diminish 'org-roam-mode)
   (diminish 'company-mode)
 #+end_src
-
-#+RESULTS:
-|   |
-#+begin_src emacs-lisp :tangle nil
-
-  (use-package telephone-line
-    :config (progn (setq telephone-line-primary-left-separator 'telephone-line-cubed-left
-                         telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
-                         telephone-line-primary-right-separator 'telephone-line-cubed-right
-                         telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right
-                         telephone-line-height 24)
-                   (telephone-line-mode +1)))
-#+end_src
-
-#+RESULTS:
-: t
 
 ** doom modeline
 
@@ -1675,6 +1721,9 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 | -I/usr/src/linux/include | -DNDEBUG |
 
 * EXWM
+:PROPERTIES:
+:header-args: :tangle nil
+:END:
 
 ** keybinding
 
@@ -1744,7 +1793,7 @@ achieved.
       (setq exwm-workspace-warp-cursor t
             mouse-autoselect-window t
             focus-follows-mouse t)
-      (exwm-enable)
+      ;; (exwm-enable)
       ))
 #+end_src
 
@@ -1924,10 +1973,6 @@ Assign workspaces to monitors.
 ** polybar
 
 #+begin_src emacs-lisp
-
-  ;; Make sure the server is started (better to do this in your
-  ;;  main Emacs config!)
-  (server-start)
 
   (defvar efs/polybar-process nil
     "Holds the process of the running Polybar instance, if any")
