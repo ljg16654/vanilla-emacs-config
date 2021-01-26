@@ -120,7 +120,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 
 ** evil
 #+begin_src emacs-lisp
-
+ 
   (use-package evil)
   (use-package evil-escape
     :config
@@ -633,37 +633,10 @@ see [[*window rules and management]] for configuration of relevent windows.
 
 #+begin_src emacs-lisp
 
-  (straight-use-package
-   '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
-
-  (require 'helm-wordnut)
-
-  (defun helm-wordnet-at-point ()
-    "Use `helm-wordnut--persistent-action' to define word at point.
-  When the region is active, define the marked phrase."
-    (interactive)
-    ;; the extraction of word is copied from
-    ;; package define-word
-    (let ((word
-           (cond
-            ((eq major-mode 'pdf-view-mode)
-             (car (pdf-view-active-region-text)))
-            ((use-region-p)
-             (buffer-substring-no-properties
-              (region-beginning)
-              (region-end)))
-            (t
-             (substring-no-properties
-              (thing-at-point 'word))))))
-      (helm-wordnut--persistent-action word)))
-
-  (global-set-key (kbd "s-d") #'helm-wordnut)
-  (global-set-key (kbd "s-D") #'helm-wordnet-at-point)
-
+  (use-package wordnut)
 #+end_src
 
 #+RESULTS:
-: helm-wordnet-at-point
 
   ,#+RESULTS:
   : t
@@ -671,7 +644,7 @@ see [[*window rules and management]] for configuration of relevent windows.
 #+begin_src emacs-lisp
 
     (use-package helm-swoop)
-    (global-set-key (kbd "C-s") #'helm-swoop)
+    (global-set-key (kbd "C-s") #'swiper)
 
 #+end_src
 
@@ -1307,7 +1280,7 @@ In addition, s-<return> is bound to =helm-filtered-bookmarks= in [[*helm]].
 ** dictionary
 
 #+begin_src emacs-lisp
-
+ 
   (use-package define-word
     :bind
     (("C-c d" . define-word-at-point)
@@ -2306,7 +2279,6 @@ maintenance could defy the meaning of its own existence.
 
 explicate how objects of note-taking are classified and
 located/refiled/archived.
-
 
 
 * anki

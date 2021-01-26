@@ -1,16 +1,3 @@
-xx
-xmodmap .Xmodmap 
-ls
-xx
-xmodmap ~/.Xmodmap 
-exit
-ping www.baidu.com
-sudo pacman -S wpa_supplicant_gui
-yay -S wpa_supplicant_gui
-sudo su
-sudo pacman -S ifconfig
-tk
-xinput list
 xinput disable 19
 xinput disable 23
 nmtui
@@ -122,3 +109,20 @@ exit
 make clean && sudo make install
 mkdir ~/org/roam-daily
 exit
+rmdir ~/org/roam-daily/
+git status
+wn 
+helm-wordnut--get-candidates 
+helm-wordnut-all-words
+helm-wordnut--get-candidates 
+(helm-wordnut--persistent-action "super")
+(helm-wordnut)
+(helm-wordnut "user")
+(helm-wordnut--get-candidates)
+(helm-wordnut--persistent-action "fuck")
+sudo pacman -S tk tcl
+exit
+(helm-wordnut--persistent-action "fuck")
+(helm-wordnut--get-candidates)
+(helm-wordnut--persistent-action "fuck")
+(helm-wordnut--get-candidates)

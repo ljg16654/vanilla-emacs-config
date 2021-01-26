@@ -319,35 +319,10 @@ buffer's window as well."
 
 (global-set-key (kbd "H-SPC") #'helm-projectile)
 
-(straight-use-package
- '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
-
-(require 'helm-wordnut)
-
-(defun helm-wordnet-at-point ()
-  "Use `helm-wordnut--persistent-action' to define word at point.
-When the region is active, define the marked phrase."
-  (interactive)
-  ;; the extraction of word is copied from
-  ;; package define-word
-  (let ((word
-         (cond
-          ((eq major-mode 'pdf-view-mode)
-           (car (pdf-view-active-region-text)))
-          ((use-region-p)
-           (buffer-substring-no-properties
-            (region-beginning)
-            (region-end)))
-          (t
-           (substring-no-properties
-            (thing-at-point 'word))))))
-    (helm-wordnut--persistent-action word)))
-
-(global-set-key (kbd "s-d") #'helm-wordnut)
-(global-set-key (kbd "s-D") #'helm-wordnet-at-point)
+(use-package wordnut)
 
 (use-package helm-swoop)
-(global-set-key (kbd "C-s") #'helm-swoop)
+(global-set-key (kbd "C-s") #'swiper)
 
 (use-package yasnippet
   :config
