@@ -86,7 +86,7 @@ use-package isn't creating any autoloads for you.
   (use-package spacemacs-theme
     :defer t)
 
-  (load-theme 'spacemacs-dark t)
+  (load-theme 'spacemacs-dark t)n
 #+end_src
 
 #+RESULTS:
@@ -107,8 +107,6 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
   (use-package general)
 #+end_src
 
-#+RESULTS:
-
 ** evil
 #+begin_src emacs-lisp
 
@@ -122,8 +120,6 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
   (global-set-key (kbd "H-e") #'evil-mode)
 #+end_src
 
-#+RESULTS:
-: evil-mode
 * searching
 
 Sometimes, when =lsp= doesn't work for some reasons (for example,
@@ -490,7 +486,7 @@ jump to left parenthesis/check parens:
   (defun langou/goto-config ()
     "go to personal configuration of emacs"
     (interactive)
-    (find-file "~/vanilla/init.org"))
+    (find-file "~/.config/emacs/init.org"))
 
   (global-set-key (kbd "C-c f p") #'langou/goto-config)
 
@@ -661,8 +657,9 @@ see [[*window rules and management]] for configuration of relevent windows.
 
 #+begin_src emacs-lisp
 
-    (use-package helm-swoop)
-    (global-set-key (kbd "C-s") #'helm-swoop)
+  (use-package helm-swoop)
+  (global-unset-key (kbd "C-s"))
+  (global-set-key (kbd "C-s") #'helm-swoop)
 
 #+end_src
 
@@ -799,9 +796,8 @@ general.el.
   (general-define-key
    :keymaps 'dired-mode-map
    ";" #'dired-up-directory)
-#+end_src
 
-#+RESULTS:
+#+end_src
 
 *** TODO improve
 - hide-detail not working
@@ -1767,8 +1763,6 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
 
 #+end_src
 
-#+RESULTS:
-
 ** window configuring
 
 #+begin_src emacs-lisp
@@ -1785,11 +1779,10 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
     (efs/start-panel)
 
     ;; Launch apps that will run in the background
-    (efs/run-in-background "dunst")
-    (efs/run-in-background "nm-applet")
-    (efs/run-in-background "pasystray")
-    (efs/run-in-background "blueman-applet")
-    (efs/run-in-background "electron-ssr"))
+    ;; (efs/run-in-background "dunst")
+    ;; (efs/run-in-background "nm-applet")
+    ;; (efs/run-in-background "pasystray")
+    ;; (efs/run-in-background "blueman-applet")
 
   (defun efs/exwm-update-class ()
     (exwm-workspace-rename-buffer exwm-class-name))
@@ -1797,9 +1790,7 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
   (defun efs/exwm-update-title ()
     (pcase exwm-class-name
       ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-      ("electron-ssr" (progn
-                        (exwm-workspace-rename-buffer "electron-ssr")
-                        (exwm-workspace-move-window 2)))))
+      )))
 
   ;; This function isn't currently used, only serves as an example how to
   ;; position a window

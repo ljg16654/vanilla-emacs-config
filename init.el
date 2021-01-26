@@ -33,7 +33,7 @@
 (use-package spacemacs-theme
   :defer t)
 
-(load-theme 'spacemacs-dark t)
+(load-theme 'spacemacs-dark t)n
 
 (use-package general)
 
@@ -265,13 +265,13 @@ buffer's window as well."
 (global-set-key (kbd "H-d") #'avy-goto-char-2)
 (global-set-key (kbd "H-f") #'avy-goto-char)
 
-;;   (global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
+(global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
 (global-set-key (kbd "s-(") #'check-parens)
 
 (defun langou/goto-config ()
   "go to personal configuration of emacs"
   (interactive)
-  (find-file "~/vanilla/init.org"))
+  (find-file "~/.config/emacs/init.org"))
 
 (global-set-key (kbd "C-c f p") #'langou/goto-config)
 
@@ -343,6 +343,7 @@ When the region is active, define the marked phrase."
 (global-set-key (kbd "s-D") #'helm-wordnet-at-point)
 
 (use-package helm-swoop)
+(global-unset-key (kbd "C-s"))
 (global-set-key (kbd "C-s") #'helm-swoop)
 
 (use-package yasnippet
@@ -640,7 +641,7 @@ When the region is active, define the marked phrase."
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(defvar +frame-transparency+ '(90 90))
+(defvar +frame-transparency+ '(85 85))
 (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
@@ -827,11 +828,10 @@ When the region is active, define the marked phrase."
   (efs/start-panel)
 
   ;; Launch apps that will run in the background
-  (efs/run-in-background "dunst")
-  (efs/run-in-background "nm-applet")
-  (efs/run-in-background "pasystray")
-  (efs/run-in-background "blueman-applet")
-  (efs/run-in-background "electron-ssr"))
+  ;; (efs/run-in-background "dunst")
+  ;; (efs/run-in-background "nm-applet")
+  ;; (efs/run-in-background "pasystray")
+  ;; (efs/run-in-background "blueman-applet")
 
 (defun efs/exwm-update-class ()
   (exwm-workspace-rename-buffer exwm-class-name))
@@ -839,9 +839,7 @@ When the region is active, define the marked phrase."
 (defun efs/exwm-update-title ()
   (pcase exwm-class-name
     ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-    ("electron-ssr" (progn
-                      (exwm-workspace-rename-buffer "electron-ssr")
-                      (exwm-workspace-move-window 2)))))
+    )))
 
 ;; This function isn't currently used, only serves as an example how to
 ;; position a window
@@ -949,6 +947,8 @@ When the region is active, define the marked phrase."
 
 ;; Update panel indicator when workspace changes
 (add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+
+(desktop-save-mode nil)
 
 (use-package anki-editor)
 
