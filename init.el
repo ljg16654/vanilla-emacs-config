@@ -33,6 +33,8 @@
 (use-package spacemacs-theme
   :defer t)
 
+(load-theme 'modus-vivendi t)
+
 (use-package general)
 
 (use-package evil)
@@ -739,10 +741,10 @@ When the region is active, define the marked phrase."
 ))
 
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
+  ;; :init (doom-modeline-mode 1)
   :config
   (progn
-    (setq doom-modeline-height 23)))
+    (setq doom-modeline-height 15)))
 
 (global-set-key (kbd "H-r") #'compile)
 
@@ -822,6 +824,7 @@ When the region is active, define the marked phrase."
   (exwm-workspace-switch-create 1)
 
   ;; Start the Polybar panel
+  (exwm-outer-gaps-mode)
   (efs/start-panel)
 
   ;; Launch apps that will run in the background
@@ -842,8 +845,8 @@ When the region is active, define the marked phrase."
 ;; position a window
 (defun efs/position-window ()
   (let* ((pos (frame-position))
-         (pos-x (car pos))
-          (pos-y (cdr pos)))
+	 (pos-x (car pos))
+	  (pos-y (cdr pos)))
     (exwm-floating-move (- pos-x) (- pos-y))))
 
 (defun efs/configure-window-by-class ()
@@ -866,6 +869,7 @@ When the region is active, define the marked phrase."
 (straight-use-package
  '(exwm-outer-gaps :host github :repo "lucasgruss/exwm-outer-gaps")
  )
+
 (setq exwm-outer-gaps-width [25 25 25 25])
 (global-set-key (kbd "H-G") #'exwm-outer-gaps-mode)
 (global-set-key (kbd "C-c 1") #'exwm-outer-gaps-mode)
