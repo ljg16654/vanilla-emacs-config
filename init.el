@@ -33,8 +33,6 @@
 (use-package spacemacs-theme
   :defer t)
 
-(load-theme 'spacemacs-dark t)n
-
 (use-package general)
 
 (use-package evil)
@@ -343,7 +341,6 @@ When the region is active, define the marked phrase."
 (global-set-key (kbd "s-D") #'helm-wordnet-at-point)
 
 (use-package helm-swoop)
-(global-unset-key (kbd "C-s"))
 (global-set-key (kbd "C-s") #'helm-swoop)
 
 (use-package yasnippet

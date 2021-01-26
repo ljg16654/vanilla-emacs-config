@@ -86,12 +86,8 @@ use-package isn't creating any autoloads for you.
   (use-package spacemacs-theme
     :defer t)
 
-  (load-theme 'spacemacs-dark t)n
 #+end_src
-
-#+RESULTS:
-: t
-
+    
 * keybinding
 
 [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
@@ -106,6 +102,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 
   (use-package general)
 #+end_src
+
 
 ** evil
 #+begin_src emacs-lisp
@@ -657,9 +654,8 @@ see [[*window rules and management]] for configuration of relevent windows.
 
 #+begin_src emacs-lisp
 
-  (use-package helm-swoop)
-  (global-unset-key (kbd "C-s"))
-  (global-set-key (kbd "C-s") #'helm-swoop)
+    (use-package helm-swoop)
+    (global-set-key (kbd "C-s") #'helm-swoop)
 
 #+end_src
 
@@ -1387,6 +1383,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
+
 
 * lsp
 
