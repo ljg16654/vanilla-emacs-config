@@ -35,7 +35,7 @@
 (use-package spacemacs-theme
   :defer t)
 
-(load-theme 'spacemacs-light t)
+(load-theme 'adwaita t)
 
 (use-package general)
 
@@ -77,7 +77,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
           (set-window-configuration prot/window-configuration))
       (setq prot/window-configuration (current-window-configuration))
       (delete-other-windows)))
-  :bind ("s-s" . prot/window-single-toggle))
+  :bind ("C-c s" . prot/window-single-toggle))
 
 (setq display-buffer-alist
       '(
@@ -492,11 +492,14 @@ When the region is active, define the marked phrase."
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config
-  (progn (setq org-roam-directory "~/org-roam")
-         (setq org-roam-tag-sources
-               (list
-                'prop
-                'last-directory)))
+  (progn
+    ;; all subdirectories of org-roam-directory are considered part of
+    ;; org-roam regardless of level of nesting.
+    (setq org-roam-directory "~/org-roam")
+    (setq org-roam-tag-sources
+          (list
+           'prop
+           'last-directory)))
   :bind (("C-c r f" . org-roam-find-file)
          ("C-c r c" . org-roam-db-build-cache)
          ("C-c r i" . org-roam-insert)
@@ -517,6 +520,15 @@ When the region is active, define the marked phrase."
         org-roam-server-network-label-truncate t
         org-roam-server-network-label-truncate-length 60
         org-roam-server-network-label-wrap-length 20))
+
+(setq org-roam-dailies-directory "daily/")
+
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry
+         #'org-roam-capture--get-point
+         "* ${abaaba} ${aba} %?"
+         :file-name "daily/%<%Y-%m-%d>"
+         :head "#+title: %<%Y-%m-%d>\n\n")))
 
 (defvar +org-capture-journal-file+ "journal.org")
 (defvar +org-capture-todo-file+ "todo.org")
@@ -608,7 +620,7 @@ When the region is active, define the marked phrase."
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
-(setq debug-on-error t)
+(setq debug-on-error nil)
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
 

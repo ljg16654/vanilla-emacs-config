@@ -95,7 +95,7 @@ use-package isn't creating any autoloads for you.
   (use-package spacemacs-theme
     :defer t)
 
-  (load-theme 'spacemacs-light t)
+  (load-theme 'adwaita t)
 #+end_src
 
 #+RESULTS:
@@ -196,24 +196,24 @@ From prot's dotEmacs. Defines a monocole layout similar to Tiling
 window managers.
 
 #+begin_src emacs-lisp
-(use-package emacs
-  :config
-  (defvar prot/window-configuration nil
-    "Current window configuration.
-Intended for use by `prot/window-monocle'.")
+  (use-package emacs
+    :config
+    (defvar prot/window-configuration nil
+      "Current window configuration.
+  Intended for use by `prot/window-monocle'.")
 
-  (define-minor-mode prot/window-single-toggle
-    "Toggle between multiple windows and single window.
-This is the equivalent of maximising a window.  Tiling window
-managers such as DWM, BSPWM refer to this state as 'monocle'."
-    :lighter " [M]"
-    :global nil
-    (if (one-window-p)
-        (when prot/window-configuration
-          (set-window-configuration prot/window-configuration))
-      (setq prot/window-configuration (current-window-configuration))
-      (delete-other-windows)))
-  :bind ("s-s" . prot/window-single-toggle))
+    (define-minor-mode prot/window-single-toggle
+      "Toggle between multiple windows and single window.
+  This is the equivalent of maximising a window.  Tiling window
+  managers such as DWM, BSPWM refer to this state as 'monocle'."
+      :lighter " [M]"
+      :global nil
+      (if (one-window-p)
+          (when prot/window-configuration
+            (set-window-configuration prot/window-configuration))
+        (setq prot/window-configuration (current-window-configuration))
+        (delete-other-windows)))
+    :bind ("C-c s" . prot/window-single-toggle))
 #+end_src
 
 #+RESULTS:
@@ -1018,21 +1018,19 @@ n** latex
 
 ** org-roam
 
-[[info:org-roam#Directories and Files][info:org-roam#Directories and Files]]
-All org files, *at any level of nesting*, are considered part of the
-org-roam. Hence one doesn't have to include all subdirectories
-recursively as for =org-directory.=
-
 #+begin_src emacs-lisp
   (use-package org-roam
     :commands org-roam-mode
     :init (add-hook 'after-init-hook 'org-roam-mode)
     :config
-    (progn (setq org-roam-directory "~/org-roam")
-           (setq org-roam-tag-sources
-                 (list
-                  'prop
-                  'last-directory)))
+    (progn
+      ;; all subdirectories of org-roam-directory are considered part of
+      ;; org-roam regardless of level of nesting.
+      (setq org-roam-directory "~/org-roam")
+      (setq org-roam-tag-sources
+            (list
+             'prop
+             'last-directory)))
     :bind (("C-c r f" . org-roam-find-file)
            ("C-c r c" . org-roam-db-build-cache)
            ("C-c r i" . org-roam-insert)
@@ -1059,11 +1057,42 @@ recursively as for =org-directory.=
         org-roam-server-network-label-truncate-length 60
         org-roam-server-network-label-wrap-length 20))
 #+end_src
-#+RESULTS:
-: t
+
+For 'org-roam-dalies' to work, several variables should be set.  The
+'org-roam-dailies-directory' is by default understood as subdirectory
+of the root 'org-roam-directory'.
+
+It's importance to notice that org-roam's templating system is /not/
+compatible with regular 'org-capture'. In fact, improvment have been
+made to allow string prefilling:
+
+#+begin_quote
+   In org-roam templates, the ‘${var}’ syntax allows for the expansion
+of variables, stored in ‘org-roam-capture--info’.  For example, during
+‘org-roam-insert’, the user is prompted for a title.  Upon entering a
+non-existent title, the ‘title’ key in ‘org-roam-capture--info’ is set
+to the provided title.  ‘${title}’ is then expanded into the provided
+title during the org-capture process.  Any variables that do not contain
+strings, are prompted for values using ‘completing-read’.
+#+end_quote
+
+Fuzzy search 'org roam template' in =describe variable= for customizable
+template brought with org-roam.
+
+#+begin_src emacs-lisp
+
+  (setq org-roam-dailies-directory "daily/")
+
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry
+           #'org-roam-capture--get-point
+           "* ${abaaba} ${aba} %?"
+           :file-name "daily/%<%Y-%m-%d>"
+           :head "#+title: %<%Y-%m-%d>\n\n")))
+#+end_src
 
 #+RESULTS:
-| ~/org-roam/20201214204228-ros_tf2.org | ~/org-roam/20201214205049-rviz.org | ~/org-roam/20201214205651-realsense_ros_slam.org | ~/org-roam/20201214211147-t265.org | ~/org-roam/20201214222731-realsenseapi.org | ~/org-roam/20201214223854-ros_messages.org | ~/org-roam/20201214224109-slaminjava.org | ~/org-roam/20201215124701-rospy.org | ~/org-roam/20201215132203-ubuntu20_04python.org | ~/org-roam/20201216124143-org_roam.org | ~/org-roam/20201216125059-hightlight_current_line.org | ~/org-roam/20201216125829-org_roam_titles.org | ~/org-roam/20201216131340-org_roam_tags.org | ~/org-roam/20201216134825-org_refile.org | ~/org-roam/20201216143227-org_tag.org | ~/org-roam/20201216152610-dkf.org | ~/org-roam/20201216211516-landmark_measurements.org | ~/org-roam/20201217210551-roscheatsheet.org | ~/org-roam/20201218204707-online_slam.org | ~/org-roam/20201218204931-slam_classification.org | ~/org-roam/20201218205027-full_slam.org | ~/org-roam/20201218212202-ekf_localization.org | ~/org-roam/20201218215300-linear_change_of_gaussian_random_variable.org | ~/org-roam/20201218222748-closure_properties_of_gaussian.org | ~/org-roam/20201218222758-convolution_of_gaussians.org | ~/org-roam/20201218224913-the_correspondence_problem.org | ~/org-roam/20201218224937-maximum_likelihood_correspondence.org | ~/org-roam/20201219104714-sum_of_gaussian_random_variable.org | ~/org-roam/20201219113346-kalman_filter_measurement_update.org | ~/org-roam/20201219114054-second_order_derivative_or_matrix.org | ~/org-roam/20201219124804-full_bayesian_implementation_of_ekf_under_unkown_data_association.org | ~/org-roam/20201219124946-mht.org | ~/org-roam/20201219165336-ekf_slam.org | ~/org-roam/20201222135306-regexp_sentence_end.org | ~/org-roam/20201223191322-uwa_framework.org | ~/org-roam/20201225012254-pyplot_colors.org | ~/org-roam/20201225023227-particle_filter_in_python.org | ~/org-roam/20201226011741-shell_script_array_size.org | ~/org-roam/20201226011850-shell_script_give_command_output_to_an_array.org | ~/org-roam/20201226013739-shell_script_number_of_command_line_arguments.org | ~/org-roam/20201226134132-emacs_tips.org | ~/org-roam/20201226192118-ssh_passphrase.org | ~/org-roam/20201227183820-catkin_build.org | ~/org-roam/20201227190758-catkin_clean.org | ~/org-roam/fastSLAM.org | ~/org-roam/particleFilter.org | ~/org-roam/pointCloudRegistration.org |
+| d | default | entry | #'org-roam-capture--get-point | * ${abaaba} ${aba} %? | :file-name | daily/%<%Y-%m-%d> | :head | #+title: %<%Y-%m-%d> |
 
 ** org-capture
 [2020-12-24 四] A weired phenomena that I just found is that the
@@ -1215,7 +1244,7 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+begin_src emacs-lisp
 
-  (setq debug-on-error t)
+  (setq debug-on-error nil)
   (setq custom-file (concat user-emacs-directory "custom.el"))
   (load custom-file)
 
@@ -2277,6 +2306,8 @@ maintenance could defy the meaning of its own existence.
 
 explicate how objects of note-taking are classified and
 located/refiled/archived.
+
+
 
 * anki
 
