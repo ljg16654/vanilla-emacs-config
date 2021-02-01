@@ -1,5 +1,5 @@
 #+TITLE: init
-#+PROPERTY: header-args :tangle init.el
+#+PROPERTY: header-args :tangle init.el :results silent
 #+startup: content
 
 Some of the awesome configurations used as reference:
@@ -16,9 +16,6 @@ Some of the awesome configurations used as reference:
   (setq user-full-name "Jigang Li"
         user-mail-address "ljg16654@sjtu.edu.cn")
 #+end_src
-n
-#+RESULTS:
-: Ljg16654@sjtu.edu.cn
 
 * server
 
@@ -72,6 +69,14 @@ appropriate time, and thus you would like to defer loading even though
 use-package isn't creating any autoloads for you.
 #+end_quote
 
+* elisp
+
+#+begin_src emacs-lisp
+
+  (use-package dash)
+  (use-package f)
+#+end_src
+
 * theme, font
 
 [[https://stackoverflow.com/questions/21033270/resizing-echoarea-of-emacsclient][related issue on wired space at bottom]]
@@ -95,15 +100,16 @@ use-package isn't creating any autoloads for you.
   (use-package spacemacs-theme
     :defer t)
 
-  (load-theme 'adwaita t)
+  (use-package apropospriate-theme)
+
+  (use-package weyland-yutani-theme)
+
+  (load-theme 'weyland-yutani t)
 #+end_src
 
-#+RESULTS:
-: t
 
-#+end_src
     
-* keybinding
+* keybinding and grouping commands
 
 [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
 /Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
@@ -119,6 +125,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 #+end_src
 
 ** evil
+
 #+begin_src emacs-lisp
  
   (use-package evil)
@@ -129,6 +136,24 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
       (evil-escape-mode)))
 
   (global-set-key (kbd "H-e") #'evil-mode)
+#+end_src
+
+** hydra
+
+#+begin_src emacs-lisp
+
+  (use-package hydra)
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (defhydra landmark (global-map "C-c f")
+    "landmarks"
+    ("p" #'(lambda () (interactive)
+             (find-file (concat user-emacs-directory "init.org"))) "config")
+    ("d" #'(lambda () (interactive)
+             (dired "~/Downloads"))
+     "downloads"))
 #+end_src
 
 * searching
@@ -329,7 +354,6 @@ Waiting for confirmation before tangling.
   ;; between buffers
 
   (global-set-key (kbd "s-i") #'ibuffer)
-  (global-set-key (kbd "M-j") #'helm-buffers-list)
   (global-set-key (kbd "s-<left>") #'previous-buffer)
   (global-set-key (kbd "s-<right>") #'next-buffer)
   (global-set-key (kbd "C-x <return> r")
@@ -491,18 +515,6 @@ jump to left parenthesis/check parens:
 #+RESULTS:
 : check-parens
 
-** frequently visited files
-
-#+begin_src emacs-lisp
-
-  (defun langou/goto-config ()
-    "go to personal configuration of emacs"
-    (interactive)
-    (find-file "~/.config/emacs/init.org"))
-
-  (global-set-key (kbd "C-c f p") #'langou/goto-config)
-
-#+end_src
 
 * project
 
@@ -633,16 +645,6 @@ see [[*window rules and management]] for configuration of relevent windows.
 
 #+begin_src emacs-lisp
 
-  (use-package wordnut)
-#+end_src
-
-#+RESULTS:
-
-  ,#+RESULTS:
-  : t
-
-#+begin_src emacs-lisp
-
     (use-package helm-swoop)
     (global-set-key (kbd "C-s") #'swiper)
 
@@ -710,7 +712,7 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
     :config
     (progn
       (setq yas-snippet-dirs
-	     (list "~/.doom.d/snippets"))
+            (list (concat user-emacs-directory "snippet/")))
       (yas-global-mode)))
 #+end_src
 #+RESULTS:
@@ -769,20 +771,6 @@ enhance ivy with ivy-rich:
 #+RESULTS:
 | lambda | nil | (progn (dired-hide-details-mode 1)) |
 
-*** keybinding
-
-The default '^' for =dired-up-directory= feels a bit clumsy.  For such
-reason, ';' is binded to the same function in dired-mode using
-general.el.
-
-#+begin_src emacs-lisp
-  (require 'general)
-
-  (general-define-key
-   :keymaps 'dired-mode-map
-   ";" #'dired-up-directory)
-
-#+end_src
 
 *** TODO improve
 - hide-detail not working
@@ -806,8 +794,6 @@ general.el.
           ))
 #+end_src
 
-#+RESULTS:
-: dired-subtree-cycle
 
 #+begin_src emacs-lisp
 
@@ -818,8 +804,31 @@ general.el.
      ))
 #+end_src
 
-#+RESULTS:
-: peep-dired
+#+begin_src emacs-lisp
+
+  (use-package dired-filter
+    :bind
+      (:map dired-mode-map
+      ("/" . dired-filter-mark-map)
+      )
+  )
+
+#+end_src
+
+*** keybinding
+The default '^' for =dired-up-directory= feels a bit clumsy.  For such
+reason, ';' is binded to the same function in dired-mode using
+general.el.
+
+#+begin_src emacs-lisp
+  (require 'general)
+
+  (general-define-key
+   :keymaps 'dired-mode-map
+   ";" #'dired-up-directory
+   )
+
+#+end_src
 
 * org
 
@@ -1059,13 +1068,13 @@ template brought with org-roam.
   (setq org-roam-dailies-capture-templates
         '(("d" "default" entry
            #'org-roam-capture--get-point
-           "* ${abaaba} ${aba} %?"
+           "* %?"
            :file-name "daily/%<%Y-%m-%d>"
            :head "#+title: %<%Y-%m-%d>\n\n")))
 #+end_src
 
 #+RESULTS:
-| d | default | entry | #'org-roam-capture--get-point | * ${abaaba} ${aba} %? | :file-name | daily/%<%Y-%m-%d> | :head | #+title: %<%Y-%m-%d> |
+| d | default | entry | #'org-roam-capture--get-point | * %? | :file-name | daily/%<%Y-%m-%d> | :head | #+title: %<%Y-%m-%d> |
 
 ** org-capture
 [2020-12-24 四] A weired phenomena that I just found is that the
@@ -1095,7 +1104,7 @@ in my org-directory.
      (setq org-capture-templates
              '(("t" "Personal todo" entry
                 (file+headline "todo.org" "Inbox")
-                "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+                "* TODO %?\n%i\n%a\n" :prepend t)
 
                ("n" "Personal notes" entry
                 (file+headline "notes.org" "Inbox")
@@ -1277,14 +1286,28 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 In addition, s-<return> is bound to =helm-filtered-bookmarks= in [[*helm]].
 
-** dictionary
+** dictionary and web search
 
 #+begin_src emacs-lisp
- 
-  (use-package define-word
-    :bind
-    (("C-c d" . define-word-at-point)
-     ("C-c D" . define-word)))
+
+  (use-package search-web)
+  (use-package wordnut)
+  (setq search-web-engines
+        '(
+          ("duck" "https://duckduckgo.com/?q=%s" nil)
+          ("google" "http://www.google.com/search?q=%s" nil)
+          ("google scholar" "https://scholar.google.co.jp/scholar?q=%s" nil)
+          ("youtube" "http://www.youtube.com/results?search_type=&search_query=%s&aq=f" External)
+          ("emacswiki" "http://www.google.com/cse?cx=004774160799092323420%%3A6-ff2s0o6yi&q=%s&sa=Search" nil)
+          ("wikipedia en" "http://www.wikipedia.org/search-redirect.php?search=%s&language=en" nil)
+          ("stackoveflow en" "http://stackoverflow.com/search?q=%s" nil)
+          ))
+
+  (defhydra define (global-map "s-d")
+    "define"
+    ("w" wordnut-search "wordnet")
+    ("i" search-web "web search"))
+
 #+end_src
 
 #+RESULTS:
@@ -1308,14 +1331,13 @@ Transparency at start:
 
 #+begin_src emacs-lisp
 
-  (defvar +frame-transparency+ '(100 100))
+  (defvar +frame-transparency+ '(95 95))
   (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 #+end_src
 
 #+RESULTS:
 | alpha                | 100 | 100 |
-| alpha                |  85 |  85 |
 | vertical-scroll-bars |     |     |
 
 ** cursor in =-nw= mode
@@ -1491,6 +1513,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 * e-books and documents
 
 ** pdf
+
 #+begin_src emacs-lisp :tangle nil
   (straight-use-package
    '(pdf-tools :host github :repo "flatwhatson/pdf-tools" :branch "fix-macros")
@@ -1506,24 +1529,56 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
    :keymaps 'pdf-view-mode-map
    "o" #'pdf-outline
    "j" #'pdf-view-next-line-or-next-page
-   "k" #'pdf-view-previous-line-or-previous-page)
+   "k" #'pdf-view-previous-line-or-previous-page
+   "]" #'pdf-view-next-page-command
+   "[" #'pdf-view-previous-page-command
+   "/" #'pdf-occur)
 #+end_src
 
 #+RESULTS:
+
+frequently used commands for movement:
+- f
+- m and '
+- /
+- SPC S-SPC
+
 
 ** TODO epub, djvu, mobi
 
 * shell and term
 
 ** vterm
+
 #+begin_src emacs-lisp
-  (use-package vterm
-    :bind (("s-v" . vterm)))
+
+  (use-package vterm)
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (use-package vterm-toggle
+    :bind
+    ("s-v" . vterm-toggle)
+    ("s-V" . vterm-toggle-cd)
+    )
+#+end_src
+
+** eshell
+
+*** git prompt
+
+#+begin_src emacs-lisp
+
+  (use-package eshell-git-prompt
+    :config
+    (progn
+      (eshell-git-prompt-use-theme 'robbyrussell)
+      ))
 #+end_src
 
 #+RESULTS:
-: vterm
-** eshell
+: t
 
 *** keybinding
 
@@ -1531,11 +1586,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
   (global-set-key (kbd "s-e") #'eshell)
 
-
 #+end_src
-
-#+RESULTS:
-: /usr/local/cbc/bin;/usr/local/cbc/bin;/home/jigang/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 
 [[http://www.howardism.org/Technical/Emacs/eshell-fun.html][eshell pop up window]]
 
@@ -1678,8 +1729,11 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   (add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
 #+end_src
 
-#+RESULTS:
-| lambda | nil | (lispy-mode 1) |
+#+begin_src emacs-lisp
+
+  (use-package paren-face)
+  (add-hook 'emacs-lisp-mode-hook (lambda () (paren-face 1)))
+#+end_src
 
 ** racket
 
@@ -1873,6 +1927,7 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
 #+RESULTS:
 | efs/configure-window-by-class |
 
+
 ** useless gaps
 
 [[https://github.com/lucasgruss/exwm-outer-gaps][the repo]] hasn't yet been submitted to MELPA.
@@ -2019,7 +2074,7 @@ Assign workspaces to monitors.
 #+RESULTS:
 | efs/send-polybar-exwm-workspace | doom-modeline-set-selected-window |
 
-#+begin_src conf :tangle ~/.config/polybar/config :mkdirp yes
+#+begin_src conf :tangle nil
 
   ; Docs: https://github.com/polybar/polybar
   ;==========================================================

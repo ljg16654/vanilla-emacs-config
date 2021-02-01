@@ -21,6 +21,9 @@
 
 (straight-use-package 'use-package)
 
+(use-package dash)
+(use-package f)
+
 (set-face-attribute 'default nil :font "iosevka" :height 135)
 
 (use-package anti-zenburn-theme
@@ -35,7 +38,11 @@
 (use-package spacemacs-theme
   :defer t)
 
-(load-theme 'adwaita t)
+(use-package apropospriate-theme)
+
+(use-package weyland-yutani-theme)
+
+(load-theme 'weyland-yutani t)
 
 (use-package general)
 
@@ -47,6 +54,16 @@
     (evil-escape-mode)))
 
 (global-set-key (kbd "H-e") #'evil-mode)
+
+(use-package hydra)
+
+(defhydra landmark (global-map "C-c f")
+  "landmarks"
+  ("p" #'(lambda () (interactive)
+           (find-file (concat user-emacs-directory "init.org"))) "config")
+  ("d" #'(lambda () (interactive)
+           (dired "~/Downloads"))
+   "downloads"))
 
 (use-package rg
   :config
@@ -158,7 +175,6 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 ;; between buffers
 
 (global-set-key (kbd "s-i") #'ibuffer)
-(global-set-key (kbd "M-j") #'helm-buffers-list)
 (global-set-key (kbd "s-<left>") #'previous-buffer)
 (global-set-key (kbd "s-<right>") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
@@ -271,13 +287,6 @@ buffer's window as well."
 (global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
 (global-set-key (kbd "s-(") #'check-parens)
 
-(defun langou/goto-config ()
-  "go to personal configuration of emacs"
-  (interactive)
-  (find-file "~/.config/emacs/init.org"))
-
-(global-set-key (kbd "C-c f p") #'langou/goto-config)
-
 (use-package magit
   :bind (("C-c g" . magit))
 )
@@ -319,8 +328,6 @@ buffer's window as well."
 
 (global-set-key (kbd "H-SPC") #'helm-projectile)
 
-(use-package wordnut)
-
 (use-package helm-swoop)
 (global-set-key (kbd "C-s") #'swiper)
 
@@ -328,7 +335,7 @@ buffer's window as well."
   :config
   (progn
     (setq yas-snippet-dirs
-	   (list "~/.doom.d/snippets"))
+          (list (concat user-emacs-directory "snippet/")))
     (yas-global-mode)))
 
 (use-package which-key
@@ -352,12 +359,6 @@ buffer's window as well."
               (progn
                 (dired-hide-details-mode +1))))
 
-(require 'general)
-
-(general-define-key
- :keymaps 'dired-mode-map
- ";" #'dired-up-directory)
-
 (use-package dired-subtree
   :after dired
   :config
@@ -375,6 +376,20 @@ buffer's window as well."
   (:map dired-mode-map
    ("`" . peep-dired)
    ))
+
+(use-package dired-filter
+  :bind
+    (:map dired-mode-map
+    ("/" . dired-filter-mark-map)
+    )
+)
+
+(require 'general)
+
+(general-define-key
+ :keymaps 'dired-mode-map
+ ";" #'dired-up-directory
+ )
 
 (use-package org
   :config
@@ -501,7 +516,7 @@ buffer's window as well."
 (setq org-roam-dailies-capture-templates
       '(("d" "default" entry
          #'org-roam-capture--get-point
-         "* ${abaaba} ${aba} %?"
+         "* %?"
          :file-name "daily/%<%Y-%m-%d>"
          :head "#+title: %<%Y-%m-%d>\n\n")))
 
@@ -522,7 +537,7 @@ buffer's window as well."
 (setq org-capture-templates
         '(("t" "Personal todo" entry
            (file+headline "todo.org" "Inbox")
-           "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+           "* TODO %?\n%i\n%a\n" :prepend t)
 
           ("n" "Personal notes" entry
            (file+headline "notes.org" "Inbox")
@@ -625,17 +640,30 @@ buffer's window as well."
 
 (global-set-key (kbd "s-m") #'bookmark-set)
 
-(use-package define-word
-  :bind
-  (("C-c d" . define-word-at-point)
-   ("C-c D" . define-word)))
+(use-package search-web)
+(use-package wordnut)
+(setq search-web-engines
+      '(
+        ("duck" "https://duckduckgo.com/?q=%s" nil)
+        ("google" "http://www.google.com/search?q=%s" nil)
+        ("google scholar" "https://scholar.google.co.jp/scholar?q=%s" nil)
+        ("youtube" "http://www.youtube.com/results?search_type=&search_query=%s&aq=f" External)
+        ("emacswiki" "http://www.google.com/cse?cx=004774160799092323420%%3A6-ff2s0o6yi&q=%s&sa=Search" nil)
+        ("wikipedia en" "http://www.wikipedia.org/search-redirect.php?search=%s&language=en" nil)
+        ("stackoveflow en" "http://stackoverflow.com/search?q=%s" nil)
+        ))
+
+(defhydra define (global-map "s-d")
+  "define"
+  ("w" wordnut-search "wordnet")
+  ("i" search-web "web search"))
 
 (defun transparency (value)
   "sets the transparency of the frame window. 0=transparent/100=opaque"
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(defvar +frame-transparency+ '(100 100))
+(defvar +frame-transparency+ '(95 95))
 (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
@@ -713,10 +741,24 @@ buffer's window as well."
  :keymaps 'pdf-view-mode-map
  "o" #'pdf-outline
  "j" #'pdf-view-next-line-or-next-page
- "k" #'pdf-view-previous-line-or-previous-page)
+ "k" #'pdf-view-previous-line-or-previous-page
+ "]" #'pdf-view-next-page-command
+ "[" #'pdf-view-previous-page-command
+ "/" #'pdf-occur)
 
-(use-package vterm
-  :bind (("s-v" . vterm)))
+(use-package vterm)
+
+(use-package vterm-toggle
+  :bind
+  ("s-v" . vterm-toggle)
+  ("s-V" . vterm-toggle-cd)
+  )
+
+(use-package eshell-git-prompt
+  :config
+  (progn
+    (eshell-git-prompt-use-theme 'robbyrussell)
+    ))
 
 (global-set-key (kbd "s-e") #'eshell)
 
@@ -761,6 +803,9 @@ buffer's window as well."
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 (add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
+
+(use-package paren-face)
+(add-hook 'emacs-lisp-mode-hook (lambda () (paren-face 1)))
 
 (use-package racket-mode)
 
