@@ -645,6 +645,7 @@ buffer's window as well."
 (setq search-web-engines
       '(
         ("duck" "https://duckduckgo.com/?q=%s" nil)
+        ("github" "https://github.com/search?q=%s" nil)
         ("google" "http://www.google.com/search?q=%s" nil)
         ("google scholar" "https://scholar.google.co.jp/scholar?q=%s" nil)
         ("youtube" "http://www.youtube.com/results?search_type=&search_query=%s&aq=f" External)

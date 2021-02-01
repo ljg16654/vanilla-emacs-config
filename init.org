@@ -145,6 +145,8 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
   (use-package hydra)
 #+end_src
 
+A minimalistic example:
+
 #+begin_src emacs-lisp
 
   (defhydra landmark (global-map "C-c f")
@@ -668,43 +670,6 @@ see [[*window rules and management]] for configuration of relevent windows.
 
 #+end_src
 
-** prescient.el
-
-#+begin_src emacs-lisp :tangle nil
-
-  (use-package prescient)
-  (use-package ivy-prescient
-    :after counsel
-    :config
-    (ivy-prescient-mode 1)
-    (prescient-persist-mode 1))
-
-
-#+end_src
-
-#+RESULTS:
-: t
-
-** embark, orderless and marginalia
-
-#+begin_src emacs-lisp :tangle nil
-
-  (use-package orderless
-    :ensure t
-    :init (icomplete-mode)		; optional but recommended!
-    :custom (completion-styles '(orderless)))
-
-#+end_src
-
-#+RESULTS:
-
-#+begin_src emacs-lisp :tangle nil
-
-    (use-package embark)
-#+end_src
-
-#+RESULTS:
-
 ** yasnippet
 The snippets are currently stored in DOOMDIR and I may move them to somewhere else later.
 #+begin_src emacs-lisp
@@ -774,10 +739,7 @@ enhance ivy with ivy-rich:
 
 *** TODO improve
 - hide-detail not working
-- working with compress files
-- dired-subtree
 - pipe to shell, group operation
-- filtering
 
 #+begin_src emacs-lisp
 
@@ -804,6 +766,7 @@ enhance ivy with ivy-rich:
      ))
 #+end_src
 
+
 #+begin_src emacs-lisp
 
   (use-package dired-filter
@@ -812,7 +775,6 @@ enhance ivy with ivy-rich:
       ("/" . dired-filter-mark-map)
       )
   )
-
 #+end_src
 
 *** keybinding
@@ -1295,6 +1257,7 @@ In addition, s-<return> is bound to =helm-filtered-bookmarks= in [[*helm]].
   (setq search-web-engines
         '(
           ("duck" "https://duckduckgo.com/?q=%s" nil)
+          ("github" "https://github.com/search?q=%s" nil)
           ("google" "http://www.google.com/search?q=%s" nil)
           ("google scholar" "https://scholar.google.co.jp/scholar?q=%s" nil)
           ("youtube" "http://www.youtube.com/results?search_type=&search_query=%s&aq=f" External)
