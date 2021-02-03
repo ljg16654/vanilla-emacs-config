@@ -42,7 +42,9 @@
 
 (use-package weyland-yutani-theme)
 
-(load-theme 'weyland-yutani t)
+(load-theme 'modus-operandi t)
+
+(global-set-key (kbd "H-a") <backspace>)
 
 (use-package general)
 
@@ -187,8 +189,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 (setq aw-keys
       (list ?a ?s ?d ?f ?j ?k ?l))
 
-(global-set-key (kbd "s-j") #'other-window)
-(global-set-key (kbd "s-k") #'(lambda () (interactive)
+(global-set-key (kbd "χ") #'other-window)
+(global-set-key (kbd "η") #'(lambda () (interactive)
                                 (other-window -1)))
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
@@ -317,7 +319,7 @@ buffer's window as well."
 (global-set-key (kbd "s-O") #'helm-recentf)
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
-(global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
+(global-set-key (kbd "μ") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
 
 (use-package helm-projectile
@@ -490,11 +492,18 @@ buffer's window as well."
           (list
            'prop
            'last-directory)))
-  :bind (("C-c r f" . org-roam-find-file)
-         ("C-c r c" . org-roam-db-build-cache)
-         ("C-c r i" . org-roam-insert)
+  :bind (
          ("C-c r t" . org-roam-tag-add)
          ))
+
+(defhydra roam (global-map "C-c r")
+  "Org Roam"
+  ("f" #'org-roam-find-file)
+  ("x" #'org-roam-dailies-capture-today)
+  ("j" #'org-roam-dailies-today)
+  ("i" #'org-roam-insert)
+  ("c" #'org-roam-build-cache)
+  )
 
 (use-package org-roam-server
   :ensure t
@@ -537,7 +546,7 @@ buffer's window as well."
 (setq org-capture-templates
         '(("t" "Personal todo" entry
            (file+headline "todo.org" "Inbox")
-           "* TODO %?\n%i\n%a\n" :prepend t)
+           "* TODO %?\n%i" :prepend t)
 
           ("n" "Personal notes" entry
            (file+headline "notes.org" "Inbox")
@@ -657,7 +666,9 @@ buffer's window as well."
 (defhydra define (global-map "s-d")
   "define"
   ("w" wordnut-search "wordnet")
-  ("i" search-web "web search"))
+  ("i" search-web "web search")
+  ("m" man "man")
+  )
 
 (defun transparency (value)
   "sets the transparency of the frame window. 0=transparent/100=opaque"
@@ -806,7 +817,7 @@ buffer's window as well."
 (add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
 
 (use-package paren-face)
-(add-hook 'emacs-lisp-mode-hook (lambda () (paren-face 1)))
+(add-hook 'emacs-lisp-mode-hook (lambda () (paren-face-mode 1)))
 
 (use-package racket-mode)
 

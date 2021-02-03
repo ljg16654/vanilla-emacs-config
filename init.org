@@ -104,16 +104,22 @@ use-package isn't creating any autoloads for you.
 
   (use-package weyland-yutani-theme)
 
-  (load-theme 'weyland-yutani t)
+  (load-theme 'modus-operandi t)
 #+end_src
 
-
-    
 * keybinding and grouping commands
 
 [[https://www.masteringemacs.org/article/mastering-key-bindings-emacs][mastering key bindings emacs]]
 /Function/ and /navigation/ keys, i.e. keys including F-keys, arrow keys
 and home row keys, should be wrapped with =<= and =>=.
+
+
+** the backspace
+
+#+begin_src emacs-lisp
+
+  (global-set-key (kbd "H-a") <backspace>)
+#+end_src
 
 ** general.el
 
@@ -214,7 +220,7 @@ read later at the moment.
 
 #+RESULTS:
 
-* window and buffer
+* windows and buffers
 
 ** window rules and management
 *** monocle-window
@@ -368,8 +374,8 @@ Waiting for confirmation before tangling.
   (setq aw-keys
         (list ?a ?s ?d ?f ?j ?k ?l))
 
-  (global-set-key (kbd "s-j") #'other-window)
-  (global-set-key (kbd "s-k") #'(lambda () (interactive)
+  (global-set-key (kbd "χ") #'other-window)
+  (global-set-key (kbd "η") #'(lambda () (interactive)
                                   (other-window -1)))
   (global-set-key (kbd "H-s") #'delete-other-windows)
 
@@ -517,7 +523,6 @@ jump to left parenthesis/check parens:
 #+RESULTS:
 : check-parens
 
-
 * project
 
 ** eyebrowse
@@ -617,7 +622,7 @@ tangling is currently disabled.
   (global-set-key (kbd "s-O") #'helm-recentf)
   (global-set-key (kbd "M-i") #'helm-imenu)
   (global-set-key (kbd "C-h a") #'helm-apropos)
-  (global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "μ") #'helm-filtered-bookmarks)
   (global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
 
 #+end_src
@@ -735,7 +740,6 @@ enhance ivy with ivy-rich:
 
 #+RESULTS:
 | lambda | nil | (progn (dired-hide-details-mode 1)) |
-
 
 *** TODO improve
 - hide-detail not working
@@ -975,15 +979,23 @@ n** latex
             (list
              'prop
              'last-directory)))
-    :bind (("C-c r f" . org-roam-find-file)
-           ("C-c r c" . org-roam-db-build-cache)
-           ("C-c r i" . org-roam-insert)
+    :bind (
            ("C-c r t" . org-roam-tag-add)
            ))
 #+end_src
 
-#+RESULTS:
-: org-roam-tag-add
+#+begin_src emacs-lisp
+
+  (defhydra roam (global-map "C-c r")
+    "Org Roam"
+    ("f" #'org-roam-find-file)
+    ("x" #'org-roam-dailies-capture-today)
+    ("j" #'org-roam-dailies-today)
+    ("i" #'org-roam-insert)
+    ("c" #'org-roam-build-cache)
+    )
+
+#+end_src
 
 #+begin_src emacs-lisp
 (use-package org-roam-server
@@ -1066,7 +1078,7 @@ in my org-directory.
      (setq org-capture-templates
              '(("t" "Personal todo" entry
                 (file+headline "todo.org" "Inbox")
-                "* TODO %?\n%i\n%a\n" :prepend t)
+                "* TODO %?\n%i" :prepend t)
 
                ("n" "Personal notes" entry
                 (file+headline "notes.org" "Inbox")
@@ -1269,7 +1281,9 @@ In addition, s-<return> is bound to =helm-filtered-bookmarks= in [[*helm]].
   (defhydra define (global-map "s-d")
     "define"
     ("w" wordnut-search "wordnet")
-    ("i" search-web "web search"))
+    ("i" search-web "web search")
+    ("m" man "man")
+    )
 
 #+end_src
 
@@ -1695,7 +1709,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+begin_src emacs-lisp
 
   (use-package paren-face)
-  (add-hook 'emacs-lisp-mode-hook (lambda () (paren-face 1)))
+  (add-hook 'emacs-lisp-mode-hook (lambda () (paren-face-mode 1)))
 #+end_src
 
 ** racket
