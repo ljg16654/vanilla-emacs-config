@@ -343,17 +343,19 @@ Used in combination with
 
 ** isearch, swiper, swoop
 
-With M-i, helm-swoop on the buffer can be called during isearch. By
-issuing M-i one more, the search will be performed throughout all
-present buffers with =helm-multi-swoop-all=.
-
-I prefer preserving the default keymap for C-s as it causes least
-distortion to the window layout and is already powerful enough.
+Despite being powerful enough, =isearch-forward= causes least distortion
+to window layout. For such reason, the default keymap bound to C-s is
+preserved.  In fact, this choice doesn't imply farewell with helm in
+terms of searching. With M-i, =helm-swoop= on the buffer can be called
+during isearch (the keybinding makes some sense as I've bound M-i to
+=imenu= normally, and one can think of swoop as an interface for the
+outline of isearch result). By issuing M-i one more, the search will
+be performed throughout all present buffers with =helm-multi-swoop-all=.
 
 #+begin_src emacs-lisp
 
-    (use-package helm-swoop)
-    (global-set-key (kbd "C-s") #'isearch-forward)
+  (use-package helm-swoop)
+  (global-set-key (kbd "C-s") #'isearch-forward)
 
 #+end_src
 
