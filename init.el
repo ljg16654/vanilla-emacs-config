@@ -21,6 +21,43 @@
 
 (straight-use-package 'use-package)
 
+(use-package helm
+  :config
+  (progn
+    (helm-mode 1)
+    ))
+
+(global-set-key (kbd "M-x") #'helm-M-x)
+(global-set-key (kbd "C-x C-f") #'helm-find-files)
+(global-set-key (kbd "s-o") #'helm-buffers-list)
+(global-set-key (kbd "s-O") #'helm-recentf)
+(global-set-key (kbd "M-i") #'helm-imenu)
+(global-set-key (kbd "C-h a") #'helm-apropos)
+(global-set-key (kbd "μ") #'helm-filtered-bookmarks)
+(global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
+
+(use-package yasnippet
+  :config
+  (progn
+    (setq yas-snippet-dirs
+          (list (concat user-emacs-directory "snippet/")))
+    (yas-global-mode)))
+
+(use-package which-key
+  ;; :init (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3))
+
+(use-package company
+  :config
+  (setq company-idle-delay 0)
+  )
+
+(add-hook 'after-init-hook 'global-company-mode)
+
+(setq tab-always-indent 'complete)
+(add-to-list 'completion-styles 'initials t)
+
 (use-package dash)
 (use-package f)
 
@@ -76,6 +113,11 @@
 (use-package ripgrep)
 
 (use-package ag)
+
+(global-set-key (kbd "C-;") #'iedit-mode)
+
+(use-package helm-swoop)
+(global-set-key (kbd "C-s") #'isearch-forward)
 
 (use-package emacs
   :config
@@ -279,8 +321,6 @@ buffer's window as well."
 (use-package avy
   :bind (("M-l" . avy-goto-line)))
 
-(global-unset-key (kbd "C-'"))
-(global-set-key (kbd "C-'") #'ace-window)
 (global-set-key (kbd "H-d") #'avy-goto-char-2)
 (global-set-key (kbd "H-f") #'avy-goto-char)
 
@@ -296,6 +336,12 @@ buffer's window as well."
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
+(use-package helm-projectile
+  :config
+  (progn
+    (helm-projectile-on)
+    ))
+
 (use-package dumb-jump
   :config
   (progn
@@ -304,51 +350,6 @@ buffer's window as well."
     (setq dumb-jump-aggressive t)
     (setq dumb-jump-selector 'helm)
     ))
-
-(use-package helm
-  :config
-  (progn
-    (helm-mode 1)
-    ))
-
-(global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "C-x C-f") #'helm-find-files)
-(global-set-key (kbd "s-o") #'helm-buffers-list)
-(global-set-key (kbd "s-O") #'helm-recentf)
-(global-set-key (kbd "M-i") #'helm-imenu)
-(global-set-key (kbd "C-h a") #'helm-apropos)
-(global-set-key (kbd "μ") #'helm-filtered-bookmarks)
-(global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
-
-(use-package helm-projectile
-   :config
-   (progn
-     (helm-projectile-on)
-     ))
-
-(global-set-key (kbd "H-SPC") #'helm-projectile)
-
-(use-package helm-swoop)
-(global-set-key (kbd "C-s") #'swiper)
-
-(use-package yasnippet
-  :config
-  (progn
-    (setq yas-snippet-dirs
-          (list (concat user-emacs-directory "snippet/")))
-    (yas-global-mode)))
-
-(use-package which-key
-  ;; :init (which-key-mode)
-  :config
-  (setq which-key-idle-delay 0.3))
-
-(use-package company
-  :config
-  (setq company-idle-delay 0)
-  )
-
-(add-hook 'after-init-hook 'global-company-mode)
 
 (use-package dired
   :straight nil
@@ -409,10 +410,6 @@ buffer's window as well."
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
-
-(general-define-key
- :keymaps 'org-mode-map
- "C-'" #'ace-window)
 
 (use-package org-bullets
   :ensure t
@@ -739,15 +736,15 @@ buffer's window as well."
                          (lsp))))
 
 (setq lsp-keymap-prefix "ρ")
-
-(setq tab-always-indent 'complete)
-(add-to-list 'completion-styles 'initials t)
+(define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+(define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
 (setq lsp-ui-doc-position 'bottom)
-(setq lsp-ui-doc-use-childframe t)
+(setq lsp-ui-doc-use-childframe nil)
 (setq lsp-ui-doc-delay 0)
 (setq lsp-ui-sideline-show-diagnostics t)
 (setq lsp-ui-sideline-show-hover nil)
+(setq lsp-eldoc-render-all nil)
 
 (setq
  mouse-wheel-scroll-amount
