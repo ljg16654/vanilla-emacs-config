@@ -44,8 +44,6 @@
 
 (load-theme 'modus-operandi t)
 
-(global-set-key (kbd "H-a") <backspace>)
-
 (use-package general)
 
 (use-package evil)
@@ -344,6 +342,13 @@ buffer's window as well."
   ;; :init (which-key-mode)
   :config
   (setq which-key-idle-delay 0.3))
+
+(use-package company
+  :config
+  (setq company-idle-delay 0)
+  )
+
+(add-hook 'after-init-hook 'global-company-mode)
 
 (use-package dired
   :straight nil
@@ -717,25 +722,43 @@ buffer's window as well."
 
 (use-package yaml-mode)
 
-(use-package company
-  :config
-  (setq company-idle-delay 0)
-  )
-(add-hook 'after-init-hook 'global-company-mode)
 (use-package lsp-mode)
+
 (use-package flycheck)
+
 (use-package lsp-ui
+  :after lsp-mode
   :demand flycheck
-  :config
-  (setq lsp-ui-sideline-show-diagnostics t
-        lsp-ui-sideline-show-hover t))
+  )
+
 (use-package lsp-python-ms
-  :ensure t
   :init (setq lsp-python-ms-auto-install-server t
               read-process-output-max 1048576)
   :hook (python-mode . (lambda ()
-                          (require 'lsp-python-ms)
-                          (lsp))))
+                         (require 'lsp-python-ms)
+                         (lsp))))
+
+(setq lsp-keymap-prefix "ρ")
+
+(setq tab-always-indent 'complete)
+(add-to-list 'completion-styles 'initials t)
+
+(setq lsp-ui-doc-position 'bottom)
+(setq lsp-ui-doc-use-childframe t)
+(setq lsp-ui-doc-delay 0)
+(setq lsp-ui-sideline-show-diagnostics t)
+(setq lsp-ui-sideline-show-hover nil)
+
+(setq
+ mouse-wheel-scroll-amount
+ '(1
+   ((shift) . 1))
+ mouse-wheel-progressive-speed nil)
+
+(general-define-key
+ :maps 'lsp-mode-map
+ "C-c u i" #'lsp-ui-imenu
+ "C-c d" #'lsp-ui-doc-focus-frame)
 
 (use-package emms
   :config
@@ -748,6 +771,10 @@ buffer's window as well."
 
 (global-set-key (kbd "C-c m m") #'emms)
 (global-set-key (kbd "C-c m p") #'emms-add-playlist)
+
+(pdf-tools-install)
+(setq pdf-view-midnight-colors
+      '("#cccccc" . "#000000"))
 
 (general-define-key
  :keymaps 'pdf-view-mode-map
