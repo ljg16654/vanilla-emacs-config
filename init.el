@@ -120,6 +120,7 @@
 (global-set-key (kbd "C-s") #'isearch-forward)
 ;; enable whitespace to match arbitrary string that doesn't contain a newline
 ;; non-greedily
+;; such behavior is, however, limited to non-regexp search
 (setq search-whitespace-regexp ".*?")
 
 (use-package emacs
