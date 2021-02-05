@@ -118,6 +118,9 @@
 
 (use-package helm-swoop)
 (global-set-key (kbd "C-s") #'isearch-forward)
+;; enable whitespace to match arbitrary string that doesn't contain a newline
+;; non-greedily
+(setq search-whitespace-regexp ".*?")
 
 (use-package emacs
   :config
@@ -688,11 +691,6 @@ buffer's window as well."
     )
   :bind (("C-c f e" . olivetti-mode)))
 
-
-(add-hook 'org-mode-hook
-          #'(lambda () (interactive)
-              (olivetti-mode +1)))
-
 (use-package expand-region
   :config
   (progn
@@ -789,6 +787,9 @@ buffer's window as well."
   ("s-v" . vterm-toggle)
   ("s-V" . vterm-toggle-cd)
   )
+
+(use-package eshell-toggle)
+(global-set-key (kbd "s-e") #'eshell-toggle)
 
 (use-package eshell-git-prompt
   :config
