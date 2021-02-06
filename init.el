@@ -79,7 +79,7 @@
 
 (use-package weyland-yutani-theme)
 
-(load-theme 'modus-operandi t)
+(load-theme 'modus-vivendi t)
 
 (use-package general)
 
@@ -93,14 +93,22 @@
 (global-set-key (kbd "H-e") #'evil-mode)
 
 (use-package hydra)
+(global-set-key (kbd "C-c h") #'hydra-pause-resume)
 
 (defhydra landmark (global-map "C-c f")
   "landmarks"
   ("p" #'(lambda () (interactive)
-           (find-file (concat user-emacs-directory "init.org"))) "config")
+           (find-file (concat user-emacs-directory "init.org")))
+   "config")
   ("d" #'(lambda () (interactive)
            (dired "~/Downloads"))
-   "downloads"))
+   "downloads")
+  ("c" #'(lambda () (interactive)
+           (dired "~/Documents"))
+   "documents")
+  ("y" #'(lambda () (interactive)
+           (dired (concat user-emacs-directory "snippet/"))
+           "snippets")))
 
 (use-package rg
   :config
@@ -234,8 +242,6 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
       (list ?a ?s ?d ?f ?j ?k ?l))
 
 (global-set-key (kbd "χ") #'other-window)
-(global-set-key (kbd "η") #'(lambda () (interactive)
-                                (other-window -1)))
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
 ;; new tab starts with scratch buffer
@@ -454,6 +460,68 @@ buffer's window as well."
 
 (setq org-export-with-toc nil)
 
+;; allow for export=>beamer by placing
+
+;; #+LaTeX_CLASS: beamer in org files
+(unless (boundp 'org-latex-classes)
+  (setq org-latex-classes nil))
+(add-to-list 'org-latex-classes
+  ;; beamer class, for presentations
+  '("beamer"
+     "\\documentclass[11pt]{beamer}\n
+      \\mode<{{{beamermode}}}>\n
+      \\usetheme{{{{beamertheme}}}}\n
+      \\usecolortheme{{{{beamercolortheme}}}}\n
+      \\beamertemplateballitem\n
+      \\setbeameroption{show notes}
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\n
+      \\usepackage{hyperref}\n
+      \\usepackage{color}
+      \\usepackage{listings}
+      \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+  frame=single,
+  basicstyle=\\small,
+  showspaces=false,showstringspaces=false,
+  showtabs=false,
+  keywordstyle=\\color{blue}\\bfseries,
+  commentstyle=\\color{red},
+  }\n
+      \\usepackage{verbatim}\n
+      \\institute{{{{beamerinstitute}}}}\n          
+       \\subject{{{{beamersubject}}}}\n"
+
+     ("\\section{%s}" . "\\section*{%s}")
+
+     ("\\begin{frame}[fragile]\\frametitle{%s}"
+       "\\end{frame}"
+       "\\begin{frame}[fragile]\\frametitle{%s}"
+       "\\end{frame}")))
+
+  ;; letter class, for formal letters
+
+  (add-to-list 'org-latex-classes
+
+  '("letter"
+     "\\documentclass[11pt]{letter}\n
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\n
+      \\usepackage{color}"
+
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+     ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(use-package org-sidebar)
+
+(defhydra org-sidebar (org-mode-map "C-c l")
+  "sidebar"
+  ("t" #'org-sidebar-tree-toggle "tree")
+  ("s" #'org-sidebar-toggle "default sidebar")
+  )
+
 (setq org-confirm-babel-evaluate nil)
 (setq org-src-window-setup 'current-window)
 
@@ -504,11 +572,19 @@ buffer's window as well."
 
 (defhydra roam (global-map "C-c r")
   "Org Roam"
-  ("f" #'org-roam-find-file)
-  ("x" #'org-roam-dailies-capture-today)
-  ("j" #'org-roam-dailies-today)
-  ("i" #'org-roam-insert)
-  ("c" #'org-roam-build-cache)
+  ("d" #'(lambda () (interactive)
+           (dired org-roam-directory))
+   "visit org-roam-directory")
+  ("f" #'org-roam-find-file
+   "find-file")
+  ("x" #'org-roam-dailies-capture-today
+   "capture today")
+  ("j" #'org-roam-dailies-today
+   "visit today")
+  ("i" #'org-roam-insert
+   "insert")
+  ("c" #'org-roam-build-cache
+   "build cache")
   )
 
 (use-package org-roam-server
@@ -736,7 +812,7 @@ buffer's window as well."
 
 (setq lsp-keymap-prefix "ρ")
 (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-(define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+(define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
 
 (setq lsp-ui-doc-position 'bottom)
 (setq lsp-ui-doc-use-childframe nil)
