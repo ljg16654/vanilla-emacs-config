@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: inline math
+# name: inline-math
 # key: $
 # --
 \\($1\\)$0
