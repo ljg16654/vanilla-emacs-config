@@ -1055,7 +1055,7 @@ recursively as for =org-directory.=
 | ~/org-roam/20201214204228-ros_tf2.org | ~/org-roam/20201214205049-rviz.org | ~/org-roam/20201214205651-realsense_ros_slam.org | ~/org-roam/20201214211147-t265.org | ~/org-roam/20201214222731-realsenseapi.org | ~/org-roam/20201214223854-ros_messages.org | ~/org-roam/20201214224109-slaminjava.org | ~/org-roam/20201215124701-rospy.org | ~/org-roam/20201215132203-ubuntu20_04python.org | ~/org-roam/20201216124143-org_roam.org | ~/org-roam/20201216125059-hightlight_current_line.org | ~/org-roam/20201216125829-org_roam_titles.org | ~/org-roam/20201216131340-org_roam_tags.org | ~/org-roam/20201216134825-org_refile.org | ~/org-roam/20201216143227-org_tag.org | ~/org-roam/20201216152610-dkf.org | ~/org-roam/20201216211516-landmark_measurements.org | ~/org-roam/20201217210551-roscheatsheet.org | ~/org-roam/20201218204707-online_slam.org | ~/org-roam/20201218204931-slam_classification.org | ~/org-roam/20201218205027-full_slam.org | ~/org-roam/20201218212202-ekf_localization.org | ~/org-roam/20201218215300-linear_change_of_gaussian_random_variable.org | ~/org-roam/20201218222748-closure_properties_of_gaussian.org | ~/org-roam/20201218222758-convolution_of_gaussians.org | ~/org-roam/20201218224913-the_correspondence_problem.org | ~/org-roam/20201218224937-maximum_likelihood_correspondence.org | ~/org-roam/20201219104714-sum_of_gaussian_random_variable.org | ~/org-roam/20201219113346-kalman_filter_measurement_update.org | ~/org-roam/20201219114054-second_order_derivative_or_matrix.org | ~/org-roam/20201219124804-full_bayesian_implementation_of_ekf_under_unkown_data_association.org | ~/org-roam/20201219124946-mht.org | ~/org-roam/20201219165336-ekf_slam.org | ~/org-roam/20201222135306-regexp_sentence_end.org | ~/org-roam/20201223191322-uwa_framework.org | ~/org-roam/20201225012254-pyplot_colors.org | ~/org-roam/20201225023227-particle_filter_in_python.org | ~/org-roam/20201226011741-shell_script_array_size.org | ~/org-roam/20201226011850-shell_script_give_command_output_to_an_array.org | ~/org-roam/20201226013739-shell_script_number_of_command_line_arguments.org | ~/org-roam/20201226134132-emacs_tips.org | ~/org-roam/20201226192118-ssh_passphrase.org | ~/org-roam/20201227183820-catkin_build.org | ~/org-roam/20201227190758-catkin_clean.org | ~/org-roam/fastSLAM.org | ~/org-roam/particleFilter.org | ~/org-roam/pointCloudRegistration.org |
 
 ** org-capture
-[2020-12-24 四] A weired phenomena that I just found is that the
+[2020-12-24 四] A wired phenomena that I just found is that the
 result of using defvar and using string for filename directly is
 different!  If I use defvar after =file+headline=, the filename is
 understood as a file in the relative path and something like
@@ -1116,8 +1116,7 @@ in my org-directory.
 
                ("v" "vocabularies" entry
                 (file+headline "voc.org" "inbox")
-                "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")
-               ))
+                "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")))
    #+end_src
 
    #+RESULTS:
@@ -1132,7 +1131,7 @@ in my org-directory.
 #+end_src
 
 #+RESULTS:
-| ~/org/journal/2020-10-25.org | ~/org/journal/2020-10-30.org | ~/org/journal/2020-11-12.org | ~/org/journal/2020-11-13.org | ~/org/journal/2020-11-14.org | ~/org/journal/2020-11-17.org | ~/org/journal/2020-12-20.org | ~/org/bug.org | ~/org/journal.org | ~/org/just-for-fun.org | ~/org/notes.org | ~/org/read-later.org | ~/org/todo.org | ~/org/voc.org |
+| ~/org/journal/2020-10-25.org | ~/org/journal/2020-10-30.org | ~/org/journal/2020-11-12.org | ~/org/journal/2020-11-13.org | ~/org/journal/2020-11-14.org | ~/org/journal/2020-11-17.org | ~/org/journal/2020-12-20.org | ~/org/bug.org | ~/org/journal.org | ~/org/just-for-fun.org | ~/org/notes.org | ~/org/read-later.org | ~/org/todo.org | ~/org/voc.org |p
 ** habit
 #+begin_src emacs-lisp
   (add-to-list 'org-modules 'org-habit)
@@ -1295,13 +1294,13 @@ Transparency at start:
 
 #+begin_src emacs-lisp
 
-  (defvar +frame-transparency+ '(85 85))
+  (defvar +frame-transparency+ '(100 100))
   (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 #+end_src
 
 #+RESULTS:
-: ((tool-bar-lines . 0) (menu-bar-lines . 0) (alpha 90 90) (vertical-scroll-bars) (buffer-predicate . exwm-layout--other-buffer-predicate))
+: ((alpha 100 100) (tool-bar-lines . 0) (menu-bar-lines . 0) (alpha 85 85) (vertical-scroll-bars))
 
 ** cursor in =-nw= mode
 
@@ -1680,9 +1679,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 | -I/usr/src/linux/include | -DNDEBUG |
 
 * EXWM
-
 ** keybinding
-
 Most keys defined in [[*window and buffer]] are configured as prefix-keys
 in exwm windows.  s-<num> switches to <num> th workspace, although
 workspace is never used with single monitor (of xps15).
@@ -1778,8 +1775,8 @@ s-SPC runs #'counsel-linux-app and s-<tab> toggles tab selection.
       (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
   (defun efs/exwm-init-hook ()
-    ;; Make workspace 1 be the one where we land at startup
-    (exwm-workspace-switch-create 1)
+
+    (exwm-workspace-switch-create 0)
 
     ;; Start the Polybar panel
     (efs/start-panel)

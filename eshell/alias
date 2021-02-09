@@ -1,6 +1,6 @@
-alias br xrandr --output eDP-1 --brightness $1
-alias tk bash ~/.dwm/toggleXpsKeyboard.sh
-alias xx xmodmap ~/.Xmodmap
-alias ll ls --l $*
-alias tt bash /home/jigang/.dwm/toggleTouchpad.sh
+alias br xrandr --output eDP-1-1 --brightness $1
 alias mcd mkdir $1 && cd $1
+alias tt bash /home/jigang/.dwm/toggleTouchpad.sh
+alias ll ls --l $*
+alias xx xmodmap ~/.Xmodmap
+alias tk bash ~/.dwm/toggleXpsKeyboard.sh

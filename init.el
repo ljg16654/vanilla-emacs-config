@@ -265,7 +265,7 @@ buffer's window as well."
 (global-set-key (kbd "H-d") #'avy-goto-char-2)
 (global-set-key (kbd "H-f") #'avy-goto-char)
 
-;;   (global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
+(global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
 (global-set-key (kbd "s-(") #'check-parens)
 
 (defun langou/goto-config ()
@@ -561,8 +561,7 @@ When the region is active, define the marked phrase."
 
           ("v" "vocabularies" entry
            (file+headline "voc.org" "inbox")
-           "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")
-          ))
+           "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")))
 
 (setq org-agenda-files (apply (function append)
 			        (mapcar
@@ -640,7 +639,7 @@ When the region is active, define the marked phrase."
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(defvar +frame-transparency+ '(90 90))
+(defvar +frame-transparency+ '(100 100))
 (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
@@ -820,8 +819,8 @@ When the region is active, define the marked phrase."
     (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
 
 (defun efs/exwm-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
+
+  (exwm-workspace-switch-create 0)
 
   ;; Start the Polybar panel
   (efs/start-panel)
@@ -949,6 +948,8 @@ When the region is active, define the marked phrase."
 
 ;; Update panel indicator when workspace changes
 (add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+
+(desktop-save-mode nil)
 
 (use-package anki-editor)
 
