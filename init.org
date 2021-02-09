@@ -871,11 +871,15 @@ Track state changes.
 #+end_src
 
 *** latex classes
+**** beamer
 
 temporary: yanked from
 http://emacs-fu.blogspot.com/2009/10/writing-presentations-with-org-mode-and.html
 which improves upon
 [[https://www.mail-archive.com/emacs-orgmode@gnu.org/msg17712.html]]
+
+org-mode tutorial on beamer
+https://orgmode.org/worg/exporters/beamer/tutorial.html
 
 #+begin_src emacs-lisp
   ;; allow for export=>beamer by placing
@@ -886,7 +890,7 @@ which improves upon
   (add-to-list 'org-latex-classes
     ;; beamer class, for presentations
     '("beamer"
-       "\\documentclass[11pt]{beamer}\n
+      "\\documentclass[11pt]{beamer}\n
         \\mode<{{{beamermode}}}>\n
         \\usetheme{{{{beamertheme}}}}\n
         \\usecolortheme{{{{beamercolortheme}}}}\n
@@ -897,6 +901,7 @@ which improves upon
         \\usepackage{hyperref}\n
         \\usepackage{color}
         \\usepackage{listings}
+        \\usepackage{physics}
         \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
     frame=single,
     basicstyle=\\small,
@@ -909,12 +914,12 @@ which improves upon
         \\institute{{{{beamerinstitute}}}}\n          
          \\subject{{{{beamersubject}}}}\n"
 
-       ("\\section{%s}" . "\\section*{%s}")
-     
-       ("\\begin{frame}[fragile]\\frametitle{%s}"
-         "\\end{frame}"
-         "\\begin{frame}[fragile]\\frametitle{%s}"
-         "\\end{frame}")))
+      ("\\section{%s}" . "\\section*{%s}")
+
+      ("\\begin{frame}[fragile]\\frametitle{%s}"
+       "\\end{frame}"
+       "\\begin{frame}[fragile]\\frametitle{%s}"
+       "\\end{frame}")))
 
     ;; letter class, for formal letters
 
@@ -925,7 +930,7 @@ which improves upon
         \\usepackage[utf8]{inputenc}\n
         \\usepackage[T1]{fontenc}\n
         \\usepackage{color}"
-     
+
        ("\\section{%s}" . "\\section*{%s}")
        ("\\subsection{%s}" . "\\subsection*{%s}")
        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")

@@ -471,7 +471,7 @@ buffer's window as well."
 (add-to-list 'org-latex-classes
   ;; beamer class, for presentations
   '("beamer"
-     "\\documentclass[11pt]{beamer}\n
+    "\\documentclass[11pt]{beamer}\n
       \\mode<{{{beamermode}}}>\n
       \\usetheme{{{{beamertheme}}}}\n
       \\usecolortheme{{{{beamercolortheme}}}}\n
@@ -482,6 +482,7 @@ buffer's window as well."
       \\usepackage{hyperref}\n
       \\usepackage{color}
       \\usepackage{listings}
+      \\usepackage{physics}
       \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
   frame=single,
   basicstyle=\\small,
@@ -494,12 +495,12 @@ buffer's window as well."
       \\institute{{{{beamerinstitute}}}}\n          
        \\subject{{{{beamersubject}}}}\n"
 
-     ("\\section{%s}" . "\\section*{%s}")
+    ("\\section{%s}" . "\\section*{%s}")
 
-     ("\\begin{frame}[fragile]\\frametitle{%s}"
-       "\\end{frame}"
-       "\\begin{frame}[fragile]\\frametitle{%s}"
-       "\\end{frame}")))
+    ("\\begin{frame}[fragile]\\frametitle{%s}"
+     "\\end{frame}"
+     "\\begin{frame}[fragile]\\frametitle{%s}"
+     "\\end{frame}")))
 
   ;; letter class, for formal letters
 
