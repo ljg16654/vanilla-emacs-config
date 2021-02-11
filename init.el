@@ -1,6 +1,8 @@
 (setq user-full-name "Jigang Li"
       user-mail-address "ljg16654@sjtu.edu.cn")
 
+(server-start)
+
 ;; each use-package form also invoke straight.el to install the package
 (setq straight-use-package-by-default t)
 
@@ -19,6 +21,47 @@
 
 (straight-use-package 'use-package)
 
+(use-package helm
+  :config
+  (progn
+    (helm-mode 1)
+    ))
+
+(global-set-key (kbd "M-x") #'helm-M-x)
+(global-set-key (kbd "C-x C-f") #'helm-find-files)
+(global-set-key (kbd "s-o") #'helm-buffers-list)
+(global-set-key (kbd "η") #'helm-buffers-list)
+(global-set-key (kbd "s-O") #'helm-recentf)
+(global-set-key (kbd "M-i") #'helm-imenu)
+(global-set-key (kbd "C-h a") #'helm-apropos)
+(global-set-key (kbd "μ") #'helm-filtered-bookmarks)
+(global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
+
+(use-package yasnippet
+  :config
+  (progn
+    (setq yas-snippet-dirs
+          (list (concat user-emacs-directory "snippet/")))
+    (yas-global-mode)))
+
+(use-package which-key
+  ;; :init (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3))
+
+(use-package company
+  :config
+  (setq company-idle-delay 0)
+  )
+
+(add-hook 'after-init-hook 'global-company-mode)
+
+(setq tab-always-indent 'complete)
+(add-to-list 'completion-styles 'initials t)
+
+(use-package dash)
+(use-package f)
+
 (set-face-attribute 'default nil :font "iosevka" :height 135)
 
 (use-package anti-zenburn-theme
@@ -33,7 +76,11 @@
 (use-package spacemacs-theme
   :defer t)
 
-(load-theme 'spacemacs-dark t)
+(use-package apropospriate-theme)
+
+(use-package weyland-yutani-theme)
+
+(load-theme 'modus-vivendi t)
 
 (use-package general)
 
@@ -46,6 +93,27 @@
 
 (global-set-key (kbd "H-e") #'evil-mode)
 
+(use-package hydra)
+(global-set-key (kbd "C-c h") #'hydra-pause-resume)
+
+(defhydra landmark (global-map "C-c f")
+  "landmarks"
+  ("p" #'(lambda () (interactive)
+           (find-file (concat user-emacs-directory "init.org")))
+   "config")
+  ("d" #'(lambda () (interactive)
+           (dired "~/Downloads"))
+   "downloads")
+  ("c" #'(lambda () (interactive)
+           (dired "~/Documents"))
+   "documents")
+  ("r" #'(lambda () (interactive)
+           (dired "~/ROS"))
+   "ros workspaces")
+  ("y" #'(lambda () (interactive)
+           (dired (concat user-emacs-directory "snippet/"))
+           "snippets")))
+
 (use-package rg
   :config
   (progn
@@ -57,6 +125,15 @@
 (use-package ripgrep)
 
 (use-package ag)
+
+(global-set-key (kbd "C-;") #'iedit-mode)
+
+(use-package helm-swoop)
+(global-set-key (kbd "C-s") #'isearch-forward)
+;; enable whitespace to match arbitrary string that doesn't contain a newline
+;; non-greedily
+;; such behavior is, however, limited to non-regexp search
+(setq search-whitespace-regexp ".*?")
 
 (use-package emacs
   :config
@@ -75,7 +152,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
           (set-window-configuration prot/window-configuration))
       (setq prot/window-configuration (current-window-configuration))
       (delete-other-windows)))
-  :bind ("s-s" . prot/window-single-toggle))
+  :bind ("C-c s" . prot/window-single-toggle))
 
 (setq display-buffer-alist
       '(
@@ -149,13 +226,13 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 (setq window-sides-vertical nil)
 (setq switch-to-buffer-in-dedicated-window 'pop)
 (global-set-key (kbd "s-q") #'window-toggle-side-windows)
+(global-set-key (kbd "C-c 2") #'window-toggle-side-windows)
 (add-hook 'help-mode-hook #'visual-line-mode)
 (add-hook 'custom-mode-hook #'visual-line-mode)
 
 ;; between buffers
 
 (global-set-key (kbd "s-i") #'ibuffer)
-;; (global-set-key (kbd "s-o") #'switch-to-buffer)
 (global-set-key (kbd "s-<left>") #'previous-buffer)
 (global-set-key (kbd "s-<right>") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
@@ -168,9 +245,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 (setq aw-keys
       (list ?a ?s ?d ?f ?j ?k ?l))
 
-(global-set-key (kbd "s-j") #'other-window)
-(global-set-key (kbd "s-k") #'(lambda () (interactive)
-                                (other-window -1)))
+(global-set-key (kbd "χ") #'other-window)
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
 ;; new tab starts with scratch buffer
@@ -260,20 +335,11 @@ buffer's window as well."
 (use-package avy
   :bind (("M-l" . avy-goto-line)))
 
-(global-unset-key (kbd "C-'"))
-(global-set-key (kbd "C-'") #'avy-goto-char-2)
 (global-set-key (kbd "H-d") #'avy-goto-char-2)
 (global-set-key (kbd "H-f") #'avy-goto-char)
 
 (global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
 (global-set-key (kbd "s-(") #'check-parens)
-
-(defun langou/goto-config ()
-  "go to personal configuration of emacs"
-  (interactive)
-  (find-file "~/vanilla/init.org"))
-
-(global-set-key (kbd "C-c f p") #'langou/goto-config)
 
 (use-package magit
   :bind (("C-c g" . magit))
@@ -284,6 +350,12 @@ buffer's window as well."
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
+(use-package helm-projectile
+  :config
+  (progn
+    (helm-projectile-on)
+    ))
+
 (use-package dumb-jump
   :config
   (progn
@@ -292,70 +364,6 @@ buffer's window as well."
     (setq dumb-jump-aggressive t)
     (setq dumb-jump-selector 'helm)
     ))
-
-(use-package helm
-  :config
-  (progn
-    (helm-mode 1)
-    ))
-
-(global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "C-x C-f") #'helm-find-files)
-(global-set-key (kbd "s-o") #'helm-buffers-list)
-(global-set-key (kbd "s-O") #'helm-recentf)
-(global-set-key (kbd "M-i") #'helm-imenu)
-(global-set-key (kbd "C-h a") #'helm-apropos)
-(global-set-key (kbd "s-<return>") #'helm-filtered-bookmarks)
-
-(use-package helm-projectile
-   :config
-   (progn
-     (helm-projectile-on)
-     ))
-
-(global-set-key (kbd "H-SPC") #'helm-projectile)
-
-(straight-use-package
- '(helm-wordnut :host github :repo "emacs-helm/helm-wordnut"))
-
-(require 'helm-wordnut)
-
-(defun helm-wordnet-at-point ()
-  "Use `helm-wordnut--persistent-action' to define word at point.
-When the region is active, define the marked phrase."
-  (interactive)
-  ;; the extraction of word is copied from
-  ;; package define-word
-  (let ((word
-         (cond
-          ((eq major-mode 'pdf-view-mode)
-           (car (pdf-view-active-region-text)))
-          ((use-region-p)
-           (buffer-substring-no-properties
-            (region-beginning)
-            (region-end)))
-          (t
-           (substring-no-properties
-            (thing-at-point 'word))))))
-    (helm-wordnut--persistent-action word)))
-
-(global-set-key (kbd "s-d") #'helm-wordnut)
-(global-set-key (kbd "s-D") #'helm-wordnet-at-point)
-
-(use-package helm-swoop)
-(global-set-key (kbd "C-s") #'helm-swoop)
-
-(use-package yasnippet
-  :config
-  (progn
-    (setq yas-snippet-dirs
-	   (list "~/.doom.d/snippets"))
-    (yas-global-mode)))
-
-(use-package which-key
-  ;; :init (which-key-mode)
-  :config
-  (setq which-key-idle-delay 0.3))
 
 (use-package dired
   :straight nil
@@ -372,12 +380,6 @@ When the region is active, define the marked phrase."
           #'(lambda ()
               (progn
                 (dired-hide-details-mode +1))))
-
-(require 'general)
-
-(general-define-key
- :keymaps 'dired-mode-map
- ";" #'dired-up-directory)
 
 (use-package dired-subtree
   :after dired
@@ -396,6 +398,20 @@ When the region is active, define the marked phrase."
   (:map dired-mode-map
    ("`" . peep-dired)
    ))
+
+(use-package dired-filter
+  :bind
+    (:map dired-mode-map
+    ("/" . dired-filter-mark-map)
+    )
+)
+
+(require 'general)
+
+(general-define-key
+ :keymaps 'dired-mode-map
+ ";" #'dired-up-directory
+ )
 
 (use-package org
   :config
@@ -448,6 +464,69 @@ When the region is active, define the marked phrase."
 
 (setq org-export-with-toc nil)
 
+;; allow for export=>beamer by placing
+
+;; #+LaTeX_CLASS: beamer in org files
+(unless (boundp 'org-latex-classes)
+  (setq org-latex-classes nil))
+(add-to-list 'org-latex-classes
+  ;; beamer class, for presentations
+  '("beamer"
+    "\\documentclass[11pt]{beamer}\n
+      \\mode<{{{beamermode}}}>\n
+      \\usetheme{{{{beamertheme}}}}\n
+      \\usecolortheme{{{{beamercolortheme}}}}\n
+      \\beamertemplateballitem\n
+      \\setbeameroption{show notes}
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\n
+      \\usepackage{hyperref}\n
+      \\usepackage{color}
+      \\usepackage{listings}
+      \\usepackage{physics}
+      \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
+  frame=single,
+  basicstyle=\\small,
+  showspaces=false,showstringspaces=false,
+  showtabs=false,
+  keywordstyle=\\color{blue}\\bfseries,
+  commentstyle=\\color{red},
+  }\n
+      \\usepackage{verbatim}\n
+      \\institute{{{{beamerinstitute}}}}\n          
+       \\subject{{{{beamersubject}}}}\n"
+
+    ("\\section{%s}" . "\\section*{%s}")
+
+    ("\\begin{frame}[fragile]\\frametitle{%s}"
+     "\\end{frame}"
+     "\\begin{frame}[fragile]\\frametitle{%s}"
+     "\\end{frame}")))
+
+  ;; letter class, for formal letters
+
+  (add-to-list 'org-latex-classes
+
+  '("letter"
+     "\\documentclass[11pt]{letter}\n
+      \\usepackage[utf8]{inputenc}\n
+      \\usepackage[T1]{fontenc}\n
+      \\usepackage{color}"
+
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+     ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(use-package org-sidebar)
+
+(defhydra org-sidebar (org-mode-map "C-c l")
+  "sidebar"
+  ("t" #'org-sidebar-tree-toggle "tree")
+  ("s" #'org-sidebar-toggle "default sidebar")
+  )
+
 (setq org-confirm-babel-evaluate nil)
 (setq org-src-window-setup 'current-window)
 
@@ -484,16 +563,34 @@ When the region is active, define the marked phrase."
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config
-  (progn (setq org-roam-directory "~/org-roam")
-         (setq org-roam-tag-sources
-               (list
-                'prop
-                'last-directory)))
-  :bind (("C-c r f" . org-roam-find-file)
-         ("C-c r c" . org-roam-db-build-cache)
-         ("C-c r i" . org-roam-insert)
+  (progn
+    ;; all subdirectories of org-roam-directory are considered part of
+    ;; org-roam regardless of level of nesting.
+    (setq org-roam-directory "~/org-roam")
+    (setq org-roam-tag-sources
+          (list
+           'prop
+           'last-directory)))
+  :bind (
          ("C-c r t" . org-roam-tag-add)
          ))
+
+(defhydra roam (global-map "C-c r")
+  "Org Roam"
+  ("d" #'(lambda () (interactive)
+           (dired org-roam-directory))
+   "visit org-roam-directory")
+  ("f" #'org-roam-find-file
+   "find-file")
+  ("x" #'org-roam-dailies-capture-today
+   "capture today")
+  ("j" #'org-roam-dailies-today
+   "visit today")
+  ("i" #'org-roam-insert
+   "insert")
+  ("c" #'org-roam-build-cache
+   "build cache")
+  )
 
 (use-package org-roam-server
   :ensure t
@@ -509,6 +606,15 @@ When the region is active, define the marked phrase."
         org-roam-server-network-label-truncate t
         org-roam-server-network-label-truncate-length 60
         org-roam-server-network-label-wrap-length 20))
+
+(setq org-roam-dailies-directory "daily/")
+
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry
+         #'org-roam-capture--get-point
+         "* %?"
+         :file-name "daily/%<%Y-%m-%d>"
+         :head "#+title: %<%Y-%m-%d>\n\n")))
 
 (defvar +org-capture-journal-file+ "journal.org")
 (defvar +org-capture-todo-file+ "todo.org")
@@ -527,7 +633,7 @@ When the region is active, define the marked phrase."
 (setq org-capture-templates
         '(("t" "Personal todo" entry
            (file+headline "todo.org" "Inbox")
-           "* TODO [%^{Select the urgency|A|B|C}] %?\n%i\n%a\n" :prepend t)
+           "* TODO %?\n%i" :prepend t)
 
           ("n" "Personal notes" entry
            (file+headline "notes.org" "Inbox")
@@ -599,7 +705,7 @@ When the region is active, define the marked phrase."
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
-(setq debug-on-error t)
+(setq debug-on-error nil)
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
 
@@ -629,17 +735,33 @@ When the region is active, define the marked phrase."
 
 (global-set-key (kbd "s-m") #'bookmark-set)
 
-(use-package define-word
-  :bind
-  (("C-c d" . define-word-at-point)
-   ("C-c D" . define-word)))
+(use-package search-web)
+(use-package wordnut)
+(setq search-web-engines
+      '(
+        ("duck" "https://duckduckgo.com/?q=%s" nil)
+        ("github" "https://github.com/search?q=%s" nil)
+        ("google" "http://www.google.com/search?q=%s" nil)
+        ("google scholar" "https://scholar.google.co.jp/scholar?q=%s" nil)
+        ("youtube" "http://www.youtube.com/results?search_type=&search_query=%s&aq=f" External)
+        ("emacswiki" "http://www.google.com/cse?cx=004774160799092323420%%3A6-ff2s0o6yi&q=%s&sa=Search" nil)
+        ("wikipedia en" "http://www.wikipedia.org/search-redirect.php?search=%s&language=en" nil)
+        ("stackoveflow en" "http://stackoverflow.com/search?q=%s" nil)
+        ))
+
+(defhydra define (global-map "s-d")
+  "define"
+  ("w" wordnut-search "wordnet")
+  ("i" search-web "web search")
+  ("m" man "man")
+  )
 
 (defun transparency (value)
   "sets the transparency of the frame window. 0=transparent/100=opaque"
   (interactive "ntransparency value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(defvar +frame-transparency+ '(100 100))
+(defvar +frame-transparency+ '(95 95))
 (add-to-list 'default-frame-alist `(alpha . ,+frame-transparency+))
 
 (use-package olivetti
@@ -649,11 +771,6 @@ When the region is active, define the marked phrase."
     (setq-default olivetti-body-width 0.7)
     )
   :bind (("C-c f e" . olivetti-mode)))
-
-
-(add-hook 'org-mode-hook
-          #'(lambda () (interactive)
-              (olivetti-mode +1)))
 
 (use-package expand-region
   :config
@@ -679,25 +796,45 @@ When the region is active, define the marked phrase."
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
-(use-package company
-  :config
-  (setq company-idle-delay 0)
-  )
-(add-hook 'after-init-hook 'global-company-mode)
+(use-package yaml-mode)
+
 (use-package lsp-mode)
+
 (use-package flycheck)
+
 (use-package lsp-ui
+  :after lsp-mode
   :demand flycheck
-  :config
-  (setq lsp-ui-sideline-show-diagnostics t
-        lsp-ui-sideline-show-hover t))
+  )
+
 (use-package lsp-python-ms
-  :ensure t
   :init (setq lsp-python-ms-auto-install-server t
               read-process-output-max 1048576)
   :hook (python-mode . (lambda ()
-                          (require 'lsp-python-ms)
-                          (lsp))))
+                         (require 'lsp-python-ms)
+                         (lsp))))
+
+(setq lsp-keymap-prefix "ρ")
+(define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+(define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+
+(setq lsp-ui-doc-position 'bottom)
+(setq lsp-ui-doc-use-childframe nil)
+(setq lsp-ui-doc-delay 0)
+(setq lsp-ui-sideline-show-diagnostics t)
+(setq lsp-ui-sideline-show-hover nil)
+(setq lsp-eldoc-render-all nil)
+
+(setq
+ mouse-wheel-scroll-amount
+ '(1
+   ((shift) . 1))
+ mouse-wheel-progressive-speed nil)
+
+(general-define-key
+ :maps 'lsp-mode-map
+ "C-c u i" #'lsp-ui-imenu
+ "C-c d" #'lsp-ui-doc-focus-frame)
 
 (use-package emms
   :config
@@ -711,11 +848,35 @@ When the region is active, define the marked phrase."
 (global-set-key (kbd "C-c m m") #'emms)
 (global-set-key (kbd "C-c m p") #'emms-add-playlist)
 
-(use-package pdf-tools
-  :config (pdf-tools-install))
+(pdf-tools-install)
+(setq pdf-view-midnight-colors
+      '("#cccccc" . "#000000"))
 
-(use-package vterm
-  :bind (("s-v" . vterm)))
+(general-define-key
+ :keymaps 'pdf-view-mode-map
+ "o" #'pdf-outline
+ "j" #'pdf-view-next-line-or-next-page
+ "k" #'pdf-view-previous-line-or-previous-page
+ "]" #'pdf-view-next-page-command
+ "[" #'pdf-view-previous-page-command
+ "/" #'pdf-occur)
+
+(use-package vterm)
+
+(use-package vterm-toggle
+  :bind
+  ("s-v" . vterm-toggle)
+  ("s-V" . vterm-toggle-cd)
+  )
+
+(use-package eshell-toggle)
+(global-set-key (kbd "s-e") #'eshell-toggle)
+
+(use-package eshell-git-prompt
+  :config
+  (progn
+    (eshell-git-prompt-use-theme 'robbyrussell)
+    ))
 
 (global-set-key (kbd "s-e") #'eshell)
 
@@ -723,8 +884,9 @@ When the region is active, define the marked phrase."
   (concat
    ;; manually added
    "/usr/local/cbc/bin" ";"
-   (getenv "PATH") ; inherited from OS
-  )
+   "~/.local/bin" ";"
+   (getenv "PATH")			; inherited from OS
+   )
 )
 
 (defun mode-line-format-raw ()
@@ -739,11 +901,20 @@ When the region is active, define the marked phrase."
             "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
 ))
 
+(use-package diminish)
+(diminish 'ivy-mode)
+(diminish 'auto-revert-mode)
+(diminish 'yas-minor-mode)
+(diminish 'org-cdlatex-mode)
+(diminish 'which-key-mode)
+(diminish 'org-roam-mode)
+(diminish 'company-mode)
+
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
+  ;; :init (doom-modeline-mode 1)
   :config
   (progn
-    (setq doom-modeline-height 23)))
+    (setq doom-modeline-height 15)))
 
 (global-set-key (kbd "H-r") #'compile)
 
@@ -751,203 +922,24 @@ When the region is active, define the marked phrase."
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 (add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
 
+(use-package paren-face)
+(add-hook 'emacs-lisp-mode-hook (lambda () (paren-face-mode 1)))
+
 (use-package racket-mode)
 
 (use-package cmake-mode)
 
-(use-package exwm
-  :config
-  (progn
-    (setq exwm-workspace-number 3)
-    (setq exwm-input-prefix-keys
-          `(?\C-x
-            ?\s-o ;; switch-to-buffer
-            ?\s-i ;; ibuffer
-            ?\s-j ;; window switch
-            ?\s-c ;; kill window
-            ?\s-C ;; kill buffer and window(if not single)
-            ?\s-k ;; window switch
-            ?\s-v ;; vterm
-            ?\s-s ;; single-window-toggle
-            ?\s-e ;; eshell
-            ?\s-q ;; toggle side windows
-            ?\s-t ;; toggle touchpad
-            ?\s-d ;; helm-wordnut
-            ?\C-u ;; general command
-            ?\C-h ;; help
-            ?\M-x
-            ?\M-&
-            ?\M-:
-            ?\H-c ;; org-capture
-            ?\H-s ;; kill other windows
-            ?\C-\ ))
-    (setq exwm-input-global-keys
-          `(([?\s-r] . exwm-reset)
-            ([?\s-w] . exwm-workspace-switch)
-            ([?\s-\;] . (lambda (command)
-                          (interactive (list (read-shell-command "$ ")))
-                          (start-process-shell-command command nil command)))
-            ,@(mapcar (lambda (i)
-                        `(,(kbd (format "s-%d" i)) .
-                          (lambda ()
-                            (interactive)
-                            (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 2))))
-    (exwm-input-set-simulation-keys
-     '(([?\C-b] . left)
-       ([?\C-f] . right)
-       ([?\C-p] . up)
-       ([?\C-n] . down)
-       ([?\C-a] . home)
-       ([?\C-e] . end)
-       ([?\M-w] . [?\C-c])
-       ;; ([?\M-b] . [?\C-?\<left>])
-       ;; ([?\M-f] . [?\C-?\<left>])
-       ))
-    (setq exwm-workspace-warp-cursor t
-          mouse-autoselect-window t
-          focus-follows-mouse t)
-    (exwm-enable)
-    ))
-
-;; After C-q, send key to the window 
-(define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-(exwm-input-set-key (kbd "s-SPC") 'counsel-linux-app)
-
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/exwm-init-hook ()
-
-  (exwm-workspace-switch-create 0)
-
-  ;; Start the Polybar panel
-  (efs/start-panel)
-
-  ;; Launch apps that will run in the background
-  (efs/run-in-background "dunst")
-  (efs/run-in-background "nm-applet")
-  (efs/run-in-background "pasystray")
-  (efs/run-in-background "blueman-applet")
-  (efs/run-in-background "electron-ssr"))
-
-(defun efs/exwm-update-class ()
-  (exwm-workspace-rename-buffer exwm-class-name))
-
-(defun efs/exwm-update-title ()
-  (pcase exwm-class-name
-    ("Firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))
-    ("electron-ssr" (progn
-                      (exwm-workspace-rename-buffer "electron-ssr")
-                      (exwm-workspace-move-window 2)))))
-
-;; This function isn't currently used, only serves as an example how to
-;; position a window
-(defun efs/position-window ()
-  (let* ((pos (frame-position))
-         (pos-x (car pos))
-          (pos-y (cdr pos)))
-    (exwm-floating-move (- pos-x) (- pos-y))))
-
-(defun efs/configure-window-by-class ()
-  (interactive)
-  (pcase exwm-class-name
-    ("electron-ssr" (exwm-floating-toggle-floating))))
-
-;; When EXWM starts up, do some extra confifuration
-(add-hook 'exwm-init-hook #'efs/exwm-init-hook)
-
-;; When window "class" updates, use it to set the buffer name
-(add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-
-;; When window title updates, use it to set the buffer name
-(add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
-
-;; Configure windows as they're created
-(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
-
-(straight-use-package
- '(exwm-outer-gaps :host github :repo "lucasgruss/exwm-outer-gaps")
- )
-(setq exwm-outer-gaps-width [25 25 25 25])
-(global-set-key (kbd "H-G") #'exwm-outer-gaps-mode)
-(global-set-key (kbd "C-c 1") #'exwm-outer-gaps-mode)
-
-(use-package desktop-environment)
-(desktop-environment-mode)
-
-(require 'exwm-randr)
-(setq exwm-randr-workspace-monitor-plist '(1 "DP-1-2" 1 "DP-2" 1 "DP-1-1" 1 "DP-1"))
-(exwm-randr-enable)
-
-(defun efs/run-in-background (command)
-  (let ((command-parts (split-string command "[ ]+")))
-    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
-
-(defun efs/update-displays ()
-  (efs/run-in-background "autorandr --change --force")
-  (message "Display config: %s"
-	   (string-trim (shell-command-to-string "autorandr --current"))))
-
-(add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
-(efs/update-displays)
-
-(unless (executable-find "feh")
-  (display-warning 'wallpaper "External command `feh' not found!"))
-
-;; This is an example `use-package' configuration
-;; It is not tangled into wallpaper.el
-(use-package wallpaper
-  :ensure t
-  :hook ((exwm-randr-screen-change . wallpaper-set-wallpaper)
-         (after-init . wallpaper-cycle-mode))
-  :custom ((wallpaper-cycle-single t)
-           (wallpaper-scaling 'fill)
-           (wallpaper-cycle-interval 45)
-           (wallpaper-cycle-directory "~/Pictures/Wallpapers")))
-
-;; Make sure the server is started (better to do this in your
-;;  main Emacs config!)
-(server-start)
-
-(defvar efs/polybar-process nil
-  "Holds the process of the running Polybar instance, if any")
-
-(defun efs/kill-panel ()
-  (interactive)
-  (when efs/polybar-process
-    (ignore-errors
-      (kill-process efs/polybar-process)))
-  (setq efs/polybar-process nil))
-
-(defun efs/start-panel ()
-  (interactive)
-  (efs/kill-panel)
-  (setq efs/polybar-process (start-process-shell-command "polybar" nil "polybar panel")))
-
-(defun efs/send-polybar-hook (module-name hook-index)
-  (start-process-shell-command "polybar-msg" nil (format "polybar-msg hook %s %s" module-name hook-index)))
-
-(defun efs/polybar-exwm-workspace ()
-  (pcase exwm-workspace-current-index
-    (0 "")
-    (1 "")
-    (2 "")
-    (3 "")
-    (4 "")))
-
-(defun efs/send-polybar-exwm-workspace ()
-  (efs/send-polybar-hook "exwm-workspace" 1))
-
-(defun langou/toggle-touchpad ()
-  (interactive)
-  (start-process-shell-command "exec" nil "exec ~/.dwm/toggleTouchpad.sh"))
-
-(global-set-key (kbd "s-t") #'langou/toggle-touchpad)
-
-;; Update panel indicator when workspace changes
-(add-hook 'exwm-workspace-switch-hook #'efs/send-polybar-exwm-workspace)
+(defhydra python-move-defun (python-mode-map "C-c n")
+  "python mode movement"
+  ("a" #'beginning-of-defun "beginning of defun")
+  ("e" #'python-nav-end-of-defun "end of defun")
+  ("p" #'python-nav-backward-defun "prev defun")
+  ("n" #'python-nav-forward-defun "next defun")
+  ("b" #'python-nav-backward-sexp "prev sexp")
+  ("f" #'python-nav-forward-sexp "next sexp")
+  ("k" #'python-nav-backward-block "prev block")
+  ("j" #'python-nav-forward-block "next block")
+  )
 
 (desktop-save-mode nil)
 
