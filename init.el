@@ -35,7 +35,6 @@
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
 (global-set-key (kbd "μ") #'helm-filtered-bookmarks)
-(global-set-key (kbd "C-s-SPC") #'helm-filtered-bookmarks)
 
 (use-package yasnippet
   :config
@@ -733,7 +732,7 @@ buffer's window as well."
        '("_2" . ?₂)
        ))
 
-(global-set-key (kbd "s-m") #'bookmark-set)
+(add-hook 'kill-emacs-hook #'bookmark-save)
 
 (use-package search-web)
 (use-package wordnut)
