@@ -255,7 +255,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 ** evil
 
 #+begin_src emacs-lisp
-p
+
   (use-package evil)
   (use-package evil-escape
     :config
@@ -663,20 +663,10 @@ In buffer or across buffers.
 ** avy
 #+begin_src emacs-lisp
 
-  (use-package avy
-    :bind (("M-l" . avy-goto-line)))
+  (use-package avy)
 
-  (global-set-key (kbd "H-d") #'avy-goto-char-2)
-  (global-set-key (kbd "H-f") #'avy-goto-char)
-
-#+end_src
-
-jump to left parenthesis/check parens:
-
-#+begin_src emacs-lisp ()
-
-  (global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
-  (global-set-key (kbd "s-(") #'check-parens)
+  (global-set-key (kbd "ν") #'avy-goto-char-2)
+  (global-set-key (kbd "σ") #'avy-goto-char)
 
 #+end_src
 
@@ -826,6 +816,17 @@ general.el.
                               '(("^ *\\([-]\\) "
                                  (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
 
+#+end_src
+
+** evil meta-left/right
+
+#+begin_src emacs-lisp
+
+  (general-define-key
+   :keymaps 'org-mode-map
+   "M-h" #'org-metaleft
+   "M-l" #'org-metaright
+   "C-c e" #'org-mark-element)
 #+end_src
 
 ** auto-fill
@@ -1816,6 +1817,18 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   (use-package helm-catkin)
 
 #+end_src
+
+* learning by repetition
+
+#+begin_src emacs-lisp
+
+  (use-package pamparam
+    :after org)
+
+  (use-package org-drill
+    :after org)
+#+end_src
+
 
 * languages
 

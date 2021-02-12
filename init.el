@@ -95,16 +95,15 @@
 
 (use-package general)
 
-p
-  (use-package evil)
-  (use-package evil-escape
-    :config
-    (progn
-      (setq-default evil-escape-key-sequence "jk")
-      ))
+(use-package evil)
+(use-package evil-escape
+  :config
+  (progn
+    (setq-default evil-escape-key-sequence "jk")
+    ))
 
-  (global-set-key (kbd "H-e") #'evil-mode)
-  (add-hook 'evil-mode-hook #'evil-escape-mode)
+(global-set-key (kbd "H-e") #'evil-mode)
+(add-hook 'evil-mode-hook #'evil-escape-mode)
 
 (use-package hydra)
 (global-set-key (kbd "C-c h") #'hydra-pause-resume)
@@ -345,14 +344,10 @@ buffer's window as well."
 
 (global-set-key (kbd "C-c b r") #'rename-buffer)
 
-(use-package avy
-  :bind (("M-l" . avy-goto-line)))
+(use-package avy)
 
-(global-set-key (kbd "H-d") #'avy-goto-char-2)
-(global-set-key (kbd "H-f") #'avy-goto-char)
-
-(global-set-key (kbd "s-9") #'(lambda () (interactive) (avy-goto-char ?\()))
-(global-set-key (kbd "s-(") #'check-parens)
+(global-set-key (kbd "ν") #'avy-goto-char-2)
+(global-set-key (kbd "σ") #'avy-goto-char)
 
 (use-package magit
   :bind (("C-c g" . magit))
@@ -437,6 +432,12 @@ buffer's window as well."
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
+
+(general-define-key
+ :keymaps 'org-mode-map
+ "M-h" #'org-metaleft
+ "M-l" #'org-metaright
+ "C-c e" #'org-mark-element)
 
 (add-hook 'org-mode-hook #'auto-fill-mode)
 
@@ -957,6 +958,12 @@ buffer's window as well."
     (setq doom-modeline-height 15)))
 
 (use-package helm-catkin)
+
+(use-package pamparam
+  :after org)
+
+(use-package org-drill
+  :after org)
 
 (global-set-key (kbd "H-r") #'compile)
 
