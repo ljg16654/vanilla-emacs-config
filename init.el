@@ -567,6 +567,10 @@ buffer's window as well."
 (use-package cdlatex
   :hook (org-mode . turn-on-org-cdlatex))
 
+(use-package org-fragtog
+  :after org)
+(add-hook 'org-mode-hook 'org-fragtog-mode)
+
 (defun langou/org-latex-delete-cache () (interactive)
        (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
 
@@ -880,7 +884,8 @@ buffer's window as well."
 
 (use-package vterm)
 
-(use-package multi-vterm)
+(use-package multi-vterm
+  :after vterm)
 
 (global-set-key (kbd "s-v v") #'multi-vterm)
 (global-set-key (kbd "s-v d") #'multi-vterm-dedicated-toggle)
@@ -946,6 +951,9 @@ buffer's window as well."
 (use-package helm-catkin)
 
 (global-set-key (kbd "H-r") #'compile)
+
+(use-package imenu-anywhere)
+(global-set-key (kbd "C-.") #'imenu-anywhere)
 
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
