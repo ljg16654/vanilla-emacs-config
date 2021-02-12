@@ -98,6 +98,16 @@ use-package isn't creating any autoloads for you.
 
 #+end_src
 
+*** speed up candidate selection
+
+#+begin_src emacs-lisp
+
+  (use-package ace-jump-helm-line)
+  (eval-after-load "helm"
+  '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
+
+#+end_src
+
 ** ivy, swiper and counsel
 
 #+begin_src emacs-lisp :tangle nil
@@ -117,6 +127,7 @@ use-package isn't creating any autoloads for you.
 #+end_src
 
 ** yasnippet
+
 The snippets are currently stored in DOOMDIR and I may move them to somewhere else later.
 #+begin_src emacs-lisp
   (use-package yasnippet
@@ -125,6 +136,19 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
       (setq yas-snippet-dirs
             (list (concat user-emacs-directory "snippet/")))
       (yas-global-mode)))
+#+end_src
+
+Integration with helm:
+
+#+begin_src emacs-lisp
+
+  (use-package helm-c-yasnippet
+    :after (helm yasnippet)
+    :config
+    (progn
+      (setq helm-yas-space-match-any-greedy t)
+      (global-set-key (kbd "C-c y") 'helm-yas-complete)
+      ))
 #+end_src
 
 ** which key
@@ -171,7 +195,6 @@ correct, completion is triggered.
   (setq tab-always-indent 'complete)
   (add-to-list 'completion-styles 'initials t)
 #+end_src
-
 
 
 * elisp
@@ -374,7 +397,6 @@ https://protesilaos.com/dotemacs/#h:b67687ee-25a3-4bf4-a924-180ccb63c629
 
 C-M-s or C-M-r prompts for regexp to search against. Alternatively,
 use M-r for =isearch-toggle-regexp= during isearch.y
-
 
 * windows and buffers
 
@@ -1296,6 +1318,14 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+end_src
 
+** mode management
+
+#+begin_src emacs-lisp
+
+  (use-package helm-mode-manager
+    :after helm)
+
+#+end_src
 
 ** dictionary and web search
 
@@ -1506,6 +1536,15 @@ lsp-ui-doc childframe, the cpu usage rises to 100% and Emacs freezes.
    :maps 'lsp-mode-map
    "C-c u i" #'lsp-ui-imenu
    "C-c d" #'lsp-ui-doc-focus-frame)
+#+end_src
+
+** helm integration
+
+#+begin_src emacs-lisp
+
+  (use-package helm-lsp
+    :after (lsp helm))
+
 #+end_src
 
 * music

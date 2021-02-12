@@ -36,12 +36,24 @@
 (global-set-key (kbd "C-h a") #'helm-apropos)
 (global-set-key (kbd "μ") #'helm-filtered-bookmarks)
 
+(use-package ace-jump-helm-line)
+(eval-after-load "helm"
+'(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
+
 (use-package yasnippet
   :config
   (progn
     (setq yas-snippet-dirs
           (list (concat user-emacs-directory "snippet/")))
     (yas-global-mode)))
+
+(use-package helm-c-yasnippet
+  :after (helm yasnippet)
+  :config
+  (progn
+    (setq helm-yas-space-match-any-greedy t)
+    (global-set-key (kbd "C-c y") 'helm-yas-complete)
+    ))
 
 (use-package which-key
   ;; :init (which-key-mode)
@@ -734,6 +746,9 @@ buffer's window as well."
 
 (add-hook 'kill-emacs-hook #'bookmark-save)
 
+(use-package helm-mode-manager
+  :after helm)
+
 (use-package search-web)
 (use-package wordnut)
 (setq search-web-engines
@@ -834,6 +849,9 @@ buffer's window as well."
  :maps 'lsp-mode-map
  "C-c u i" #'lsp-ui-imenu
  "C-c d" #'lsp-ui-doc-focus-frame)
+
+(use-package helm-lsp
+  :after (lsp helm))
 
 (use-package emms
   :config
