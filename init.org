@@ -196,7 +196,6 @@ correct, completion is triggered.
   (add-to-list 'completion-styles 'initials t)
 #+end_src
 
-
 * elisp
 
 #+begin_src emacs-lisp
@@ -1820,13 +1819,11 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 * learning by repetition
 
-#+begin_src emacs-lisp
+#+begin_src emacs-use
 
-  (use-package pamparam
+  (lisp-package pamparam
     :after org)
 
-  (use-package org-drill
-    :after org)
 #+end_src
 
 
@@ -2162,7 +2159,8 @@ Assign workspaces to monitors.
 
 #+begin_src emacs-lisp
 
-(desktop-save-mode nil)
+  (setq desktop-save-mode nil)
+
 #+end_src
 
 * eaf

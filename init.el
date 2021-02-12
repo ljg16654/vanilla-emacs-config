@@ -959,12 +959,6 @@ buffer's window as well."
 
 (use-package helm-catkin)
 
-(use-package pamparam
-  :after org)
-
-(use-package org-drill
-  :after org)
-
 (global-set-key (kbd "H-r") #'compile)
 
 (use-package imenu-anywhere)
@@ -993,7 +987,7 @@ buffer's window as well."
   ("j" #'python-nav-forward-block "next block")
   )
 
-(desktop-save-mode nil)
+(setq desktop-save-mode nil)
 
 (use-package anki-editor)
 
@@ -1005,3 +999,6 @@ buffer's window as well."
       (org-babel-tangle))))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+
+(lisp-package pamparam
+  :after org)
