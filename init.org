@@ -255,15 +255,16 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 ** evil
 
 #+begin_src emacs-lisp
- 
+
   (use-package evil)
   (use-package evil-escape
     :config
     (progn
       (setq-default evil-escape-key-sequence "jk")
-      (evil-escape-mode)))
+      ))
 
   (global-set-key (kbd "H-e") #'evil-mode)
+  (add-hook 'evil-mode-hook #'evil-escape-mode)
 #+end_src
 
 ** hydra

@@ -100,9 +100,10 @@
   :config
   (progn
     (setq-default evil-escape-key-sequence "jk")
-    (evil-escape-mode)))
+    ))
 
 (global-set-key (kbd "H-e") #'evil-mode)
+(add-hook 'evil-mode-hook #'evil-escape-mode)
 
 (use-package hydra)
 (global-set-key (kbd "C-c h") #'hydra-pause-resume)
