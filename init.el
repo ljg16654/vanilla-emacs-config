@@ -862,11 +862,21 @@ buffer's window as well."
 
 (use-package vterm)
 
-(use-package vterm-toggle
-  :bind
-  ("s-v" . vterm-toggle)
-  ("s-V" . vterm-toggle-cd)
+(use-package multi-vterm)
+
+(global-set-key (kbd "s-v v") #'multi-vterm)
+(global-set-key (kbd "s-v d") #'multi-vterm-dedicated-toggle)
+
+(defhydra multi-vterm (vterm-mode-map "s-v")
+  "multi-vterm"
+  ("d" #'multi-vterm-dedicated-toggle "dedicated")
+  ("n" #'multi-vterm-next "next")
+  ("p" #'multi-vterm-prev "prev")
+  ("s" #'multi-vterm-dedicated-select "select as dedicated")
+  ("r" #'multi-vterm-rename-buffer "rename")
   )
+
+(setq multi-vterm-dedicated-window-height 15)
 
 (use-package eshell-toggle)
 (global-set-key (kbd "s-e") #'eshell-toggle)
@@ -914,6 +924,8 @@ buffer's window as well."
   :config
   (progn
     (setq doom-modeline-height 15)))
+
+(use-package helm-catkin)
 
 (global-set-key (kbd "H-r") #'compile)
 

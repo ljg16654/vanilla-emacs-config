@@ -659,7 +659,6 @@ jump to left parenthesis/check parens:
 
 * project
 
-
 ** version control
 
 #+begin_src emacs-lisp
@@ -1570,13 +1569,33 @@ frequently used commands for movement:
   (use-package vterm)
 #+end_src
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 
   (use-package vterm-toggle
     :bind
     ("s-v" . vterm-toggle)
     ("s-V" . vterm-toggle-cd)
     )
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (use-package multi-vterm)
+
+  (global-set-key (kbd "s-v v") #'multi-vterm)
+  (global-set-key (kbd "s-v d") #'multi-vterm-dedicated-toggle)
+
+  (defhydra multi-vterm (vterm-mode-map "s-v")
+    "multi-vterm"
+    ("d" #'multi-vterm-dedicated-toggle "dedicated")
+    ("n" #'multi-vterm-next "next")
+    ("p" #'multi-vterm-prev "prev")
+    ("s" #'multi-vterm-dedicated-select "select as dedicated")
+    ("r" #'multi-vterm-rename-buffer "rename")
+    )
+
+  (setq multi-vterm-dedicated-window-height 15)
+
 #+end_src
 
 ** eshell
@@ -1722,6 +1741,14 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
     :config
     (progn
       (setq doom-modeline-height 15)))
+
+#+end_src
+
+* ROS
+
+#+begin_src emacs-lisp
+
+  (use-package helm-catkin)
 
 #+end_src
 
@@ -2314,13 +2341,13 @@ maintenance could defy the meaning of its own existence.
 ** code reading
 
 - peep-dired + dired-subtree :: for brief grasp of file structure
-- ? :: take note on file structure
 - ;-m :: bookmark
 - ? :: capture template for specific code
 
 - s-p f :: helm-projectile-find-file
 - s-f d :: rg-dwim
 - s-f r :: regexp search in chosen directory
+- C-c n :: hydra for code navigation (recently defined for python-mode only)
 
 ** debug
 
@@ -2332,6 +2359,8 @@ maintenance could defy the meaning of its own existence.
 
 explicate how objects of note-taking are classified and
 located/refiled/archived.
+
+** emacsclient + bspwm + tmux + firefox
 
 * anki
 
