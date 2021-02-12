@@ -95,15 +95,16 @@
 
 (use-package general)
 
-(use-package evil)
-(use-package evil-escape
-  :config
-  (progn
-    (setq-default evil-escape-key-sequence "jk")
-    ))
+p
+  (use-package evil)
+  (use-package evil-escape
+    :config
+    (progn
+      (setq-default evil-escape-key-sequence "jk")
+      ))
 
-(global-set-key (kbd "H-e") #'evil-mode)
-(add-hook 'evil-mode-hook #'evil-escape-mode)
+  (global-set-key (kbd "H-e") #'evil-mode)
+  (add-hook 'evil-mode-hook #'evil-escape-mode)
 
 (use-package hydra)
 (global-set-key (kbd "C-c h") #'hydra-pause-resume)
@@ -436,6 +437,8 @@ buffer's window as well."
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
+
+(add-hook 'org-mode-hook #'auto-fill-mode)
 
 (use-package org-bullets
   :ensure t
@@ -938,10 +941,14 @@ buffer's window as well."
 (diminish 'ivy-mode)
 (diminish 'auto-revert-mode)
 (diminish 'yas-minor-mode)
-(diminish 'org-cdlatex-mode)
-(diminish 'which-key-mode)
+(diminish 'which-key-mode "which?")
+(diminish 'org-indent-mode)
 (diminish 'org-roam-mode)
+(diminish 'org-cdlatex-mode "cd")
 (diminish 'company-mode)
+(diminish 'projectile-mode)
+(diminish 'helm-mode)
+(diminish 'auto-fill-function "AuF")
 
 (use-package doom-modeline
   ;; :init (doom-modeline-mode 1)

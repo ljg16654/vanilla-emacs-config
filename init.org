@@ -255,7 +255,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 ** evil
 
 #+begin_src emacs-lisp
-
+p
   (use-package evil)
   (use-package evil-escape
     :config
@@ -826,6 +826,13 @@ general.el.
                               '(("^ *\\([-]\\) "
                                  (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
 
+#+end_src
+
+** auto-fill
+
+#+begin_src emacs-lisp
+
+  (add-hook 'org-mode-hook #'auto-fill-mode)
 #+end_src
 
 ** appearance
@@ -1780,10 +1787,14 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   (diminish 'ivy-mode)
   (diminish 'auto-revert-mode)
   (diminish 'yas-minor-mode)
-  (diminish 'org-cdlatex-mode)
-  (diminish 'which-key-mode)
+  (diminish 'which-key-mode "which?")
+  (diminish 'org-indent-mode)
   (diminish 'org-roam-mode)
+  (diminish 'org-cdlatex-mode "cd")
   (diminish 'company-mode)
+  (diminish 'projectile-mode)
+  (diminish 'helm-mode)
+  (diminish 'auto-fill-function "AuF")
 #+end_src
 
 ** doom modeline
