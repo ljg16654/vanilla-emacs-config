@@ -40,6 +40,88 @@
 (eval-after-load "helm"
 '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
+(cl-macrolet
+      ((make-splitter-fn (name open-fn split-fn)
+                         `(defun ,name (_candidate)
+                            ;; Display buffers in new windows
+                            (dolist (cand (helm-marked-candidates))
+                              (select-window (,split-fn))
+                              (,open-fn cand))
+                            ;; Adjust size of windows
+                            (balance-windows)))
+       (generate-helm-splitter-funcs
+        (op-type open-fn)
+        (let* ((prefix (s-concat "helm-" op-type "-switch-"))
+               (vert-split (intern (s-concat prefix "vert-window")))
+               (horiz-split (intern (s-concat prefix "horiz-window"))))
+          `(progn
+             (make-splitter-fn ,vert-split ,open-fn split-window-right)
+
+             (make-splitter-fn ,horiz-split ,open-fn split-window-below)
+
+             (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
+                 ()
+               (interactive)
+               (with-helm-alive-p
+                 (helm-exit-and-execute-action (quote ,vert-split))))
+
+             (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
+                 ()
+               (interactive)
+               (with-helm-alive-p
+                 (helm-exit-and-execute-action (quote ,horiz-split))))))))
+    (generate-helm-splitter-funcs "buffer" switch-to-buffer)
+    (generate-helm-splitter-funcs "file" find-file))
+
+;; install the actions for helm-find-files after that source is
+    ;; inited, which fortunately has a hook
+    (add-hook
+     'helm-find-files-after-init-hook
+     (lambda ()
+       (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
+                                  #'helm-file-switch-vert-window
+                                  helm-source-find-files)
+       (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
+                                  #'helm-file-switch-horiz-window
+                                  helm-source-find-files)))
+
+    ;; ditto for helm-projectile; that defines the source when loaded, so we can
+    ;; just eval-after-load
+    (with-eval-after-load "helm-projectile"
+      (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
+                                 #'helm-file-switch-vert-window
+                                 helm-source-projectile-files-list)
+      (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
+                                 #'helm-file-switch-horiz-window
+                                 helm-source-projectile-files-list))
+
+    ;; ...but helm-buffers defines the source by calling an init function, but doesn't
+    ;; have a hook, so we use advice to add the actions after that init function
+    ;; is called
+    (defun cogent/add-helm-buffer-actions (&rest _args)
+      (helm-add-action-to-source "Display buffer(s) in new vertical split(s) `C-v'"
+                                 #'helm-buffer-switch-vert-window
+                                 helm-source-buffers-list)
+      (helm-add-action-to-source "Display buffer(s) in new horizontal split(s) `C-s'"
+                                 #'helm-buffer-switch-horiz-window
+                                 helm-source-buffers-list))
+    (advice-add 'helm-buffers-list--init :after #'cogent/add-helm-buffer-actions)
+
+(general-define-key
+ :keymaps 'helm-buffer-map
+ "C-v" #'helm-buffer-switch-vert-window-command
+ "C-s" #'helm-buffer-switch-horiz-window-command)
+
+(general-define-key
+ :keymaps 'helm-projectile-find-file-map
+ "C-v" #'helm-file-switch-vert-window-command
+ "C-s" #'helm-file-switch-horiz-window-command)
+
+(general-define-key
+ :keymaps 'helm-find-files-map
+ "C-v" #'helm-file-switch-vert-window-command
+ "C-s" #'helm-file-switch-horiz-window-command)
+
 (use-package yasnippet
   :config
   (progn
@@ -888,6 +970,9 @@ buffer's window as well."
  "/" #'pdf-occur)
 
 (use-package vterm)
+(general-define-key
+ :keymaps 'vterm-copy-mode-map
+ "q" #'vterm-copy-mode)
 
 (use-package multi-vterm
   :after vterm)
@@ -959,6 +1044,16 @@ buffer's window as well."
 
 (use-package helm-catkin)
 
+(add-to-list 'auto-mode-alist '("\\.world\\'" . xml-mode))
+
+(use-package pamparam
+  :after org)
+
+(use-package anki-editor)
+
+(use-package rainbow-delimiters)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+
 (global-set-key (kbd "H-r") #'compile)
 
 (use-package imenu-anywhere)
@@ -989,8 +1084,6 @@ buffer's window as well."
 
 (setq desktop-save-mode nil)
 
-(use-package anki-editor)
-
 (defun efs/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
                       (expand-file-name user-emacs-directory))
@@ -999,6 +1092,3 @@ buffer's window as well."
       (org-babel-tangle))))
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
-
-(lisp-package pamparam
-  :after org)

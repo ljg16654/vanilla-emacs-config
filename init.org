@@ -108,6 +108,110 @@ use-package isn't creating any autoloads for you.
 
 #+end_src
 
+*** custom actions
+
+**** open in split
+
+https://occasionallycogent.com/emacs_custom_helm_actions/index.html
+
+#+begin_src emacs-lisp
+
+  (cl-macrolet
+        ((make-splitter-fn (name open-fn split-fn)
+                           `(defun ,name (_candidate)
+                              ;; Display buffers in new windows
+                              (dolist (cand (helm-marked-candidates))
+                                (select-window (,split-fn))
+                                (,open-fn cand))
+                              ;; Adjust size of windows
+                              (balance-windows)))
+         (generate-helm-splitter-funcs
+          (op-type open-fn)
+          (let* ((prefix (s-concat "helm-" op-type "-switch-"))
+                 (vert-split (intern (s-concat prefix "vert-window")))
+                 (horiz-split (intern (s-concat prefix "horiz-window"))))
+            `(progn
+               (make-splitter-fn ,vert-split ,open-fn split-window-right)
+
+               (make-splitter-fn ,horiz-split ,open-fn split-window-below)
+
+               (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
+                   ()
+                 (interactive)
+                 (with-helm-alive-p
+                   (helm-exit-and-execute-action (quote ,vert-split))))
+
+               (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
+                   ()
+                 (interactive)
+                 (with-helm-alive-p
+                   (helm-exit-and-execute-action (quote ,horiz-split))))))))
+      (generate-helm-splitter-funcs "buffer" switch-to-buffer)
+      (generate-helm-splitter-funcs "file" find-file))
+#+end_src
+
+install the commands defined above with hooks:
+
+#+begin_src emacs-lisp
+
+  ;; install the actions for helm-find-files after that source is
+      ;; inited, which fortunately has a hook
+      (add-hook
+       'helm-find-files-after-init-hook
+       (lambda ()
+         (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
+                                    #'helm-file-switch-vert-window
+                                    helm-source-find-files)
+         (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
+                                    #'helm-file-switch-horiz-window
+                                    helm-source-find-files)))
+
+      ;; ditto for helm-projectile; that defines the source when loaded, so we can
+      ;; just eval-after-load
+      (with-eval-after-load "helm-projectile"
+        (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
+                                   #'helm-file-switch-vert-window
+                                   helm-source-projectile-files-list)
+        (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
+                                   #'helm-file-switch-horiz-window
+                                   helm-source-projectile-files-list))
+
+      ;; ...but helm-buffers defines the source by calling an init function, but doesn't
+      ;; have a hook, so we use advice to add the actions after that init function
+      ;; is called
+      (defun cogent/add-helm-buffer-actions (&rest _args)
+        (helm-add-action-to-source "Display buffer(s) in new vertical split(s) `C-v'"
+                                   #'helm-buffer-switch-vert-window
+                                   helm-source-buffers-list)
+        (helm-add-action-to-source "Display buffer(s) in new horizontal split(s) `C-s'"
+                                   #'helm-buffer-switch-horiz-window
+                                   helm-source-buffers-list))
+      (advice-add 'helm-buffers-list--init :after #'cogent/add-helm-buffer-actions)
+
+#+end_src
+
+and define keys
+
+#+begin_src emacs-lisp
+
+
+  (general-define-key
+   :keymaps 'helm-buffer-map
+   "C-v" #'helm-buffer-switch-vert-window-command
+   "C-s" #'helm-buffer-switch-horiz-window-command)
+
+  (general-define-key
+   :keymaps 'helm-projectile-find-file-map
+   "C-v" #'helm-file-switch-vert-window-command
+   "C-s" #'helm-file-switch-horiz-window-command)
+
+  (general-define-key
+   :keymaps 'helm-find-files-map
+   "C-v" #'helm-file-switch-vert-window-command
+   "C-s" #'helm-file-switch-horiz-window-command)
+
+#+end_src
+
 ** ivy, swiper and counsel
 
 #+begin_src emacs-lisp :tangle nil
@@ -267,6 +371,8 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 #+end_src
 
 ** hydra
+
+[[https://github.com/abo-abo/hydra/wiki][hydra wiki]]
 
 #+begin_src emacs-lisp
 
@@ -1624,6 +1730,9 @@ frequently used commands for movement:
 #+begin_src emacs-lisp
 
   (use-package vterm)
+  (general-define-key
+   :keymaps 'vterm-copy-mode-map
+   "q" #'vterm-copy-mode)
 #+end_src
 
 #+begin_src emacs-lisp :tangle nil
@@ -1817,17 +1926,44 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 #+end_src
 
+gazebo simulation files:
+
+#+begin_src emacs-lisp
+
+(add-to-list 'auto-mode-alist '("\\.world\\'" . xml-mode))
+#+end_src
+
+
 * learning by repetition
 
-#+begin_src emacs-use
+** pamparam
 
-  (lisp-package pamparam
+#+begin_src emacs-lisp
+
+  (use-package pamparam
     :after org)
 
 #+end_src
 
+** anki
 
-* languages
+anki-editor provides anki-integration with org-mode.
+see [[*org-capture]] for capture-templates creating anki entries.
+
+#+begin_src emacs-lisp
+
+  (use-package anki-editor)
+#+end_src
+
+* rainbow delimiters
+
+#+begin_src emacs-lisp
+
+  (use-package rainbow-delimiters)
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+#+end_src
+
+* programming languages
 
 #+begin_src emacs-lisp
 (global-set-key (kbd "H-r") #'compile)
@@ -2255,16 +2391,6 @@ explicate how objects of note-taking are classified and
 located/refiled/archived.
 
 ** emacsclient + bspwm + tmux + firefox
-
-* anki
-
-anki-editor provides anki-integration with org-mode.
-see [[*org-capture]] for capture-templates creating anki entries.
-
-#+begin_src emacs-lisp
-
-  (use-package anki-editor)
-#+end_src
 
 * meta
 
