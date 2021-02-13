@@ -1370,6 +1370,10 @@ in my org-directory.
 ))
 #+end_example
 ** pdf
+
+[[https://www.youtube.com/watch?v=zqc-CWm4DGE&feature=emb_logo][org pdftools workflow]]
+[[https://www.youtube.com/watch?v=LFO2UbzbZhA][another one]]
+
 #+begin_src emacs-lisp
 
 (use-package org-pdftools
@@ -1977,6 +1981,8 @@ code navigation:
   (global-set-key (kbd "C-.") #'imenu-anywhere)
 #+end_src
 
+
+** TODO autoinsert
 ** lisp-general
 
 #+begin_src emacs-lisp
@@ -2005,6 +2011,110 @@ code navigation:
 #+end_src
 
 ** C/C++
+
+*** irony
+
+#+begin_src emacs-lisp
+
+  (use-package irony)
+
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+  (defun my-irony-mode-hook ()
+    (define-key irony-mode-map [remap completion-at-point]
+      'irony-completion-at-point-async)
+    (define-key irony-mode-map [remap complete-symbol]
+      'irony-completion-at-point-async))
+
+  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+
+  (use-package company-irony
+    :after (irony company)
+    :config
+    (progn
+      (add-to-list 'company-backends 'company-irony)
+      ))
+
+  (use-package flycheck-irony
+    :after (irony flycheck)
+    :config
+    (progn
+      (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+      ))
+
+  (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+  (setq company-backends (delete 'company-semantic company-backends))
+  (eval-after-load 'company
+    '(add-to-list
+      'company-backends 'company-irony))
+
+  (use-package irony-eldoc)
+  (add-hook 'irony-mode-hook #'irony-eldoc)
+#+end_src
+
+*** rtags
+
+#+begin_src emacs-lisp
+
+(setq rtags-completions-enabled t)
+(eval-after-load 'company
+  '(add-to-list
+    'company-backends 'company-rtags))
+(setq rtags-autostart-diagnostics t)
+(rtags-enable-standard-keybindings)
+#+end_src
+
+helm integration:
+
+#+begin_src emacs-lisp
+  (use-package rtags-xref)
+  (use-package company-rtags)
+  (use-package helm-rtags)
+  (setq rtags-use-helm t)
+
+#+end_src
+
+company integration:
+
+#+begin_src emacs-lisp
+
+  (setq company-idle-delay 0)
+  (define-key c-mode-map [(tab)] 'company-complete)
+  (define-key c++-mode-map [(tab)] 'company-complete)
+
+
+  (use-package company-irony-c-headers)
+  (eval-after-load 'company
+    '(add-to-list
+      'company-backends '(company-irony-c-headers company-irony)))
+
+#+end_src
+
+flycheck integration:
+
+#+begin_src emacs-lisp
+
+  (add-hook 'c++-mode-hook 'flycheck-mode)
+  (add-hook 'c-mode-hook 'flycheck-mode)
+  (use-package flycheck-rtags)
+  (defun my-flycheck-rtags-setup ()
+    (flycheck-select-checker 'rtags)
+    (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
+    (setq-local flycheck-check-syntax-automatically nil))
+  ;; c-mode-common-hook is also called by c++-mode
+  (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
+
+#+end_src
+
+*** cmake-ide
+
+#+begin_src emacs-lisp
+
+  (use-package cmake-ide)
+  (cmake-ide-setup)
+#+end_src
 
 *** cpputils-cmake
 

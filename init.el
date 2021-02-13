@@ -1070,6 +1070,78 @@ buffer's window as well."
 
 (use-package cmake-mode)
 
+(use-package irony)
+
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+(defun my-irony-mode-hook ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+
+(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+
+(use-package company-irony
+  :after (irony company)
+  :config
+  (progn
+    (add-to-list 'company-backends 'company-irony)
+    ))
+
+(use-package flycheck-irony
+  :after (irony flycheck)
+  :config
+  (progn
+    (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
+    ))
+
+(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+(setq company-backends (delete 'company-semantic company-backends))
+(eval-after-load 'company
+  '(add-to-list
+    'company-backends 'company-irony))
+
+(use-package irony-eldoc)
+(add-hook 'irony-mode-hook #'irony-eldoc)
+
+(setq rtags-completions-enabled t)
+(eval-after-load 'company
+  '(add-to-list
+    'company-backends 'company-rtags))
+(setq rtags-autostart-diagnostics t)
+(rtags-enable-standard-keybindings)
+
+(use-package rtags-xref)
+(use-package company-rtags)
+(use-package helm-rtags)
+(setq rtags-use-helm t)
+
+(setq company-idle-delay 0)
+(define-key c-mode-map [(tab)] 'company-complete)
+(define-key c++-mode-map [(tab)] 'company-complete)
+
+
+(use-package company-irony-c-headers)
+(eval-after-load 'company
+  '(add-to-list
+    'company-backends '(company-irony-c-headers company-irony)))
+
+(add-hook 'c++-mode-hook 'flycheck-mode)
+(add-hook 'c-mode-hook 'flycheck-mode)
+(use-package flycheck-rtags)
+(defun my-flycheck-rtags-setup ()
+  (flycheck-select-checker 'rtags)
+  (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
+  (setq-local flycheck-check-syntax-automatically nil))
+;; c-mode-common-hook is also called by c++-mode
+(add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
+
+(use-package cmake-ide)
+(cmake-ide-setup)
+
 (defhydra python-move-defun (python-mode-map "C-c n")
   "python mode movement"
   ("a" #'beginning-of-defun "beginning of defun")
