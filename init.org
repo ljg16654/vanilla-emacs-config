@@ -732,6 +732,9 @@ Waiting for confirmation before tangling.
   (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
 #+end_src
 
+integration with projectile:
+https://www.reddit.com/r/emacs/comments/bhj7tu/tabbar_with_projectile_grouping/
+
 ** kill buffer
 #+begin_src emacs-lisp
 
@@ -1868,6 +1871,14 @@ would cause ‘mcd foo’ to create and switch to a directory called
 [[https://occasionallycogent.com/custom_emacs_modeline/index.html][A tutorial]]
 [[info:emacs#Mode Line][info:emacs#Mode Line]]
 [[help:mode-line-format]]
+
+** 3d
+
+#+begin_src emacs-lisp
+
+  (set-face-attribute 'mode-line nil :box t)
+#+end_src
+
 ** the default
 
 CS:CH-FR BUF  POS LINE (MAJOR MODE)
@@ -1924,6 +1935,17 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 #+end_src
 
+** nyan
+
+#+begin_src emacs-lisp
+
+  (use-package nyan-mode
+    :config
+    (progn
+      (nyan-mode)
+      (nyan-start-animation)))
+#+end_src
+
 * ROS
 
 #+begin_src emacs-lisp
@@ -1938,7 +1960,6 @@ gazebo simulation files:
 
 (add-to-list 'auto-mode-alist '("\\.world\\'" . xml-mode))
 #+end_src
-
 
 * learning by repetition
 
@@ -1985,6 +2006,7 @@ code navigation:
 
 
 ** TODO autoinsert
+
 ** lisp-general
 
 #+begin_src emacs-lisp
