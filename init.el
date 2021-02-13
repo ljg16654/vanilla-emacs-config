@@ -21,6 +21,39 @@
 
 (straight-use-package 'use-package)
 
+(use-package general)
+
+(use-package evil)
+(use-package evil-escape
+  :config
+  (progn
+    (setq-default evil-escape-key-sequence "jk")
+    ))
+
+(global-set-key (kbd "H-e") #'evil-mode)
+(add-hook 'evil-mode-hook #'evil-escape-mode)
+
+(use-package hydra)
+(global-set-key (kbd "C-c h") #'hydra-pause-resume)
+
+(defhydra landmark (global-map "C-c f")
+  "landmarks"
+  ("p" #'(lambda () (interactive)
+           (find-file (concat user-emacs-directory "init.org")))
+   "config")
+  ("d" #'(lambda () (interactive)
+           (dired "~/Downloads"))
+   "downloads")
+  ("c" #'(lambda () (interactive)
+           (dired "~/Documents"))
+   "documents")
+  ("r" #'(lambda () (interactive)
+           (dired "~/ROS"))
+   "ros workspaces")
+  ("y" #'(lambda () (interactive)
+           (dired (concat user-emacs-directory "snippet/"))
+           "snippets")))
+
 (use-package helm
   :config
   (progn
@@ -40,36 +73,38 @@
 (eval-after-load "helm"
 '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
+(use-package s)
+
 (cl-macrolet
       ((make-splitter-fn (name open-fn split-fn)
-                         `(defun ,name (_candidate)
-                            ;; Display buffers in new windows
-                            (dolist (cand (helm-marked-candidates))
-                              (select-window (,split-fn))
-                              (,open-fn cand))
-                            ;; Adjust size of windows
-                            (balance-windows)))
+			 `(defun ,name (_candidate)
+			    ;; Display buffers in new windows
+			    (dolist (cand (helm-marked-candidates))
+			      (select-window (,split-fn))
+			      (,open-fn cand))
+			    ;; Adjust size of windows
+			    (balance-windows)))
        (generate-helm-splitter-funcs
-        (op-type open-fn)
-        (let* ((prefix (s-concat "helm-" op-type "-switch-"))
-               (vert-split (intern (s-concat prefix "vert-window")))
-               (horiz-split (intern (s-concat prefix "horiz-window"))))
-          `(progn
-             (make-splitter-fn ,vert-split ,open-fn split-window-right)
+	(op-type open-fn)
+	(let* ((prefix (s-concat "helm-" op-type "-switch-"))
+	       (vert-split (intern (s-concat prefix "vert-window")))
+	       (horiz-split (intern (s-concat prefix "horiz-window"))))
+	  `(progn
+	     (make-splitter-fn ,vert-split ,open-fn split-window-right)
 
-             (make-splitter-fn ,horiz-split ,open-fn split-window-below)
+	     (make-splitter-fn ,horiz-split ,open-fn split-window-below)
 
-             (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
-                 ()
-               (interactive)
-               (with-helm-alive-p
-                 (helm-exit-and-execute-action (quote ,vert-split))))
+	     (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
+		 ()
+	       (interactive)
+	       (with-helm-alive-p
+		 (helm-exit-and-execute-action (quote ,vert-split))))
 
-             (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
-                 ()
-               (interactive)
-               (with-helm-alive-p
-                 (helm-exit-and-execute-action (quote ,horiz-split))))))))
+	     (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
+		 ()
+	       (interactive)
+	       (with-helm-alive-p
+		 (helm-exit-and-execute-action (quote ,horiz-split))))))))
     (generate-helm-splitter-funcs "buffer" switch-to-buffer)
     (generate-helm-splitter-funcs "file" find-file))
 
@@ -174,39 +209,6 @@
 (use-package weyland-yutani-theme)
 
 (load-theme 'modus-vivendi t)
-
-(use-package general)
-
-(use-package evil)
-(use-package evil-escape
-  :config
-  (progn
-    (setq-default evil-escape-key-sequence "jk")
-    ))
-
-(global-set-key (kbd "H-e") #'evil-mode)
-(add-hook 'evil-mode-hook #'evil-escape-mode)
-
-(use-package hydra)
-(global-set-key (kbd "C-c h") #'hydra-pause-resume)
-
-(defhydra landmark (global-map "C-c f")
-  "landmarks"
-  ("p" #'(lambda () (interactive)
-           (find-file (concat user-emacs-directory "init.org")))
-   "config")
-  ("d" #'(lambda () (interactive)
-           (dired "~/Downloads"))
-   "downloads")
-  ("c" #'(lambda () (interactive)
-           (dired "~/Documents"))
-   "documents")
-  ("r" #'(lambda () (interactive)
-           (dired "~/ROS"))
-   "ros workspaces")
-  ("y" #'(lambda () (interactive)
-           (dired (concat user-emacs-directory "snippet/"))
-           "snippets")))
 
 (use-package rg
   :config
