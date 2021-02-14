@@ -328,7 +328,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 ;; between buffers
 
-(global-set-key (kbd "s-i") #'ibuffer)
+(global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "s-<left>") #'previous-buffer)
 (global-set-key (kbd "s-<right>") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
@@ -443,10 +443,23 @@ buffer's window as well."
 (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 (use-package helm-projectile
+  ;; :after persp-projectile
   :config
   (progn
     (helm-projectile-on)
     ))
+
+(use-package ibuffer-projectile
+  :after projectile
+  :config
+  (progn
+    (add-hook 'ibuffer-hook
+    (lambda ()
+      (ibuffer-projectile-set-filter-groups)
+      (unless (eq ibuffer-sorting-mode 'alphabetic)
+        (ibuffer-do-sort-by-alphabetic))))))
+
+(use-package org-projectile)
 
 (use-package dumb-jump
   :config
@@ -1013,6 +1026,8 @@ buffer's window as well."
    )
 )
 
+(set-face-attribute 'mode-line nil :box t)
+
 (defun mode-line-format-raw ()
   (interactive)
 
@@ -1043,6 +1058,12 @@ buffer's window as well."
   :config
   (progn
     (setq doom-modeline-height 15)))
+
+(use-package nyan-mode
+  :config
+  (progn
+    (nyan-mode)
+    (nyan-start-animation)))
 
 (use-package helm-catkin)
 
@@ -1114,7 +1135,6 @@ buffer's window as well."
   '(add-to-list
     'company-backends 'company-rtags))
 (setq rtags-autostart-diagnostics t)
-(rtags-enable-standard-keybindings)
 
 (use-package rtags-xref)
 (use-package company-rtags)

@@ -635,13 +635,13 @@ Waiting for confirmation before tangling.
 
 #+end_src
 
-** buffer switch
+** buffer switch keys
 
 #+begin_src emacs-lisp
 
   ;; between buffers
 
-  (global-set-key (kbd "s-i") #'ibuffer)
+  (global-set-key (kbd "C-x C-b") #'ibuffer)
   (global-set-key (kbd "s-<left>") #'previous-buffer)
   (global-set-key (kbd "s-<right>") #'next-buffer)
   (global-set-key (kbd "C-x <return> r")
@@ -662,9 +662,6 @@ Waiting for confirmation before tangling.
   (setq tab-bar-new-tab-choice "*scratch*")
 
 #+end_src
-
-#+RESULTS:
-: *scratch*
 
 ** tab-bar
 
@@ -803,13 +800,74 @@ In buffer or across buffers.
 
 integration with helm:
 
+see https://github.com/bbatsov/persp-projectile/issues/23 for the
+=:after= keyword here.
+
 #+begin_src emacs-lisp
 
-   (use-package helm-projectile
-     :config
-     (progn
-       (helm-projectile-on)
-       ))
+  (use-package helm-projectile
+    ;; :after persp-projectile
+    :config
+    (progn
+      (helm-projectile-on)
+      ))
+
+#+end_src
+
+integration with ibuffer:
+
+#+begin_src emacs-lisp
+
+  (use-package ibuffer-projectile
+    :after projectile
+    :config
+    (progn
+      (add-hook 'ibuffer-hook
+      (lambda ()
+        (ibuffer-projectile-set-filter-groups)
+        (unless (eq ibuffer-sorting-mode 'alphabetic)
+          (ibuffer-do-sort-by-alphabetic))))))
+#+end_src
+
+integration with org:
+[[https://github.com/IvanMalison/org-projectile/tree/96a57a43555e24e5e0d81e79f0fbb47001c41bachttps://github.com/IvanMalison/org-projectile/tree/96a57a43555e24e5e0d81e79f0fbb47001c41bac][repo]]
+
+#+begin_src emacs-lisp
+
+  (use-package org-projectile)
+#+end_src
+
+** perspective.el
+
+The [[https://github.com/nex3/perspective-el][repo]] includes the desired workflow bound with such package. What
+interests me particularly is the term "Yak shaving", which describes
+'any seemingly pointless activity which is actually necessary to solve
+a problem which solves a problem which, several levels of recursion
+later, solves the real problem you're working on.' Such an everyday
+senario has so far been neglected in my choice of buffer/window
+grouping tool due to naïvety.
+
+The package is currently disabled as =persp-projectile= doesn't seem to
+function properly according to my expectation (a new 'perspective' is
+not created after I issue projectile switch). Also, the git repo isn't
+exhausive as I would normally expect from an Emacs package. Therefore,
+I decide to continue with =tar-bar= and =projectile=.
+
+#+begin_src emacs-lisp :tangle nil
+
+  (use-package perspective
+    :config
+    (progn
+      (persp-mode)
+      (setq persp-sort 'acess)))
+
+#+end_src
+
+integration with projectile:
+
+#+begin_src emacs-lisp :tangle nil
+
+  (use-package persp-projectile)
 
 #+end_src
 
@@ -2004,7 +2062,6 @@ code navigation:
   (global-set-key (kbd "C-.") #'imenu-anywhere)
 #+end_src
 
-
 ** TODO autoinsert
 
 ** lisp-general
@@ -2087,7 +2144,7 @@ code navigation:
   '(add-to-list
     'company-backends 'company-rtags))
 (setq rtags-autostart-diagnostics t)
-(rtags-enable-standard-keybindings)
+
 #+end_src
 
 helm integration:
