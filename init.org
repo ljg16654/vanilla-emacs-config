@@ -124,7 +124,13 @@ A minimalistic example:
      "documents")
     ("r" #'(lambda () (interactive)
              (dired "~/ROS"))
-     "ros workspaces")
+     "ros")
+    ("x" #'(lambda () (interactive)
+             (dired "~/code"))
+     "code")
+    ("o" #'(lambda () (interactive)
+             (dired org-directory))
+     "org")
     ("y" #'(lambda () (interactive)
              (dired (concat user-emacs-directory "snippet/"))
              "snippets")))
@@ -158,6 +164,15 @@ A minimalistic example:
   (global-set-key (kbd "M-i") #'helm-imenu)
   (global-set-key (kbd "C-h a") #'helm-apropos)
   (global-set-key (kbd "μ") #'helm-filtered-bookmarks)
+
+#+end_src
+
+*** geometry
+
+#+begin_src emacs-lisp
+
+  (helm-autoresize-mode)
+  (setq helm-autoresize-max-height 40)
 
 #+end_src
 
@@ -450,6 +465,14 @@ read later at the moment.
   (use-package ripgrep) 
 #+end_src
 
+*** helm integration
+
+#+begin_src emacs-lisp
+
+  (use-package helm-rg
+    :after (helm rg))
+#+end_src
+
 ** ag
 
 #+begin_src emacs-lisp
@@ -542,7 +565,7 @@ window managers.
 
 #+begin_src emacs-lisp
 
-  (setq display-buffer-alist
+  (setq display-buffer-alistqqqqqqqqqqqq2q22q2q22
         '(
           ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
            (display-buffer-in-side-window)
@@ -572,7 +595,7 @@ window managers.
           ;; left side window
           ("\\*Help.*"
            (display-buffer-in-side-window)
-           (window-width . 0.20)       ; See the :hook
+           (window-width . 0.25)       ; See the :hook
            (side . left)
            (slot . 0)
            (window-parameters . ((no-other-window . t))))
@@ -586,23 +609,6 @@ window managers.
             . ((mode-line-format
                 . (" "
                    mode-line-buffer-identification)))))
-          ("\\*Custom.*"
-           (display-buffer-in-side-window)
-           (window-width . 0.25)
-           (side . right)
-           (slot . 1)
-           (window-parameters . ((no-other-window . t))))
-          ;; bottom buffer (NOT side window)
-          ("\\*\\vc-\\(incoming\\|outgoing\\).*"
-           (display-buffer-at-bottom))
-          ("\\*\\(Output\\|Register Preview\\).*"
-           (display-buffer-at-bottom)
-           (window-parameters . ((no-other-window . t))))
-          ;; ("\\*WordNet.*"
-          ;;  (display-buffer-reuse-mode-window display-buffer-at-right)
-          ;;  (slot . 0)
-          ;;  (window-width . 0.4)
-          ;;  )
           ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . 0.2)
@@ -807,6 +813,7 @@ see https://github.com/bbatsov/persp-projectile/issues/23 for the
 
   (use-package helm-projectile
     ;; :after persp-projectile
+    :after helm-rg
     :config
     (progn
       (helm-projectile-on)
@@ -834,7 +841,15 @@ integration with org:
 
 #+begin_src emacs-lisp
 
-  (use-package org-projectile)
+  (use-package org-projectile
+    :after (org projectile)
+    :config
+    (progn
+      (setq org-projectile-projects-file
+            (concat org-directory "/project.org"))
+      (global-set-key (kbd "C-c n p")
+                      #'org-projectile-project-todo-completing-read)
+      ))
 #+end_src
 
 ** perspective.el
@@ -1025,9 +1040,9 @@ general.el.
 				      '("~/org-roam/"))))
 
   (setq org-refile-targets
-	'((nil :maxlevel . 5)
-	  (org-agenda-files :maxlevel . 5)
-	  (+personal-org-roam-files+ :maxlevel . 5)
+	'((nil :maxlevel . 2)
+	  (org-agenda-files :maxlevel . 2)
+	  (+personal-org-roam-files+ :maxlevel . 2)
 	  )
 	;; Without this, completers like ivy/helm are only given the first level of
 	;; each outline candidates. i.e. all the candidates under the "Tasks" heading
@@ -1036,6 +1051,10 @@ general.el.
 	org-refile-use-outline-path 'file
 	org-outline-path-complete-in-steps nil)
 #+end_src
+
+*** TODO refile by context
+
+[[https://emacs.stackexchange.com/questions/24976/org-mode-can-you-set-up-context-dependent-refile-targets][related Q]]
 
 ** the todo-keywords cycle
 Track state changes.
@@ -1318,7 +1337,7 @@ template brought with org-roam.
            :head "#+title: %<%Y-%m-%d>\n\n")))
 #+end_src
 
-** org-capture
+** TODO org-capture: define entries separately 
 [2020-12-24 四] A wired phenomena that I just found is that the
 result of using defvar and using string for filename directly is
 different!  If I use defvar after =file+headline=, the filename is
@@ -1381,6 +1400,9 @@ in my org-directory.
                ("v" "vocabularies" entry
                 (file+headline "voc.org" "inbox")
                 "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")))
+
+     (require 'org-projectile)
+     (push (org-projectile-project-todo-entry) org-capture-templates)
    #+end_src
 
 ** org-agenda
@@ -2147,7 +2169,9 @@ code navigation:
 
 #+end_src
 
-helm integration:
+[[https://github.com/Andersbakken/rtags/wiki/Usage][wiki]]
+
+**** helm integration
 
 #+begin_src emacs-lisp
   (use-package rtags-xref)
@@ -2157,7 +2181,7 @@ helm integration:
 
 #+end_src
 
-company integration:
+**** company integration
 
 #+begin_src emacs-lisp
 
@@ -2173,7 +2197,7 @@ company integration:
 
 #+end_src
 
-flycheck integration:
+**** flycheck integration
 
 #+begin_src emacs-lisp
 
@@ -2235,6 +2259,8 @@ flycheck integration:
 
 
 #+end_src
+
+** TODO format on save:
 
 * EXWM
 :PROPERTIES:

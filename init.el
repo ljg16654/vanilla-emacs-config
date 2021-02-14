@@ -49,7 +49,13 @@
    "documents")
   ("r" #'(lambda () (interactive)
            (dired "~/ROS"))
-   "ros workspaces")
+   "ros")
+  ("x" #'(lambda () (interactive)
+           (dired "~/code"))
+   "code")
+  ("o" #'(lambda () (interactive)
+           (dired org-directory))
+   "org")
   ("y" #'(lambda () (interactive)
            (dired (concat user-emacs-directory "snippet/"))
            "snippets")))
@@ -68,6 +74,9 @@
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
 (global-set-key (kbd "μ") #'helm-filtered-bookmarks)
+
+(helm-autoresize-mode)
+(setq helm-autoresize-max-height 40)
 
 (use-package ace-jump-helm-line)
 (eval-after-load "helm"
@@ -220,6 +229,9 @@
 ;; seems to be dependency for projectile-ripgrep
 (use-package ripgrep)
 
+(use-package helm-rg
+  :after (helm rg))
+
 (use-package ag)
 
 (global-set-key (kbd "C-;") #'iedit-mode)
@@ -250,7 +262,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
       (delete-other-windows)))
   :bind ("C-c s" . prot/window-single-toggle))
 
-(setq display-buffer-alist
+(setq display-buffer-alistqqqqqqqqqqqq2q22q2q22
       '(
         ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
          (display-buffer-in-side-window)
@@ -280,7 +292,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
         ;; left side window
         ("\\*Help.*"
          (display-buffer-in-side-window)
-         (window-width . 0.20)       ; See the :hook
+         (window-width . 0.25)       ; See the :hook
          (side . left)
          (slot . 0)
          (window-parameters . ((no-other-window . t))))
@@ -294,23 +306,6 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
           . ((mode-line-format
               . (" "
                  mode-line-buffer-identification)))))
-        ("\\*Custom.*"
-         (display-buffer-in-side-window)
-         (window-width . 0.25)
-         (side . right)
-         (slot . 1)
-         (window-parameters . ((no-other-window . t))))
-        ;; bottom buffer (NOT side window)
-        ("\\*\\vc-\\(incoming\\|outgoing\\).*"
-         (display-buffer-at-bottom))
-        ("\\*\\(Output\\|Register Preview\\).*"
-         (display-buffer-at-bottom)
-         (window-parameters . ((no-other-window . t))))
-        ;; ("\\*WordNet.*"
-        ;;  (display-buffer-reuse-mode-window display-buffer-at-right)
-        ;;  (slot . 0)
-        ;;  (window-width . 0.4)
-        ;;  )
         ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
          (window-height . 0.2)
@@ -444,6 +439,7 @@ buffer's window as well."
 
 (use-package helm-projectile
   ;; :after persp-projectile
+  :after helm-rg
   :config
   (progn
     (helm-projectile-on)
@@ -459,7 +455,15 @@ buffer's window as well."
       (unless (eq ibuffer-sorting-mode 'alphabetic)
         (ibuffer-do-sort-by-alphabetic))))))
 
-(use-package org-projectile)
+(use-package org-projectile
+  :after (org projectile)
+  :config
+  (progn
+    (setq org-projectile-projects-file
+          (concat org-directory "/project.org"))
+    (global-set-key (kbd "C-c n p")
+                    #'org-projectile-project-todo-completing-read)
+    ))
 
 (use-package dumb-jump
   :config
@@ -552,9 +556,9 @@ buffer's window as well."
 				    '("~/org-roam/"))))
 
 (setq org-refile-targets
-      '((nil :maxlevel . 5)
-	(org-agenda-files :maxlevel . 5)
-	(+personal-org-roam-files+ :maxlevel . 5)
+      '((nil :maxlevel . 2)
+	(org-agenda-files :maxlevel . 2)
+	(+personal-org-roam-files+ :maxlevel . 2)
 	)
       ;; Without this, completers like ivy/helm are only given the first level of
       ;; each outline candidates. i.e. all the candidates under the "Tasks" heading
@@ -785,6 +789,9 @@ buffer's window as well."
           ("v" "vocabularies" entry
            (file+headline "voc.org" "inbox")
            "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")))
+
+(require 'org-projectile)
+(push (org-projectile-project-todo-entry) org-capture-templates)
 
 (setq org-agenda-files (apply (function append)
 			        (mapcar
