@@ -324,8 +324,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 ;; between buffers
 
 (global-set-key (kbd "C-x C-b") #'ibuffer)
-(global-set-key (kbd "s-<left>") #'previous-buffer)
-(global-set-key (kbd "s-<right>") #'next-buffer)
+(global-set-key (kbd "C-M-,") #'previous-buffer)
+(global-set-key (kbd "C-M-.") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
                 ;; originally bound to
                 ;; revert-buffer-with-coding-system
@@ -425,7 +425,7 @@ buffer's window as well."
 
 (use-package avy)
 
-(global-set-key (kbd "ν") #'avy-goto-char-2)
+(global-set-key (kbd "ν") #'ace-window)
 (global-set-key (kbd "σ") #'avy-goto-char)
 
 (use-package magit
@@ -925,6 +925,13 @@ buffer's window as well."
 
 (use-package yaml-mode)
 
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize)))
+
+(use-package rainbow-mode)
+
 (use-package lsp-mode)
 
 (use-package flycheck)
@@ -941,7 +948,6 @@ buffer's window as well."
                          (require 'lsp-python-ms)
                          (lsp))))
 
-(setq lsp-keymap-prefix "ρ")
 (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
 
@@ -1075,6 +1081,7 @@ buffer's window as well."
 (use-package helm-catkin)
 
 (add-to-list 'auto-mode-alist '("\\.world\\'" . xml-mode))
+(add-to-list 'auto-mode-alist '("\\.launch\\'" . xml-mode))
 
 (use-package pamparam
   :after org)
@@ -1167,6 +1174,11 @@ buffer's window as well."
   (setq-local flycheck-check-syntax-automatically nil))
 ;; c-mode-common-hook is also called by c++-mode
 (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
+
+(defhydra rtags-movement (c-mode-base-map "ρ")
+  "code navigation using rtags"
+  ("ρ" #'rtags-find-symbol-at-point "gd")
+  )
 
 (use-package cmake-ide)
 (cmake-ide-setup)

@@ -625,9 +625,6 @@ window managers.
   (add-hook 'custom-mode-hook #'visual-line-mode)
 #+end_src
 
-#+RESULTS:
-| visual-line-mode |
-
 *** window-layout history
 
 Waiting for confirmation before tangling.
@@ -648,8 +645,8 @@ Waiting for confirmation before tangling.
   ;; between buffers
 
   (global-set-key (kbd "C-x C-b") #'ibuffer)
-  (global-set-key (kbd "s-<left>") #'previous-buffer)
-  (global-set-key (kbd "s-<right>") #'next-buffer)
+  (global-set-key (kbd "C-M-,") #'previous-buffer)
+  (global-set-key (kbd "C-M-.") #'next-buffer)
   (global-set-key (kbd "C-x <return> r")
                   ;; originally bound to
                   ;; revert-buffer-with-coding-system
@@ -778,7 +775,7 @@ In buffer or across buffers.
 
   (use-package avy)
 
-  (global-set-key (kbd "ν") #'avy-goto-char-2)
+  (global-set-key (kbd "ν") #'ace-window)
   (global-set-key (kbd "σ") #'avy-goto-char)
 
 #+end_src
@@ -810,6 +807,7 @@ see https://github.com/bbatsov/persp-projectile/issues/23 for the
 =:after= keyword here.
 
 #+begin_src emacs-lisp
+
 
   (use-package helm-projectile
     ;; :after persp-projectile
@@ -1681,6 +1679,23 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
      :repo "cqql/xresources-theme"))
 #+end_src
 
+** exec path from shell
+
+#+begin_src emacs-lisp
+
+  (use-package exec-path-from-shell
+    :config
+    (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+end_src
+
+** hex color
+
+#+begin_src emacs-lisp
+
+  (use-package rainbow-mode)
+
+#+end_src
 * lsp
 
 ** basic
@@ -1713,7 +1728,6 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 #+begin_src emacs-lisp
 
-  (setq lsp-keymap-prefix "ρ")
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
 
@@ -2038,7 +2052,8 @@ gazebo simulation files:
 
 #+begin_src emacs-lisp
 
-(add-to-list 'auto-mode-alist '("\\.world\\'" . xml-mode))
+  (add-to-list 'auto-mode-alist '("\\.world\\'" . xml-mode))
+  (add-to-list 'auto-mode-alist '("\\.launch\\'" . xml-mode))
 #+end_src
 
 * learning by repetition
@@ -2210,6 +2225,17 @@ code navigation:
     (setq-local flycheck-check-syntax-automatically nil))
   ;; c-mode-common-hook is also called by c++-mode
   (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
+
+#+end_src
+
+**** keybinding
+
+#+begin_src emacs-lisp
+
+  (defhydra rtags-movement (c-mode-base-map "ρ")
+    "code navigation using rtags"
+    ("ρ" #'rtags-find-symbol-at-point "gd")
+    )
 
 #+end_src
 
@@ -2627,3 +2653,5 @@ Automatically tangle /this file/ on save.
 #+end_src
 
  
+
+
