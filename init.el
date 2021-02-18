@@ -217,7 +217,7 @@
 
 (use-package weyland-yutani-theme)
 
-(load-theme 'modus-vivendi t)
+(load-theme 'apropospriate-light t)
 
 (use-package rg
   :config
@@ -488,7 +488,9 @@ buffer's window as well."
 (add-hook 'dired-mode
           #'(lambda ()
               (progn
-                (dired-hide-details-mode +1))))
+                (dired-hide-details-mode +1)
+                (dired-omit-mode +1)
+                )))
 
 (use-package dired-subtree
   :after dired
@@ -533,6 +535,8 @@ buffer's window as well."
     (font-lock-add-keywords 'org-mode
                             '(("^ *\\([-]\\) "
                                (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
+
+(global-set-key (kbd "C-c n l") #'org-store-link)
 
 (general-define-key
  :keymaps 'org-mode-map
@@ -1178,6 +1182,7 @@ buffer's window as well."
 (defhydra rtags-movement (c-mode-base-map "ρ")
   "code navigation using rtags"
   ("ρ" #'rtags-find-symbol-at-point "gd")
+  (":" #'rtags-diagnostics "diagnostics")
   )
 
 (use-package cmake-ide)

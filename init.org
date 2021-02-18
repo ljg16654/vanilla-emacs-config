@@ -417,7 +417,7 @@ correct, completion is triggered.
 
   (use-package weyland-yutani-theme)
 
-  (load-theme 'modus-vivendi t)
+  (load-theme 'apropospriate-light t)
 #+end_src
 
 * search/replace
@@ -923,7 +923,9 @@ integration with projectile:
   (add-hook 'dired-mode
             #'(lambda ()
                 (progn
-                  (dired-hide-details-mode +1))))
+                  (dired-hide-details-mode +1)
+                  (dired-omit-mode +1)
+                  )))
 #+end_src
 
 *** TODO improve
@@ -997,6 +999,13 @@ general.el.
                               '(("^ *\\([-]\\) "
                                  (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))))
 
+#+end_src
+
+** links
+
+#+begin_src emacs-lisp
+
+(global-set-key (kbd "C-c n l") #'org-store-link)
 #+end_src
 
 ** evil meta-left/right
@@ -2235,6 +2244,7 @@ code navigation:
   (defhydra rtags-movement (c-mode-base-map "ρ")
     "code navigation using rtags"
     ("ρ" #'rtags-find-symbol-at-point "gd")
+    (":" #'rtags-diagnostics "diagnostics")
     )
 
 #+end_src
