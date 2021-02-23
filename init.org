@@ -312,7 +312,9 @@ and define keys
 
 ** yasnippet
 
-The snippets are currently stored in DOOMDIR and I may move them to somewhere else later.
+[[http://joaotavora.github.io/yasnippet/snippet-development.html][how to write?]]
+[[http://joaotavora.github.io/yasnippet/snippet-expansion.html][expanding snippets]]
+
 #+begin_src emacs-lisp
   (use-package yasnippet
     :config
@@ -322,6 +324,17 @@ The snippets are currently stored in DOOMDIR and I may move them to somewhere el
       (yas-global-mode)))
 #+end_src
 
+Yasnippet's own major-mode, =snippet-mode=, provides
+=yas-tryout-snippet= (bound to C-c C-t) by default for users to
+experiment with the snippet's effect immediately.
+Also, C-c C-c does things similar to what it does inside =org-mode=.
+
+What makes this package particularly 'Emacsy', from my perspective, is
+its ability to leverage the power of elisp:
+- =# consition= keyword :: conidition for expansion.
+- # =expand-env= keyword :: temporarily replace some variables during
+  snippet expansion.
+  
 Integration with helm:
 
 #+begin_src emacs-lisp
@@ -1265,6 +1278,83 @@ use the python lexer for ipython blocks:
 #+begin_src emacs-lisp
 
 (add-to-list 'org-latex-minted-langs '(ipython "python"))
+#+end_src
+
+*** keymap
+
+[[https://kitchingroup.cheme.cmu.edu/blog/2017/06/10/Adding-keymaps-to-src-blocks-via-org-font-lock-hook/][use src-block major-mode keymap inside src block]]
+
+#+begin_src emacs-lisp
+
+  (setq scimax-src-block-keymaps
+        `(("ipython" . ,(let ((map (make-composed-keymap
+                                    `(,elpy-mode-map ,python-mode-map ,pyvenv-mode-map)
+                                    org-mode-map)))
+                          ;; In org-mode I define RET so we f
+                          (define-key map (kbd "<return>") 'newline)
+                          (define-key map (kbd "C-c C-c") 'org-ctrl-c-ctrl-c)
+                          map))
+          ("python" . ,(let ((map (make-composed-keymap
+                                   `(,elpy-mode-map ,python-mode-map ,pyvenv-mode-map)
+                                   org-mode-map)))
+                         ;; In org-mode I define RET so we f
+                         (define-key map (kbd "<return>") 'newline)
+                         (define-key map (kbd "C-c C-c") 'org-ctrl-c-ctrl-c)
+                         map))
+          ("emacs-lisp" . ,(let ((map (make-composed-keymap `(,lispy-mode-map
+                                                              ,emacs-lisp-mode-map
+                                                              ,outline-minor-mode-map)
+                                                            org-mode-map)))
+                             (define-key map (kbd "C-c C-c") 'org-ctrl-c-ctrl-c)
+                             map))))
+
+  (defun scimax-add-keymap-to-src-blocks (limit)
+    "Add keymaps to src-blocks defined in `scimax-src-block-keymaps'."
+    (let ((case-fold-search t)
+          lang)
+      (while (re-search-forward org-babel-src-block-regexp limit t)
+        (let ((lang (match-string 2))
+              (beg (match-beginning 0))
+              (end (match-end 0)))
+          (if (assoc (org-no-properties lang) scimax-src-block-keymaps)
+              (progn
+                (add-text-properties
+                 beg end `(local-map ,(cdr (assoc
+                                            (org-no-properties lang)
+                                            scimax-src-block-keymaps))))
+                (add-text-properties
+                 beg end `(cursor-sensor-functions
+                           ((lambda (win prev-pos sym)
+                              ;; This simulates a mouse click and makes a menu change
+                              (org-mouse-down-mouse nil)))))))))))
+
+  (defun scimax-spoof-mode (orig-func &rest args)
+    "Advice function to spoof commands in org-mode src blocks.
+  It is for commands that depend on the major mode. One example is
+  `lispy--eval'."
+    (if (org-in-src-block-p)
+        (let ((major-mode (intern (format "%s-mode" (first (org-babel-get-src-block-info))))))
+          (apply orig-func args))
+      (apply orig-func args)))
+
+  (define-minor-mode scimax-src-keymap-mode
+    "Minor mode to add mode keymaps to src-blocks."
+    :init-value nil
+    (if scimax-src-keymap-mode
+        (progn
+          (add-hook 'org-font-lock-hook #'scimax-add-keymap-to-src-blocks t)
+          (add-to-list 'font-lock-extra-managed-props 'local-map)
+          (add-to-list 'font-lock-extra-managed-props 'cursor-sensor-functions)
+          (advice-add 'lispy--eval :around 'scimax-spoof-mode)
+          (cursor-sensor-mode +1))
+      (remove-hook 'org-font-lock-hook #'scimax-add-keymap-to-src-blocks)
+      (advice-remove 'lispy--eval 'scimax-spoof-mode)
+      (cursor-sensor-mode -1))
+    (font-lock-fontify-buffer))
+
+  (add-hook 'org-mode-hook (lambda ()
+                             (scimax-src-keymap-mode +1)))
+
 #+end_src
 
 ** latex
@@ -2428,6 +2518,9 @@ code navigation:
 ** python
 
 #+begin_src emacs-lisp
+
+  (use-package elpy)
+  ;; (elpy-enable)
 
   (defhydra python-move-defun (python-mode-map "C-c n")
     "python mode movement"
