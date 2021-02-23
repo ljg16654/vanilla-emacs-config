@@ -237,7 +237,7 @@
 (global-set-key (kbd "C-;") #'iedit-mode)
 
 (use-package helm-swoop)
-(global-set-key (kbd "C-s") #'isearch-forward)
+(global-set-key (kbd "C-s") #'helm-swoop)
 ;; enable whitespace to match arbitrary string that doesn't contain a newline
 ;; non-greedily
 ;; such behavior is, however, limited to non-regexp search
@@ -320,6 +320,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 (global-set-key (kbd "C-c 2") #'window-toggle-side-windows)
 (add-hook 'help-mode-hook #'visual-line-mode)
 (add-hook 'custom-mode-hook #'visual-line-mode)
+
+(setq Man-notify-method 'pushy)
 
 ;; between buffers
 
@@ -422,6 +424,18 @@ buffer's window as well."
                                 (prot-simple-kill-buffer-current 1)))
 
 (global-set-key (kbd "C-c b r") #'rename-buffer)
+
+(use-package golden-ratio
+  :config
+  (progn
+    (setq golden-ratio-exclude-modes
+          (list
+           "eshell-mode"
+           "vterm-mode"
+           "helm-mode"
+           "dired-mode"))
+    (golden-ratio-mode nil)
+    ))
 
 (use-package avy)
 
@@ -554,16 +568,17 @@ buffer's window as well."
 (add-hook 'org-mode-hook #'org-indent-mode)
 
 (setq +personal-org-roam-files+ (apply (function append)
-				(mapcar
-				 (lambda (directory)
-					(directory-files-recursively directory org-agenda-file-regexp))
-				    '("~/org-roam/"))))
+                                (mapcar
+                                 (lambda (directory)
+                                        (directory-files-recursively directory org-agenda-file-regexp))
+                                    '("~/org-roam/"))))
 
 (setq org-refile-targets
-      '((nil :maxlevel . 2)
-	(org-agenda-files :maxlevel . 2)
-	(+personal-org-roam-files+ :maxlevel . 2)
-	)
+      `((nil :maxlevel . 2)
+        (org-agenda-files :maxlevel . 2)
+        (,(list (concat user-emacs-directory "init.org")) :maxlevel . 3)
+        ;; (+personal-org-roam-files+ :maxlevel . 2)
+        )
       ;; Without this, completers like ivy/helm are only given the first level of
       ;; each outline candidates. i.e. all the candidates under the "Tasks" heading
       ;; are just "Tasks/". This is unhelpful. We want the full path to each refile
@@ -572,9 +587,10 @@ buffer's window as well."
       org-outline-path-complete-in-steps nil)
 
 (setq org-todo-keywords
-      '((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(s@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
-	(sequence "REPORT(r)" "BUG(b/@)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
-	))
+      '((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(z@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
+        (sequence "REPORT(r)" "BUG(b/@)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
+        (sequence "STUDY(s)" "|" "STUDIED(S@)" "ARCHIVED(a@)")
+        ))
 
 (setq org-stuck-projects
       ;; identify a project with TODO keywords/tags
@@ -837,7 +853,8 @@ buffer's window as well."
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
 
-(setq browse-url-browser-function 'browse-url-firefox)
+(setq browse-url-generic-program "qutebrowser")
+(setq browse-url-browser-function #'browse-url-generic)
 
 (use-package command-log-mode)
 
@@ -948,9 +965,10 @@ buffer's window as well."
 (use-package lsp-python-ms
   :init (setq lsp-python-ms-auto-install-server t
               read-process-output-max 1048576)
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-python-ms)
-                         (lsp))))
+  ;; :hook (python-mode . (lambda ()
+  ;;                        (require 'lsp-python-ms)
+  ;;                        (lsp)))
+  )
 
 (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
@@ -1000,6 +1018,22 @@ buffer's window as well."
  "]" #'pdf-view-next-page-command
  "[" #'pdf-view-previous-page-command
  "/" #'pdf-occur)
+
+(use-package nov
+  :config
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+    ))
+
+(use-package elfeed)
+(global-set-key (kbd "C-x w") #'elfeed)
+(setq elfeed-feeds
+      '(
+        ("https://www.motorsport.com/rss/f1/news/" motorsport)
+        ("grandprix.com/rss.xml" motorsport)
+        ("https://www.reddit.com/r/motorsports/.rss?format=xml" motorsport)
+        ("http://finance.yahoo.com/rss/headline?s=MSFT" finance)
+        ))
 
 (use-package vterm)
 (general-define-key
@@ -1087,9 +1121,6 @@ buffer's window as well."
 (add-to-list 'auto-mode-alist '("\\.world\\'" . xml-mode))
 (add-to-list 'auto-mode-alist '("\\.launch\\'" . xml-mode))
 
-(use-package pamparam
-  :after org)
-
 (use-package anki-editor)
 
 (use-package rainbow-delimiters)
@@ -1099,6 +1130,9 @@ buffer's window as well."
 
 (use-package imenu-anywhere)
 (global-set-key (kbd "C-.") #'imenu-anywhere)
+
+(use-package autopair)
+(add-hook 'python-mode-hook #'autopair-mode)
 
 (use-package lispy)
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
@@ -1111,48 +1145,27 @@ buffer's window as well."
 
 (use-package cmake-mode)
 
-(use-package irony)
-
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-(defun my-irony-mode-hook ()
-  (define-key irony-mode-map [remap completion-at-point]
-    'irony-completion-at-point-async)
-  (define-key irony-mode-map [remap complete-symbol]
-    'irony-completion-at-point-async))
-
-(add-hook 'irony-mode-hook 'my-irony-mode-hook)
-
-(use-package company-irony
-  :after (irony company)
-  :config
-  (progn
-    (add-to-list 'company-backends 'company-irony)
-    ))
-
-(use-package flycheck-irony
-  :after (irony flycheck)
-  :config
-  (progn
-    (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
-    ))
-
-(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
-(setq company-backends (delete 'company-semantic company-backends))
-(eval-after-load 'company
-  '(add-to-list
-    'company-backends 'company-irony))
-
-(use-package irony-eldoc)
-(add-hook 'irony-mode-hook #'irony-eldoc)
+(add-hook 'c-mode-hook #'linum-mode)
+(add-hook 'c++-mode-hook #'linum-mode)
 
 (setq rtags-completions-enabled t)
 (eval-after-load 'company
   '(add-to-list
     'company-backends 'company-rtags))
 (setq rtags-autostart-diagnostics t)
+
+(defun ciao-goto-symbol ()
+  (interactive)
+  (deactivate-mark)
+  (ring-insert find-tag-marker-ring (point-marker))
+  (or (and (require 'rtags nil t)
+           (rtags-find-symbol-at-point))
+      (and (require 'semantic/ia)
+           (condition-case nil
+               (semantic-ia-fast-jump (point))
+             (error nil)))))
+(define-key c++-mode-map (kbd "M-.") 'ciao-goto-symbol)
+(define-key c++-mode-map (kbd "M-,") 'pop-tag-mark)
 
 (use-package rtags-xref)
 (use-package company-rtags)
@@ -1199,6 +1212,8 @@ buffer's window as well."
   ("k" #'python-nav-backward-block "prev block")
   ("j" #'python-nav-forward-block "next block")
   )
+
+(use-package cider)
 
 (setq desktop-save-mode nil)
 

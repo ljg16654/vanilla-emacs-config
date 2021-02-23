@@ -516,7 +516,7 @@ be performed throughout all present buffers with =helm-multi-swoop-all=.
 #+begin_src emacs-lisp
 
   (use-package helm-swoop)
-  (global-set-key (kbd "C-s") #'isearch-forward)
+  (global-set-key (kbd "C-s") #'helm-swoop)
   ;; enable whitespace to match arbitrary string that doesn't contain a newline
   ;; non-greedily
   ;; such behavior is, however, limited to non-regexp search
@@ -624,6 +624,15 @@ window managers.
   (add-hook 'help-mode-hook #'visual-line-mode)
   (add-hook 'custom-mode-hook #'visual-line-mode)
 #+end_src
+
+**** man page window behavior
+
+#+begin_src emacs-lisp
+(setq Man-notify-method 'pushy)
+#+end_src
+
+
+
 
 *** window-layout history
 
@@ -764,8 +773,23 @@ https://www.reddit.com/r/emacs/comments/bhj7tu/tabbar_with_projectile_grouping/
   (global-set-key (kbd "C-c b r") #'rename-buffer)
 #+end_src
 
-#+RESULTS:
-: rename-buffer
+** window resize
+
+#+begin_src emacs-lisp
+
+  (use-package golden-ratio
+    :config
+    (progn
+      (setq golden-ratio-exclude-modes
+            (list
+             "eshell-mode"
+             "vterm-mode"
+             "helm-mode"
+             "dired-mode"))
+      (golden-ratio-mode nil)
+      ))
+
+#+end_src
 
 * movement
 
@@ -1041,22 +1065,23 @@ general.el.
 ** refile
 #+begin_src emacs-lisp
   (setq +personal-org-roam-files+ (apply (function append)
-				  (mapcar
-				   (lambda (directory)
-					  (directory-files-recursively directory org-agenda-file-regexp))
-				      '("~/org-roam/"))))
+                                  (mapcar
+                                   (lambda (directory)
+                                          (directory-files-recursively directory org-agenda-file-regexp))
+                                      '("~/org-roam/"))))
 
   (setq org-refile-targets
-	'((nil :maxlevel . 2)
-	  (org-agenda-files :maxlevel . 2)
-	  (+personal-org-roam-files+ :maxlevel . 2)
-	  )
-	;; Without this, completers like ivy/helm are only given the first level of
-	;; each outline candidates. i.e. all the candidates under the "Tasks" heading
-	;; are just "Tasks/". This is unhelpful. We want the full path to each refile
-	;; target! e.g. FILE/Tasks/heading/subheading
-	org-refile-use-outline-path 'file
-	org-outline-path-complete-in-steps nil)
+        `((nil :maxlevel . 2)
+          (org-agenda-files :maxlevel . 2)
+          (,(list (concat user-emacs-directory "init.org")) :maxlevel . 3)
+          ;; (+personal-org-roam-files+ :maxlevel . 2)
+          )
+        ;; Without this, completers like ivy/helm are only given the first level of
+        ;; each outline candidates. i.e. all the candidates under the "Tasks" heading
+        ;; are just "Tasks/". This is unhelpful. We want the full path to each refile
+        ;; target! e.g. FILE/Tasks/heading/subheading
+        org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil)
 #+end_src
 
 *** TODO refile by context
@@ -1070,9 +1095,10 @@ Track state changes.
 
 #+begin_src emacs-lisp
   (setq org-todo-keywords
-	'((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(s@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
-	  (sequence "REPORT(r)" "BUG(b/@)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
-	  ))
+        '((sequence "MAYBE(m@)" "TODO(t)" "IN-PROGRESS(i@)" "STUCK(z@/@)" "|" "DONE(d@)" "CANCELLED(c@)")
+          (sequence "REPORT(r)" "BUG(b/@)" "KNOWNCAUSE(k@)" "|" "FIXED(f)")
+          (sequence "STUDY(s)" "|" "STUDIED(S@)" "ARCHIVED(a@)")
+          ))
 #+end_src
 
 
@@ -1496,8 +1522,17 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 #+end_src
 
 ** default browser
-#+begin_src emacs-lisp
+
+For firefox:
+#+begin_src emacs-lisp :tangle nil
 (setq browse-url-browser-function 'browse-url-firefox)
+#+end_src
+
+As I've recently (as of Feb2021) switched to =qutebrowser=, I'd like to
+have
+#+begin_src emacs-lisp
+  (setq browse-url-generic-program "qutebrowser")
+  (setq browse-url-browser-function #'browse-url-generic)
 #+end_src
 
 ** command-log
@@ -1537,6 +1572,16 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
   (add-hook 'kill-emacs-hook #'bookmark-save)
 
 #+end_src
+
+Bookmarks in Emacs are similar in spirit to registers.
+
+frequently used register commands:
+- C-x r s <register> :: copy region
+- C-x r w <register> :: save window config in selected frame
+- C-x r f <register> :: save window config in *all* frames
+- C-x r j <register> :: restore window config/cursor position
+- C-x r r <register> :: copy region-rectangle
+- C-x r i <register> :: insert region/rectangle
 
 ** mode management
 
@@ -1706,8 +1751,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 #+end_src
 * lsp
-
-** basic
+* basic
 
 - find definitions :: 'C-x 4 .', 'M-.',  'C-x 5 .'
 - find references :: 'M-?'
@@ -1727,9 +1771,10 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
   (use-package lsp-python-ms
     :init (setq lsp-python-ms-auto-install-server t
                 read-process-output-max 1048576)
-    :hook (python-mode . (lambda ()
-                           (require 'lsp-python-ms)
-                           (lsp))))
+    ;; :hook (python-mode . (lambda ()
+    ;;                        (require 'lsp-python-ms)
+    ;;                        (lsp)))
+    )
 
 #+end_src
 
@@ -1806,7 +1851,7 @@ lsp-ui-doc childframe, the cpu usage rises to 100% and Emacs freezes.
 ** TODO improve config
 + block mplayer from poping up
 
-* e-books and documents
+* rss, e-books and documents
 
 ** pdf
 
@@ -1834,6 +1879,30 @@ frequently used commands for movement:
 - SPC S-SPC
 
 ** TODO epub, djvu, mobi
+
+#+begin_src emacs-lisp
+
+  (use-package nov
+    :config
+    (progn
+      (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+      ))
+#+end_src
+
+** elfeed
+
+#+begin_src emacs-lisp
+
+  (use-package elfeed)
+  (global-set-key (kbd "C-x w") #'elfeed)
+  (setq elfeed-feeds
+        '(
+          ("https://www.motorsport.com/rss/f1/news/" motorsport)
+          ("grandprix.com/rss.xml" motorsport)
+          ("https://www.reddit.com/r/motorsports/.rss?format=xml" motorsport)
+          ("http://finance.yahoo.com/rss/headline?s=MSFT" finance)
+          ))
+#+end_src
 
 * shell and term
 
@@ -2051,6 +2120,12 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 
 * ROS
 
+#+begin_src emacs-lisp :tangle nil
+
+  (add-to-list 'load-path "/opt/ros/noetic/share/emacs/site-lisp")
+  (require 'rosemacs-config)
+#+end_src
+
 #+begin_src emacs-lisp
 
   (use-package helm-catkin)
@@ -2068,6 +2143,9 @@ gazebo simulation files:
 * learning by repetition
 
 ** pamparam
+:PROPERTIES:
+:header-args: :tangle nil
+:END:
 
 #+begin_src emacs-lisp
 
@@ -2110,6 +2188,15 @@ code navigation:
 
 ** TODO autoinsert
 
+** autopair
+
+#+begin_src emacs-lisp
+
+  (use-package autopair)
+  (add-hook 'python-mode-hook #'autopair-mode)
+#+end_src
+
+
 ** lisp-general
 
 #+begin_src emacs-lisp
@@ -2139,7 +2226,29 @@ code navigation:
 
 ** C/C++
 
+*** line number
+
+#+begin_src emacs-lisp
+
+(add-hook 'c-mode-hook #'linum-mode)
+(add-hook 'c++-mode-hook #'linum-mode)
+#+end_src
+
+*** ccls
+
+#+begin_src emacs-lisp :tangle nil
+
+  (use-package ccls
+    :config
+    (progn
+      (setq ccls-executable "/usr/local/bin/ccls")
+      ))
+#+end_src
+
 *** irony
+:PROPERTIES:
+:header-args: :tangle nil
+:END:
 
 #+begin_src emacs-lisp
 
@@ -2151,9 +2260,9 @@ code navigation:
 
   (defun my-irony-mode-hook ()
     (define-key irony-mode-map [remap completion-at-point]
-      'irony-completion-at-point-async)
+      'counsel-irony)
     (define-key irony-mode-map [remap complete-symbol]
-      'irony-completion-at-point-async))
+      'counsel-irony))
 
   (add-hook 'irony-mode-hook 'my-irony-mode-hook)
 
@@ -2194,6 +2303,24 @@ code navigation:
 #+end_src
 
 [[https://github.com/Andersbakken/rtags/wiki/Usage][wiki]]
+
+**** navigation
+
+#+begin_src emacs-lisp
+
+(defun ciao-goto-symbol ()
+  (interactive)
+  (deactivate-mark)
+  (ring-insert find-tag-marker-ring (point-marker))
+  (or (and (require 'rtags nil t)
+           (rtags-find-symbol-at-point))
+      (and (require 'semantic/ia)
+           (condition-case nil
+               (semantic-ia-fast-jump (point))
+             (error nil)))))
+(define-key c++-mode-map (kbd "M-.") 'ciao-goto-symbol)
+(define-key c++-mode-map (kbd "M-,") 'pop-tag-mark)
+#+end_src
 
 **** helm integration
 
@@ -2294,6 +2421,16 @@ code navigation:
     )
 
 
+#+end_src
+
+** clojure
+
+I don't actually write clojure but =lispy= tells me to have =cider=
+installed (for overlay display of eval results...)
+
+#+begin_src emacs-lisp
+
+  (use-package cider)
 #+end_src
 
 ** TODO format on save:
