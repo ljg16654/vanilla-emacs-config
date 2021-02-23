@@ -565,7 +565,7 @@ window managers.
 
 #+begin_src emacs-lisp
 
-  (setq display-buffer-alistqqqqqqqqqqqq2q22q2q22
+  (setq display-buffer-alist
         '(
           ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
            (display-buffer-in-side-window)
@@ -1210,6 +1210,10 @@ https://orgmode.org/worg/exporters/beamer/tutorial.html
 
   (setq org-confirm-babel-evaluate nil)
   (setq org-src-window-setup 'current-window)
+
+  ;; display/update images in the buffer after I evaluate
+  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+
 #+end_src
 
 #+RESULTS:
@@ -1219,24 +1223,26 @@ https://orgmode.org/worg/exporters/beamer/tutorial.html
 
 Include languages: 
 #+begin_src emacs-lisp
+  (use-package ob-ipython)
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((python . t)
-   (emacs-lisp . t)
-   (gnuplot . t)
-   (shell . t)
-   (java . t)
-   (C . t)
-   (clojure . t)
-   (js . t)
-   (ditaa . t)
-   (dot . t)
-   (org . t)
-   (latex . t)
-   (haskell . t)
-   (ditaa . t)
-   ))
+     (emacs-lisp . t)
+     (gnuplot . t)
+     (shell . t)
+     (java . t)
+     (C . t)
+     (clojure . t)
+     (js . t)
+     (ditaa . t)
+     (dot . t)
+     (org . t)
+     (latex . t)
+     (haskell . t)
+     (ditaa . t)
+     (ipython . t) 			;; provided by package ob-ipython
+     ))
 
 #+end_src
 
@@ -1252,6 +1258,13 @@ the default settings calls python2.7).
 
 import sys
 print(sys.version)
+#+end_src
+
+use the python lexer for ipython blocks:
+
+#+begin_src emacs-lisp
+
+(add-to-list 'org-latex-minted-langs '(ipython "python"))
 #+end_src
 
 ** latex
@@ -1570,6 +1583,12 @@ have
 #+begin_src emacs-lisp
 
   (add-hook 'kill-emacs-hook #'bookmark-save)
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (global-set-key (kbd "H-j") #'jump-to-register)
 
 #+end_src
 
@@ -2078,6 +2097,8 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
               "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
   ))
 #+end_src
+
+** diminish
 
 #+begin_src emacs-lisp
 
