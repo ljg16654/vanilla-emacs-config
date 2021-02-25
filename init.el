@@ -57,6 +57,9 @@
 (use-package evil-matchit)
 (global-evil-matchit-mode)
 
+(use-package evil-exchange)
+(evil-exchange-install)
+
 (global-set-key (kbd "H-e") #'evil-mode)
 (evil-escape-mode)
 
