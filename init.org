@@ -85,16 +85,35 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 ** evil
 
 #+begin_src emacs-lisp
+  ;; variables that must be set before Evil is loaded:
+  (setq evil-respect-visual-line-mode t)
 
-  (use-package evil)
-  (use-package evil-escape
+  (use-package evil
     :config
     (progn
-      (setq-default evil-escape-key-sequence "jk")
-      ))
+      (setq
+       evil-want-C-d-scroll nil
+       evil-want-C-u-delete nil
+       evil-want-Y-yank-to-eol t
+       evil-regexp-search t
+       evil-auto-indent t
+       evil-cross-lines t
+       evil-insert-state-cursor 'hbar
+       )
+      (evil-mode +1)
+      )
+    (use-package evil-escape
+      :config
+      (progn
+        (setq-default evil-escape-key-sequence "jk")))
 
-  (global-set-key (kbd "H-e") #'evil-mode)
-  (add-hook 'evil-mode-hook #'evil-escape-mode)
+    (global-set-key (kbd "H-e") #'evil-mode)
+    (add-hook 'evil-mode-hook #'evil-escape-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+
+  (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
 #+end_src
 
 ** hydra
@@ -407,7 +426,7 @@ correct, completion is triggered.
 
 #+begin_src emacs-lisp
 
-  (set-face-attribute 'default nil :font "iosevka" :height 135)
+  (set-face-attribute 'default nil :family "FiraCode" :height 135)
 #+end_src
 
 [[https://protesilaos.com/modus-themes/][modus-theme manual]]
@@ -646,7 +665,6 @@ window managers.
 
 
 
-
 *** window-layout history
 
 Waiting for confirmation before tangling.
@@ -799,7 +817,6 @@ https://www.reddit.com/r/emacs/comments/bhj7tu/tabbar_with_projectile_grouping/
              "vterm-mode"
              "helm-mode"
              "dired-mode"))
-      (golden-ratio-mode nil)
       ))
 
 #+end_src
@@ -1277,7 +1294,9 @@ use the python lexer for ipython blocks:
 
 #+begin_src emacs-lisp
 
-(add-to-list 'org-latex-minted-langs '(ipython "python"))
+  (unless (boundp 'org-latex-minted-langs)
+          (setq org-latex-minted-langs nil))
+  (add-to-list 'org-latex-minted-langs '(ipython "python"))
 #+end_src
 
 *** keymap
@@ -1285,6 +1304,8 @@ use the python lexer for ipython blocks:
 [[https://kitchingroup.cheme.cmu.edu/blog/2017/06/10/Adding-keymaps-to-src-blocks-via-org-font-lock-hook/][use src-block major-mode keymap inside src block]]
 
 #+begin_src emacs-lisp
+  (use-package elpy)
+  (use-package lispy)
 
   (setq scimax-src-block-keymaps
         `(("ipython" . ,(let ((map (make-composed-keymap
@@ -1352,8 +1373,8 @@ use the python lexer for ipython blocks:
       (cursor-sensor-mode -1))
     (font-lock-fontify-buffer))
 
-  (add-hook 'org-mode-hook (lambda ()
-                             (scimax-src-keymap-mode +1)))
+  ;; (add-hook 'org-mode-hook (lambda ()
+  ;;                             (scimax-src-keymap-mode +1)))
 
 #+end_src
 

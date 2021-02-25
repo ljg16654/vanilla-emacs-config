@@ -23,15 +23,32 @@
 
 (use-package general)
 
-(use-package evil)
-(use-package evil-escape
+;; variables that must be set before Evil is loaded:
+(setq evil-respect-visual-line-mode t)
+
+(use-package evil
   :config
   (progn
-    (setq-default evil-escape-key-sequence "jk")
-    ))
+    (setq
+     evil-want-C-d-scroll nil
+     evil-want-C-u-delete nil
+     evil-want-Y-yank-to-eol t
+     evil-regexp-search t
+     evil-auto-indent t
+     evil-cross-lines t
+     evil-insert-state-cursor 'hbar
+     )
+    (evil-mode +1)
+    )
+  (use-package evil-escape
+    :config
+    (progn
+      (setq-default evil-escape-key-sequence "jk")))
 
-(global-set-key (kbd "H-e") #'evil-mode)
-(add-hook 'evil-mode-hook #'evil-escape-mode)
+  (global-set-key (kbd "H-e") #'evil-mode)
+  (add-hook 'evil-mode-hook #'evil-escape-mode)
+
+(evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
 
 (use-package hydra)
 (global-set-key (kbd "C-c h") #'hydra-pause-resume)
@@ -199,7 +216,7 @@
 (use-package dash)
 (use-package f)
 
-(set-face-attribute 'default nil :font "iosevka" :height 135)
+(set-face-attribute 'default nil :family "FiraCode" :height 135)
 
 (use-package anti-zenburn-theme
   :defer t)
@@ -434,7 +451,6 @@ buffer's window as well."
            "vterm-mode"
            "helm-mode"
            "dired-mode"))
-    (golden-ratio-mode nil)
     ))
 
 (use-package avy)
@@ -693,7 +709,12 @@ buffer's window as well."
 
 (setq org-babel-python-command "python3")
 
+(unless (boundp 'org-latex-minted-langs)
+        (setq org-latex-minted-langs nil))
 (add-to-list 'org-latex-minted-langs '(ipython "python"))
+
+(use-package elpy)
+(use-package lispy)
 
 (setq scimax-src-block-keymaps
       `(("ipython" . ,(let ((map (make-composed-keymap
@@ -761,8 +782,8 @@ It is for commands that depend on the major mode. One example is
     (cursor-sensor-mode -1))
   (font-lock-fontify-buffer))
 
-(add-hook 'org-mode-hook (lambda ()
-                           (scimax-src-keymap-mode +1)))
+;; (add-hook 'org-mode-hook (lambda ()
+;;                             (scimax-src-keymap-mode +1)))
 
 (use-package auctex
   :defer t)
