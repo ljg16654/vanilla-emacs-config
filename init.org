@@ -87,6 +87,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 #+begin_src emacs-lisp
   ;; variables that must be set before Evil is loaded:
   (setq evil-respect-visual-line-mode t)
+  (setq evil-want-keybinding nil)
 
   (use-package evil
     :config
@@ -114,6 +115,11 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 #+begin_src emacs-lisp
 
   (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package evil-collection)
+  (evil-collection-init)
 #+end_src
 
 ** hydra
@@ -843,6 +849,8 @@ In buffer or across buffers.
   (use-package magit
     :bind (("C-c g" . magit))
   )
+
+  (evil-define-key 'normal 'global (kbd "SPC g") #'magit)
 #+end_src
 
 ** projectile

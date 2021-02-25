@@ -25,6 +25,7 @@
 
 ;; variables that must be set before Evil is loaded:
 (setq evil-respect-visual-line-mode t)
+(setq evil-want-keybinding nil)
 
 (use-package evil
   :config
@@ -49,6 +50,9 @@
   (add-hook 'evil-mode-hook #'evil-escape-mode)
 
 (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
+
+(use-package evil-collection)
+(evil-collection-init)
 
 (use-package hydra)
 (global-set-key (kbd "C-c h") #'hydra-pause-resume)
@@ -461,6 +465,8 @@ buffer's window as well."
 (use-package magit
   :bind (("C-c g" . magit))
 )
+
+(evil-define-key 'normal 'global (kbd "SPC g") #'magit)
 
 (use-package projectile)
 (projectile-mode +1)
