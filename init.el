@@ -40,16 +40,30 @@
      evil-insert-state-cursor 'hbar
      )
     (evil-mode +1)
-    )
-  (use-package evil-escape
+    ))
+
+(use-package evil-escape
     :config
     (progn
       (setq-default evil-escape-key-sequence "jk")))
 
-  (global-set-key (kbd "H-e") #'evil-mode)
-  (add-hook 'evil-mode-hook #'evil-escape-mode)
+(use-package evil-snipe
+            :config
+            (progn
+              (setq evil-snipe-spillover-scope 'whole-buffer)
+              (evil-snipe-mode +1)
+              (evil-snipe-override-mode +1)))
+
+(use-package evil-matchit)
+(global-evil-matchit-mode)
+
+(global-set-key (kbd "H-e") #'evil-mode)
+(evil-escape-mode)
 
 (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
+(evil-define-key 'normal 'global (kbd "J") #'tab-bar-switch-to-next-tab)
+(evil-define-key 'normal 'global (kbd "K") #'tab-bar-switch-to-prev-tab)
+(evil-define-key '(insert normal) 'global (kbd "C-e") #'end-of-line)
 
 (use-package evil-collection)
 (evil-collection-init)
@@ -221,6 +235,7 @@
 (use-package f)
 
 (set-face-attribute 'default nil :family "FiraCode" :height 135)
+(setq line-spacing 0.2)
 
 (use-package anti-zenburn-theme
   :defer t)
@@ -1241,8 +1256,9 @@ It is for commands that depend on the major mode. One example is
 (add-hook 'python-mode-hook #'autopair-mode)
 
 (use-package lispy)
-(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
-(add-hook 'racket-mode-hook (lambda () (lispy-mode 1)))
+(use-package evil-lispy)
+(add-hook 'emacs-lisp-mode-hook (lambda () (evil-lispy-mode 1)))
+(add-hook 'racket-mode-hook (lambda () (evil-lispy-mode 1)))
 
 (use-package paren-face)
 (add-hook 'emacs-lisp-mode-hook (lambda () (paren-face-mode 1)))
