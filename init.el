@@ -94,6 +94,9 @@
   ("o" #'(lambda () (interactive)
            (dired org-directory))
    "org")
+  ("l" #'(lambda () (interactive)
+           (find-file "~/org/reading-list.org")
+           "reading list"))
   ("y" #'(lambda () (interactive)
            (dired (concat user-emacs-directory "snippet/"))
            "snippets")))
@@ -257,6 +260,9 @@
 (use-package weyland-yutani-theme)
 
 (load-theme 'apropospriate-light t)
+
+(setq linum-format " %d  ")
+(add-hook 'python-mode-hook #'linum-mode)
 
 (use-package rg
   :config
@@ -1270,6 +1276,21 @@ It is for commands that depend on the major mode. One example is
 
 (use-package cmake-mode)
 
+(use-package elpy)
+;; (elpy-enable)
+(use-package jedi)
+
+(defhydra python-move-defun (python-mode-map "C-c n")
+  "python mode movement"
+  ("a" #'beginning-of-defun "beginning of defun")
+  ("e" #'python-nav-end-of-defun "end of defun")
+  ("p" #'python-nav-backward-defun "prev defun")
+  ("n" #'python-nav-forward-defun "next defun")
+  ("b" #'python-nav-backward-sexp "prev sexp")
+  ("f" #'python-nav-forward-sexp "next sexp")
+  ("k" #'python-nav-backward-block "prev block")
+  ("j" #'python-nav-forward-block "next block"))
+
 (add-hook 'c-mode-hook #'linum-mode)
 (add-hook 'c++-mode-hook #'linum-mode)
 
@@ -1325,21 +1346,6 @@ It is for commands that depend on the major mode. One example is
 
 (use-package cmake-ide)
 (cmake-ide-setup)
-
-(use-package elpy)
-;; (elpy-enable)
-
-(defhydra python-move-defun (python-mode-map "C-c n")
-  "python mode movement"
-  ("a" #'beginning-of-defun "beginning of defun")
-  ("e" #'python-nav-end-of-defun "end of defun")
-  ("p" #'python-nav-backward-defun "prev defun")
-  ("n" #'python-nav-forward-defun "next defun")
-  ("b" #'python-nav-backward-sexp "prev sexp")
-  ("f" #'python-nav-forward-sexp "next sexp")
-  ("k" #'python-nav-backward-block "prev block")
-  ("j" #'python-nav-forward-block "next block")
-  )
 
 (use-package cider)
 

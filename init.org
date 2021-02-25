@@ -173,6 +173,9 @@ A minimalistic example:
     ("o" #'(lambda () (interactive)
              (dired org-directory))
      "org")
+    ("l" #'(lambda () (interactive)
+             (find-file "~/org/reading-list.org")
+             "reading list"))
     ("y" #'(lambda () (interactive)
              (dired (concat user-emacs-directory "snippet/"))
              "snippets")))
@@ -474,6 +477,14 @@ correct, completion is triggered.
     (use-package weyland-yutani-theme)
 
     (load-theme 'apropospriate-light t)
+#+end_src
+
+* linum
+
+#+begin_src emacs-lisp
+
+  (setq linum-format " %d  ")
+  (add-hook 'python-mode-hook #'linum-mode)
 #+end_src
 
 * search/replace
@@ -2382,6 +2393,27 @@ code navigation:
   (use-package cmake-mode)
 #+end_src
 
+** python
+
+#+begin_src emacs-lisp
+
+  (use-package elpy)
+  ;; (elpy-enable)
+  (use-package jedi)
+
+  (defhydra python-move-defun (python-mode-map "C-c n")
+    "python mode movement"
+    ("a" #'beginning-of-defun "beginning of defun")
+    ("e" #'python-nav-end-of-defun "end of defun")
+    ("p" #'python-nav-backward-defun "prev defun")
+    ("n" #'python-nav-forward-defun "next defun")
+    ("b" #'python-nav-backward-sexp "prev sexp")
+    ("f" #'python-nav-forward-sexp "next sexp")
+    ("k" #'python-nav-backward-block "prev block")
+    ("j" #'python-nav-forward-block "next block"))
+
+#+end_src
+
 ** C/C++
 
 *** line number
@@ -2560,28 +2592,6 @@ code navigation:
    '(lambda ()(interactive) (gud-gdb (concat "gdb --fullname " (cppcm-get-exe-path-current-buffer)))))
   ;; OPTIONAL, some users need specify extra flags forwarded to compiler
   (setq cppcm-extra-preprocss-flags-from-user '("-I/usr/src/linux/include" "-DNDEBUG"))
-#+end_src
-
-** python
-
-#+begin_src emacs-lisp
-
-  (use-package elpy)
-  ;; (elpy-enable)
-
-  (defhydra python-move-defun (python-mode-map "C-c n")
-    "python mode movement"
-    ("a" #'beginning-of-defun "beginning of defun")
-    ("e" #'python-nav-end-of-defun "end of defun")
-    ("p" #'python-nav-backward-defun "prev defun")
-    ("n" #'python-nav-forward-defun "next defun")
-    ("b" #'python-nav-backward-sexp "prev sexp")
-    ("f" #'python-nav-forward-sexp "next sexp")
-    ("k" #'python-nav-backward-block "prev block")
-    ("j" #'python-nav-forward-block "next block")
-    )
-
-
 #+end_src
 
 ** clojure
