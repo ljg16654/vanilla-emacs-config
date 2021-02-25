@@ -262,7 +262,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
       (delete-other-windows)))
   :bind ("C-c s" . prot/window-single-toggle))
 
-(setq display-buffer-alistqqqqqqqqqqqq2q22q2q22
+(setq display-buffer-alist
       '(
         ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
          (display-buffer-in-side-window)
@@ -667,25 +667,102 @@ buffer's window as well."
 (setq org-confirm-babel-evaluate nil)
 (setq org-src-window-setup 'current-window)
 
+;; display/update images in the buffer after I evaluate
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+
+(use-package ob-ipython)
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
- (emacs-lisp . t)
- (gnuplot . t)
- (shell . t)
- (java . t)
- (C . t)
- (clojure . t)
- (js . t)
- (ditaa . t)
- (dot . t)
- (org . t)
- (latex . t)
- (haskell . t)
- (ditaa . t)
- ))
+   (emacs-lisp . t)
+   (gnuplot . t)
+   (shell . t)
+   (java . t)
+   (C . t)
+   (clojure . t)
+   (js . t)
+   (ditaa . t)
+   (dot . t)
+   (org . t)
+   (latex . t)
+   (haskell . t)
+   (ditaa . t)
+   (ipython . t) 			;; provided by package ob-ipython
+   ))
 
 (setq org-babel-python-command "python3")
+
+(add-to-list 'org-latex-minted-langs '(ipython "python"))
+
+(setq scimax-src-block-keymaps
+      `(("ipython" . ,(let ((map (make-composed-keymap
+                                  `(,elpy-mode-map ,python-mode-map ,pyvenv-mode-map)
+                                  org-mode-map)))
+                        ;; In org-mode I define RET so we f
+                        (define-key map (kbd "<return>") 'newline)
+                        (define-key map (kbd "C-c C-c") 'org-ctrl-c-ctrl-c)
+                        map))
+        ("python" . ,(let ((map (make-composed-keymap
+                                 `(,elpy-mode-map ,python-mode-map ,pyvenv-mode-map)
+                                 org-mode-map)))
+                       ;; In org-mode I define RET so we f
+                       (define-key map (kbd "<return>") 'newline)
+                       (define-key map (kbd "C-c C-c") 'org-ctrl-c-ctrl-c)
+                       map))
+        ("emacs-lisp" . ,(let ((map (make-composed-keymap `(,lispy-mode-map
+                                                            ,emacs-lisp-mode-map
+                                                            ,outline-minor-mode-map)
+                                                          org-mode-map)))
+                           (define-key map (kbd "C-c C-c") 'org-ctrl-c-ctrl-c)
+                           map))))
+
+(defun scimax-add-keymap-to-src-blocks (limit)
+  "Add keymaps to src-blocks defined in `scimax-src-block-keymaps'."
+  (let ((case-fold-search t)
+        lang)
+    (while (re-search-forward org-babel-src-block-regexp limit t)
+      (let ((lang (match-string 2))
+            (beg (match-beginning 0))
+            (end (match-end 0)))
+        (if (assoc (org-no-properties lang) scimax-src-block-keymaps)
+            (progn
+              (add-text-properties
+               beg end `(local-map ,(cdr (assoc
+                                          (org-no-properties lang)
+                                          scimax-src-block-keymaps))))
+              (add-text-properties
+               beg end `(cursor-sensor-functions
+                         ((lambda (win prev-pos sym)
+                            ;; This simulates a mouse click and makes a menu change
+                            (org-mouse-down-mouse nil)))))))))))
+
+(defun scimax-spoof-mode (orig-func &rest args)
+  "Advice function to spoof commands in org-mode src blocks.
+It is for commands that depend on the major mode. One example is
+`lispy--eval'."
+  (if (org-in-src-block-p)
+      (let ((major-mode (intern (format "%s-mode" (first (org-babel-get-src-block-info))))))
+        (apply orig-func args))
+    (apply orig-func args)))
+
+(define-minor-mode scimax-src-keymap-mode
+  "Minor mode to add mode keymaps to src-blocks."
+  :init-value nil
+  (if scimax-src-keymap-mode
+      (progn
+        (add-hook 'org-font-lock-hook #'scimax-add-keymap-to-src-blocks t)
+        (add-to-list 'font-lock-extra-managed-props 'local-map)
+        (add-to-list 'font-lock-extra-managed-props 'cursor-sensor-functions)
+        (advice-add 'lispy--eval :around 'scimax-spoof-mode)
+        (cursor-sensor-mode +1))
+    (remove-hook 'org-font-lock-hook #'scimax-add-keymap-to-src-blocks)
+    (advice-remove 'lispy--eval 'scimax-spoof-mode)
+    (cursor-sensor-mode -1))
+  (font-lock-fontify-buffer))
+
+(add-hook 'org-mode-hook (lambda ()
+                           (scimax-src-keymap-mode +1)))
 
 (use-package auctex
   :defer t)
@@ -879,6 +956,8 @@ buffer's window as well."
        ))
 
 (add-hook 'kill-emacs-hook #'bookmark-save)
+
+(global-set-key (kbd "H-j") #'jump-to-register)
 
 (use-package helm-mode-manager
   :after helm)
@@ -1200,6 +1279,9 @@ buffer's window as well."
 
 (use-package cmake-ide)
 (cmake-ide-setup)
+
+(use-package elpy)
+;; (elpy-enable)
 
 (defhydra python-move-defun (python-mode-map "C-c n")
   "python mode movement"
