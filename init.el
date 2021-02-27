@@ -76,6 +76,7 @@
 (define-key evil-motion-state-map "H" 'evil-backward-arg)
 
 (global-set-key (kbd "H-e") #'evil-mode)
+(global-set-key (kbd "H-x") #'helm-M-x)
 (evil-escape-mode)
 
 (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
@@ -134,6 +135,15 @@
 
 (helm-autoresize-mode)
 (setq helm-autoresize-max-height 40)
+
+(use-package helm-posframe
+  :config
+  (progn
+    (setq helm-posframe-parameters
+          '((left-fringe . 10)
+            (right-fringe . 10)))
+    ;; (helm-posframe-enable)
+    ))
 
 (use-package ace-jump-helm-line)
 (eval-after-load "helm"
@@ -275,7 +285,9 @@
 
 (use-package weyland-yutani-theme)
 
-(load-theme 'apropospriate-light t)
+(use-package doom-themes)
+
+(load-theme 'doom-city-lights t)
 
 (setq linum-format " %d  ")
 (add-hook 'python-mode-hook #'linum-mode)
@@ -1251,7 +1263,7 @@ It is for commands that depend on the major mode. One example is
 (diminish 'projectile-mode)
 (diminish 'helm-mode)
 (diminish 'auto-fill-function "AuF")
-(diminish 'snipe)
+(diminish 'evil-snipe-mode)
 
 (use-package doom-modeline
   ;; :init (doom-modeline-mode 1)

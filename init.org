@@ -138,6 +138,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
   (define-key evil-motion-state-map "H" 'evil-backward-arg)
 
   (global-set-key (kbd "H-e") #'evil-mode)
+  (global-set-key (kbd "H-x") #'helm-M-x)
   (evil-escape-mode)
 #+end_src
 
@@ -236,6 +237,22 @@ A minimalistic example:
   (setq helm-autoresize-max-height 40)
 
 #+end_src
+
+posframe:
+
+#+begin_src emacs-lisp
+
+  (use-package helm-posframe
+    :config
+    (progn
+      (setq helm-posframe-parameters
+            '((left-fringe . 10)
+              (right-fringe . 10)))
+      ;; (helm-posframe-enable)
+      ))
+  
+#+end_src
+
 
 *** speed up candidate selection
 
@@ -476,23 +493,25 @@ correct, completion is triggered.
 
 #+begin_src emacs-lisp
 
-    (use-package anti-zenburn-theme
-      :defer t)
+  (use-package anti-zenburn-theme
+    :defer t)
 
-    (use-package solarized-theme
-      :defer t
-      :config
-      (progn
-        (setq solarized-use-variable-pitch nil)))
+  (use-package solarized-theme
+    :defer t
+    :config
+    (progn
+      (setq solarized-use-variable-pitch nil)))
 
-    (use-package spacemacs-theme
-      :defer t)
+  (use-package spacemacs-theme
+    :defer t)
 
-    (use-package apropospriate-theme)
+  (use-package apropospriate-theme)
 
-    (use-package weyland-yutani-theme)
+  (use-package weyland-yutani-theme)
 
-    (load-theme 'apropospriate-light t)
+  (use-package doom-themes)
+
+  (load-theme 'doom-city-lights t)
 #+end_src
 
 * linum
@@ -2280,7 +2299,7 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
   (diminish 'projectile-mode)
   (diminish 'helm-mode)
   (diminish 'auto-fill-function "AuF")
-  (diminish 'snipe)
+  (diminish 'evil-snipe-mode)
 #+end_src
 
 ** doom modeline
