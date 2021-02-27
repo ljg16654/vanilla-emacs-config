@@ -60,12 +60,28 @@
 (use-package evil-exchange)
 (evil-exchange-install)
 
+(use-package evil-surround
+  :config
+  (progn (global-evil-surround-mode 1)))
+
+(use-package evil-args)
+;; bind evil-args text objects
+(define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
+(define-key evil-outer-text-objects-map "a" 'evil-outer-arg)
+
+;; bind evil-forward/backward-args
+(define-key evil-normal-state-map "L" 'evil-forward-arg)
+(define-key evil-normal-state-map "H" 'evil-backward-arg)
+(define-key evil-motion-state-map "L" 'evil-forward-arg)
+(define-key evil-motion-state-map "H" 'evil-backward-arg)
+
 (global-set-key (kbd "H-e") #'evil-mode)
 (evil-escape-mode)
 
 (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
 (evil-define-key 'normal 'global (kbd "J") #'tab-bar-switch-to-next-tab)
 (evil-define-key 'normal 'global (kbd "K") #'tab-bar-switch-to-prev-tab)
+(evil-define-key 'normal 'global (kbd "SPC x") #'helm-M-x)
 (evil-define-key '(insert normal) 'global (kbd "C-e") #'end-of-line)
 
 (use-package evil-collection)
@@ -990,7 +1006,7 @@ It is for commands that depend on the major mode. One example is
       '(("lambda"  . ?λ)))
 
   (add-hook 'lisp-mode-hook #'(lambda () (interactive)
-			       (prettify-symbols-mode +1)))
+                               (prettify-symbols-mode +1)))
 
 
 (setq python-prettify-symbols-alist
@@ -1005,6 +1021,8 @@ It is for commands that depend on the major mode. One example is
        '("_1" . ?₁)
        '("_2" . ?₂)
        ))
+
+(add-hook 'python-mode-hook #'prettify-symbols-mode)
 
 (add-hook 'kill-emacs-hook #'bookmark-save)
 
@@ -1233,6 +1251,7 @@ It is for commands that depend on the major mode. One example is
 (diminish 'projectile-mode)
 (diminish 'helm-mode)
 (diminish 'auto-fill-function "AuF")
+(diminish 'snipe)
 
 (use-package doom-modeline
   ;; :init (doom-modeline-mode 1)
