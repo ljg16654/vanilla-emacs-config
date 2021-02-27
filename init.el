@@ -43,16 +43,16 @@
     ))
 
 (use-package evil-escape
-    :config
-    (progn
-      (setq-default evil-escape-key-sequence "jk")))
+  :config
+  (progn
+    (setq-default evil-escape-key-sequence "jk")))
 
 (use-package evil-snipe
-            :config
-            (progn
-              (setq evil-snipe-spillover-scope 'whole-buffer)
-              (evil-snipe-mode +1)
-              (evil-snipe-override-mode +1)))
+  :config
+  (progn
+    (setq evil-snipe-spillover-scope 'whole-buffer)
+    (evil-snipe-mode +1)
+    (evil-snipe-override-mode +1)))
 
 (use-package evil-matchit)
 (global-evil-matchit-mode)
@@ -147,76 +147,76 @@
 
 (use-package ace-jump-helm-line)
 (eval-after-load "helm"
-'(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
+  '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
 (use-package s)
 
 (cl-macrolet
-      ((make-splitter-fn (name open-fn split-fn)
-			 `(defun ,name (_candidate)
-			    ;; Display buffers in new windows
-			    (dolist (cand (helm-marked-candidates))
-			      (select-window (,split-fn))
-			      (,open-fn cand))
-			    ;; Adjust size of windows
-			    (balance-windows)))
-       (generate-helm-splitter-funcs
-	(op-type open-fn)
-	(let* ((prefix (s-concat "helm-" op-type "-switch-"))
-	       (vert-split (intern (s-concat prefix "vert-window")))
-	       (horiz-split (intern (s-concat prefix "horiz-window"))))
-	  `(progn
-	     (make-splitter-fn ,vert-split ,open-fn split-window-right)
+    ((make-splitter-fn (name open-fn split-fn)
+		       `(defun ,name (_candidate)
+			  ;; Display buffers in new windows
+			  (dolist (cand (helm-marked-candidates))
+			    (select-window (,split-fn))
+			    (,open-fn cand))
+			  ;; Adjust size of windows
+			  (balance-windows)))
+     (generate-helm-splitter-funcs
+      (op-type open-fn)
+      (let* ((prefix (s-concat "helm-" op-type "-switch-"))
+	     (vert-split (intern (s-concat prefix "vert-window")))
+	     (horiz-split (intern (s-concat prefix "horiz-window"))))
+	`(progn
+	   (make-splitter-fn ,vert-split ,open-fn split-window-right)
 
-	     (make-splitter-fn ,horiz-split ,open-fn split-window-below)
+	   (make-splitter-fn ,horiz-split ,open-fn split-window-below)
 
-	     (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
-		 ()
-	       (interactive)
-	       (with-helm-alive-p
-		 (helm-exit-and-execute-action (quote ,vert-split))))
+	   (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
+	       ()
+	     (interactive)
+	     (with-helm-alive-p
+	       (helm-exit-and-execute-action (quote ,vert-split))))
 
-	     (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
-		 ()
-	       (interactive)
-	       (with-helm-alive-p
-		 (helm-exit-and-execute-action (quote ,horiz-split))))))))
-    (generate-helm-splitter-funcs "buffer" switch-to-buffer)
-    (generate-helm-splitter-funcs "file" find-file))
+	   (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
+	       ()
+	     (interactive)
+	     (with-helm-alive-p
+	       (helm-exit-and-execute-action (quote ,horiz-split))))))))
+  (generate-helm-splitter-funcs "buffer" switch-to-buffer)
+  (generate-helm-splitter-funcs "file" find-file))
 
 ;; install the actions for helm-find-files after that source is
-    ;; inited, which fortunately has a hook
-    (add-hook
-     'helm-find-files-after-init-hook
-     (lambda ()
-       (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
-                                  #'helm-file-switch-vert-window
-                                  helm-source-find-files)
-       (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
-                                  #'helm-file-switch-horiz-window
-                                  helm-source-find-files)))
+;; inited, which fortunately has a hook
+(add-hook
+ 'helm-find-files-after-init-hook
+ (lambda ()
+   (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
+                              #'helm-file-switch-vert-window
+                              helm-source-find-files)
+   (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
+                              #'helm-file-switch-horiz-window
+                              helm-source-find-files)))
 
-    ;; ditto for helm-projectile; that defines the source when loaded, so we can
-    ;; just eval-after-load
-    (with-eval-after-load "helm-projectile"
-      (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
-                                 #'helm-file-switch-vert-window
-                                 helm-source-projectile-files-list)
-      (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
-                                 #'helm-file-switch-horiz-window
-                                 helm-source-projectile-files-list))
+;; ditto for helm-projectile; that defines the source when loaded, so we can
+;; just eval-after-load
+(with-eval-after-load "helm-projectile"
+  (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
+                             #'helm-file-switch-vert-window
+                             helm-source-projectile-files-list)
+  (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
+                             #'helm-file-switch-horiz-window
+                             helm-source-projectile-files-list))
 
-    ;; ...but helm-buffers defines the source by calling an init function, but doesn't
-    ;; have a hook, so we use advice to add the actions after that init function
-    ;; is called
-    (defun cogent/add-helm-buffer-actions (&rest _args)
-      (helm-add-action-to-source "Display buffer(s) in new vertical split(s) `C-v'"
-                                 #'helm-buffer-switch-vert-window
-                                 helm-source-buffers-list)
-      (helm-add-action-to-source "Display buffer(s) in new horizontal split(s) `C-s'"
-                                 #'helm-buffer-switch-horiz-window
-                                 helm-source-buffers-list))
-    (advice-add 'helm-buffers-list--init :after #'cogent/add-helm-buffer-actions)
+;; ...but helm-buffers defines the source by calling an init function, but doesn't
+;; have a hook, so we use advice to add the actions after that init function
+;; is called
+(defun cogent/add-helm-buffer-actions (&rest _args)
+  (helm-add-action-to-source "Display buffer(s) in new vertical split(s) `C-v'"
+                             #'helm-buffer-switch-vert-window
+                             helm-source-buffers-list)
+  (helm-add-action-to-source "Display buffer(s) in new horizontal split(s) `C-s'"
+                             #'helm-buffer-switch-horiz-window
+                             helm-source-buffers-list))
+(advice-add 'helm-buffers-list--init :after #'cogent/add-helm-buffer-actions)
 
 (general-define-key
  :keymaps 'helm-buffer-map
@@ -440,19 +440,19 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
           (tab-bar--tabs-recent)))
 
 (defun prot-tab-select-tab-dwim ()
-    "Do-What-I-Mean function for getting to a `tab-bar' tab.
+  "Do-What-I-Mean function for getting to a `tab-bar' tab.
 If no other tab exists, create one and switch to it.  If there is
 one other tab (so two in total) switch to it without further
 questions.  Else use completion to select the tab to switch to."
-    (interactive)
-    (let ((tabs (prot-tab--tab-bar-tabs)))
-      (cond ((eq tabs nil)
-             (tab-new))
-            ((eq (length tabs) 1)
-             (tab-next))
-            (t
-             (tab-bar-switch-to-tab
-              (completing-read "Select tab: " tabs nil t))))))
+  (interactive)
+  (let ((tabs (prot-tab--tab-bar-tabs)))
+    (cond ((eq tabs nil)
+           (tab-new))
+          ((eq (length tabs) 1)
+           (tab-next))
+          (t
+           (tab-bar-switch-to-tab
+            (completing-read "Select tab: " tabs nil t))))))
 
 (defun prot-tab-tab-bar-toggle ()
   "Toggle `tab-bar' presentation."
@@ -516,7 +516,7 @@ buffer's window as well."
 
 (use-package magit
   :bind (("C-c g" . magit))
-)
+  )
 
 (evil-define-key 'normal 'global (kbd "SPC g") #'magit)
 
@@ -538,10 +538,10 @@ buffer's window as well."
   :config
   (progn
     (add-hook 'ibuffer-hook
-    (lambda ()
-      (ibuffer-projectile-set-filter-groups)
-      (unless (eq ibuffer-sorting-mode 'alphabetic)
-        (ibuffer-do-sort-by-alphabetic))))))
+	      (lambda ()
+		(ibuffer-projectile-set-filter-groups)
+		(unless (eq ibuffer-sorting-mode 'alphabetic)
+		  (ibuffer-do-sort-by-alphabetic))))))
 
 (use-package org-projectile
   :after (org projectile)
@@ -600,10 +600,10 @@ buffer's window as well."
 
 (use-package dired-filter
   :bind
-    (:map dired-mode-map
-    ("/" . dired-filter-mark-map)
-    )
-)
+  (:map dired-mode-map
+	("/" . dired-filter-mark-map)
+	)
+  )
 
 (require 'general)
 
@@ -642,10 +642,10 @@ buffer's window as well."
 (add-hook 'org-mode-hook #'org-indent-mode)
 
 (setq +personal-org-roam-files+ (apply (function append)
-                                (mapcar
-                                 (lambda (directory)
-                                        (directory-files-recursively directory org-agenda-file-regexp))
-                                    '("~/org-roam/"))))
+                                       (mapcar
+					(lambda (directory)
+                                          (directory-files-recursively directory org-agenda-file-regexp))
+					'("~/org-roam/"))))
 
 (setq org-refile-targets
       `((nil :maxlevel . 2)
@@ -681,9 +681,9 @@ buffer's window as well."
 (unless (boundp 'org-latex-classes)
   (setq org-latex-classes nil))
 (add-to-list 'org-latex-classes
-  ;; beamer class, for presentations
-  '("beamer"
-    "\\documentclass[11pt]{beamer}\n
+	     ;; beamer class, for presentations
+	     '("beamer"
+	       "\\documentclass[11pt]{beamer}\n
       \\mode<{{{beamermode}}}>\n
       \\usetheme{{{{beamertheme}}}}\n
       \\usecolortheme{{{{beamercolortheme}}}}\n
@@ -707,28 +707,28 @@ buffer's window as well."
       \\institute{{{{beamerinstitute}}}}\n          
        \\subject{{{{beamersubject}}}}\n"
 
-    ("\\section{%s}" . "\\section*{%s}")
+	       ("\\section{%s}" . "\\section*{%s}")
 
-    ("\\begin{frame}[fragile]\\frametitle{%s}"
-     "\\end{frame}"
-     "\\begin{frame}[fragile]\\frametitle{%s}"
-     "\\end{frame}")))
+	       ("\\begin{frame}[fragile]\\frametitle{%s}"
+		"\\end{frame}"
+		"\\begin{frame}[fragile]\\frametitle{%s}"
+		"\\end{frame}")))
 
-  ;; letter class, for formal letters
+;; letter class, for formal letters
 
-  (add-to-list 'org-latex-classes
+(add-to-list 'org-latex-classes
 
-  '("letter"
-     "\\documentclass[11pt]{letter}\n
+	     '("letter"
+	       "\\documentclass[11pt]{letter}\n
       \\usepackage[utf8]{inputenc}\n
       \\usepackage[T1]{fontenc}\n
       \\usepackage{color}"
 
-     ("\\section{%s}" . "\\section*{%s}")
-     ("\\subsection{%s}" . "\\subsection*{%s}")
-     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-     ("\\paragraph{%s}" . "\\paragraph*{%s}")
-     ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+	       ("\\section{%s}" . "\\section*{%s}")
+	       ("\\subsection{%s}" . "\\subsection*{%s}")
+	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 (use-package org-sidebar)
 
@@ -743,6 +743,20 @@ buffer's window as well."
 
 ;; display/update images in the buffer after I evaluate
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+
+;; additional identation relative to #begin_src token
+(setq org-edit-src-content-indentation 0)
+(setq org-src-tab-src-acts-natively t)
+;; leading whitespace not preserved on export
+(setq org-src-preserve-indentation nil)
+
+(defun indent-org-block-automatically ()
+  (when (org-in-src-block-p)
+    (org-edit-special)
+    (indent-region (point-min) (point-max))
+    (org-edit-src-exit)))
+
+(run-at-time 1 0.1 'indent-org-block-automatically)
 
 (use-package ob-ipython)
 
@@ -768,7 +782,7 @@ buffer's window as well."
 (setq org-babel-python-command "python3")
 
 (unless (boundp 'org-latex-minted-langs)
-        (setq org-latex-minted-langs nil))
+  (setq org-latex-minted-langs nil))
 (add-to-list 'org-latex-minted-langs '(ipython "python"))
 
 (use-package elpy)
@@ -928,71 +942,71 @@ It is for commands that depend on the major mode. One example is
 (global-set-key (kbd "H-c") #'org-capture)
 
 (setq org-capture-templates
-        '(("t" "Personal todo" entry
-           (file+headline "todo.org" "Inbox")
-           "* TODO %?\n%i" :prepend t)
+      '(("t" "Personal todo" entry
+         (file+headline "todo.org" "Inbox")
+         "* TODO %?\n%i" :prepend t)
 
-          ("n" "Personal notes" entry
-           (file+headline "notes.org" "Inbox")
-           "* %U %?\n%i\n%a" :prepend t)
+        ("n" "Personal notes" entry
+         (file+headline "notes.org" "Inbox")
+         "* %U %?\n%i\n%a" :prepend t)
 
-          ("f" "Maybe it would be fun someday..." entry
-           (file+headline "just-for-fun.org" "Inbox")
-           "* MAYBE %U %?" :prepend t)
+        ("f" "Maybe it would be fun someday..." entry
+         (file+headline "just-for-fun.org" "Inbox")
+         "* MAYBE %U %?" :prepend t)
 
-          ;; declare root node j
-          ("j" "Journal")
+        ;; declare root node j
+        ("j" "Journal")
 
-          ("ja" "Journal arbitrary recording" entry
-           (file+olp+datetree "journal.org")
-           "* %?\n%U\n%i" :tree-type week)
+        ("ja" "Journal arbitrary recording" entry
+         (file+olp+datetree "journal.org")
+         "* %?\n%U\n%i" :tree-type week)
 
-          ("jc" "journal clock into something new" entry
-           (file+olp+datetree "journal.org")
-           "* %?" :clock-in t :clock-keep t :tree-type week)
+        ("jc" "journal clock into something new" entry
+         (file+olp+datetree "journal.org")
+         "* %?" :clock-in t :clock-keep t :tree-type week)
 
-          ("jn" "journal edit the task currently clocked in" plain
-           (clock) "%?" :unnarrowed t)
+        ("jn" "journal edit the task currently clocked in" plain
+         (clock) "%?" :unnarrowed t)
 
-          ("r" "read later" checkitem
-           (file+headline "read-later.org" "Inbox")
-           "[ ] %? ")
+        ("r" "read later" checkitem
+         (file+headline "read-later.org" "Inbox")
+         "[ ] %? ")
 
-          ("b" "bug" entry
-           (file+headline "bug.org" "Inbox")
-           "* BUG %^{header}\n%U\n#+begin_src\n\n%i\n\n#+end_src\n%?")
+        ("b" "bug" entry
+         (file+headline "bug.org" "Inbox")
+         "* BUG %^{header}\n%U\n#+begin_src\n\n%i\n\n#+end_src\n%?")
 
-          ("v" "vocabularies" entry
-           (file+headline "voc.org" "inbox")
-           "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")))
+        ("v" "vocabularies" entry
+         (file+headline "voc.org" "inbox")
+         "* %<%Y-%m-%d %H:%M:%S>\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: langou gre\n:END:\n** Front\n%?\n** Back\n%i\n")))
 
 (require 'org-projectile)
 (push (org-projectile-project-todo-entry) org-capture-templates)
 
 (setq org-agenda-files (apply (function append)
-			        (mapcar
-			         (lambda (directory)
-				        (directory-files-recursively directory org-agenda-file-regexp))
-			            '("~/org/"))))
+			      (mapcar
+			       (lambda (directory)
+				 (directory-files-recursively directory org-agenda-file-regexp))
+			       '("~/org/"))))
 
 (add-to-list 'org-modules 'org-habit)
 (global-set-key (kbd "s-a") #'org-agenda)
 
 (add-to-list 'org-modules 'org-tempo)
 (setq org-structure-template-alist
-  '(("a" . "export ascii\n")
-    ("c" . "center\n")
-    ("C" . "comment\n")
-    ("e" . "src emacs-lisp\n")
-    ("cp" . "src cpp\n")
-    ("py" . "src python\n")
-    ("sh" . "src shell")
-    ("E" . "export")
-    ("h" . "export html\n")
-    ("l" . "export latex\n")
-    ("q" . "quote\n")
-    ("s" . "src")
-    ("v" . "verse\n")))
+      '(("a" . "export ascii\n")
+	("c" . "center\n")
+	("C" . "comment\n")
+	("e" . "src emacs-lisp\n")
+	("cp" . "src cpp\n")
+	("py" . "src python\n")
+	("sh" . "src shell")
+	("E" . "export")
+	("h" . "export html\n")
+	("l" . "export latex\n")
+	("q" . "quote\n")
+	("s" . "src")
+	("v" . "verse\n")))
 
 (use-package org-pdftools
   :hook (org-mode . org-pdftools-setup-link))
@@ -1015,10 +1029,10 @@ It is for commands that depend on the major mode. One example is
 (use-package command-log-mode)
 
 (defconst lisp--prettify-symbols-alist
-      '(("lambda"  . ?λ)))
+  '(("lambda"  . ?λ)))
 
-  (add-hook 'lisp-mode-hook #'(lambda () (interactive)
-                               (prettify-symbols-mode +1)))
+(add-hook 'lisp-mode-hook #'(lambda () (interactive)
+                              (prettify-symbols-mode +1)))
 
 
 (setq python-prettify-symbols-alist
@@ -1109,7 +1123,7 @@ It is for commands that depend on the major mode. One example is
 (use-package exec-path-from-shell
   :config
   (when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize)))
+    (exec-path-from-shell-initialize)))
 
 (use-package rainbow-mode)
 
@@ -1161,7 +1175,7 @@ It is for commands that depend on the major mode. One example is
     (emms-default-players)
     (setq emms-source-file-default-directory "~/Music")
     (setq emms-player-mplayer-parameters
-	    '("-slave" "-quiet" "-really-quiet" "-novideo"))))
+	  '("-slave" "-quiet" "-really-quiet" "-novideo"))))
 
 (global-set-key (kbd "C-c m m") #'emms)
 (global-set-key (kbd "C-c m p") #'emms-add-playlist)
@@ -1229,13 +1243,13 @@ It is for commands that depend on the major mode. One example is
 (global-set-key (kbd "s-e") #'eshell)
 
 (setenv "PATH"
-  (concat
-   ;; manually added
-   "/usr/local/cbc/bin" ";"
-   "~/.local/bin" ";"
-   (getenv "PATH")			; inherited from OS
-   )
-)
+	(concat
+	 ;; manually added
+	 "/usr/local/cbc/bin" ";"
+	 "~/.local/bin" ";"
+	 (getenv "PATH")			; inherited from OS
+	 )
+	)
 
 (set-face-attribute 'mode-line nil :box t)
 
@@ -1243,13 +1257,13 @@ It is for commands that depend on the major mode. One example is
   (interactive)
 
   (setq mode-line-format
-          '("%e" mode-line-front-space mode-line-mule-info mode-line-client
-            mode-line-modified mode-line-remote
-            mode-line-frame-identification
-            mode-line-buffer-identification " " mode-line-position
-            (vc-mode vc-mode)
-            "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
-))
+        '("%e" mode-line-front-space mode-line-mule-info mode-line-client
+          mode-line-modified mode-line-remote
+          mode-line-frame-identification
+          mode-line-buffer-identification " " mode-line-position
+          (vc-mode vc-mode)
+          "  " mode-line-modes mode-line-misc-info mode-line-end-spaces)
+	))
 
 (use-package diminish)
 (diminish 'ivy-mode)
