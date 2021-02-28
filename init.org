@@ -1341,7 +1341,7 @@ https://emacs.stackexchange.com/questions/5850/how-to-auto-format-the-source-cod
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
-(run-at-time 1 0.1 'indent-org-block-automatically)
+(run-at-time 1 5 'indent-org-block-automatically)
 #+end_src
 
 *** languages
@@ -2474,6 +2474,8 @@ code navigation:
   ("k" #'python-nav-backward-block "prev block")
   ("j" #'python-nav-forward-block "next block"))
 
+(use-package python-pytest)
+(evil-define-key 'normal python-mode-map (kbd "SPC t") #'python-pytest-dispatch)
 #+end_src
 
 ** C/C++
@@ -3031,7 +3033,6 @@ Automatically tangle /this file/ on save.
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 
 #+end_src
-
  
 
 

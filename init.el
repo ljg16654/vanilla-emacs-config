@@ -756,7 +756,7 @@ buffer's window as well."
     (indent-region (point-min) (point-max))
     (org-edit-src-exit)))
 
-(run-at-time 1 0.1 'indent-org-block-automatically)
+(run-at-time 1 5 'indent-org-block-automatically)
 
 (use-package ob-ipython)
 
@@ -1335,6 +1335,9 @@ It is for commands that depend on the major mode. One example is
   ("f" #'python-nav-forward-sexp "next sexp")
   ("k" #'python-nav-backward-block "prev block")
   ("j" #'python-nav-forward-block "next block"))
+
+(use-package python-pytest)
+(evil-define-key 'normal python-mode-map (kbd "SPC t") #'python-pytest-dispatch)
 
 (add-hook 'c-mode-hook #'linum-mode)
 (add-hook 'c++-mode-hook #'linum-mode)
