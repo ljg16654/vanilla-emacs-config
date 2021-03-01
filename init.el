@@ -511,8 +511,7 @@ buffer's window as well."
 
 (use-package avy)
 
-(global-set-key (kbd "ν") #'ace-window)
-(global-set-key (kbd "σ") #'avy-goto-char)
+(global-set-key (kbd "θ") #'ace-window)
 
 (use-package magit
   :bind (("C-c g" . magit))
@@ -1053,6 +1052,7 @@ It is for commands that depend on the major mode. One example is
 (add-hook 'kill-emacs-hook #'bookmark-save)
 
 (global-set-key (kbd "H-j") #'jump-to-register)
+(global-set-key (kbd "H-SPC") #'point-to-register)
 
 (use-package helm-mode-manager
   :after helm)

@@ -898,8 +898,7 @@ In buffer or across buffers.
 
 (use-package avy)
 
-(global-set-key (kbd "ν") #'ace-window)
-(global-set-key (kbd "σ") #'avy-goto-char)
+(global-set-key (kbd "θ") #'ace-window)
 
 #+end_src
 
@@ -1786,7 +1785,7 @@ have
 
 #+end_src
 
-** bookmarks
+** bookmarks and registers
 
 #+begin_src emacs-lisp
 
@@ -1796,14 +1795,20 @@ have
 
 #+begin_src emacs-lisp
 
-  (global-set-key (kbd "H-j") #'jump-to-register)
+(global-set-key (kbd "H-j") #'jump-to-register)
+(global-set-key (kbd "H-SPC") #'point-to-register)
 
 #+end_src
 
 Bookmarks in Emacs are similar in spirit to registers.
 
+Unlike marks in vim (usually bound to m and '), which are limited to
+independent buffers, registers allows one to jump across buffers or
+persistent window layouts.
+
 frequently used register commands:
 - C-x r s <register> :: copy region
+- C-x r SPC <register> :: save cursor position in some buffer
 - C-x r w <register> :: save window config in selected frame
 - C-x r f <register> :: save window config in *all* frames
 - C-x r j <register> :: restore window config/cursor position
