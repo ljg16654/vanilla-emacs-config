@@ -75,6 +75,9 @@
 (define-key evil-motion-state-map "L" 'evil-forward-arg)
 (define-key evil-motion-state-map "H" 'evil-backward-arg)
 
+(use-package evil-nerd-commenter
+  :config (progn (evilnc-default-hotkeys)))
+
 (global-set-key (kbd "H-e") #'evil-mode)
 (global-set-key (kbd "H-x") #'helm-M-x)
 (evil-escape-mode)
@@ -127,7 +130,6 @@
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 (global-set-key (kbd "s-o") #'helm-buffers-list)
-(global-set-key (kbd "η") #'helm-buffers-list)
 (global-set-key (kbd "s-O") #'helm-recentf)
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
@@ -400,11 +402,14 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "C-M-,") #'previous-buffer)
+(global-set-key (kbd "η") #'previous-buffer)
 (global-set-key (kbd "C-M-.") #'next-buffer)
+(global-set-key (kbd "λ") #'next-buffer)
+(global-set-key (kbd "") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
-                ;; originally bound to
-                ;; revert-buffer-with-coding-system
-                #'revert-buffer)
+		;; originally bound to
+		;; revert-buffer-with-coding-system
+		#'revert-buffer)
 
 ;; inside a tab
 
@@ -1018,6 +1023,8 @@ It is for commands that depend on the major mode. One example is
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
+(use-package lorem-ipsum)
+
 (setq debug-on-error nil)
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
@@ -1031,7 +1038,7 @@ It is for commands that depend on the major mode. One example is
   '(("lambda"  . ?λ)))
 
 (add-hook 'lisp-mode-hook #'(lambda () (interactive)
-                              (prettify-symbols-mode +1)))
+			      (prettify-symbols-mode +1)))
 
 
 (setq python-prettify-symbols-alist
@@ -1040,6 +1047,7 @@ It is for commands that depend on the major mode. One example is
        '("**2" . ?²)
        '("sum" . ?∑)
        '("sigma" . ?σ)
+       '("rho" . ?ρ)
        '("mu" . ?μ)
        '("theta" . ?θ)
        '("_0" . ?₀)
@@ -1204,9 +1212,8 @@ It is for commands that depend on the major mode. One example is
 (setq elfeed-feeds
       '(
         ("https://www.motorsport.com/rss/f1/news/" motorsport)
-        ("grandprix.com/rss.xml" motorsport)
-        ("https://www.reddit.com/r/motorsports/.rss?format=xml" motorsport)
         ("http://finance.yahoo.com/rss/headline?s=MSFT" finance)
+	("https://feeds.bloomberg.com/politics/news.rss" bloomberg-politics)
         ))
 
 (use-package vterm)
@@ -1302,6 +1309,7 @@ It is for commands that depend on the major mode. One example is
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 (global-set-key (kbd "H-r") #'compile)
+(global-set-key (kbd "σ") #'compile)
 
 (use-package imenu-anywhere)
 (global-set-key (kbd "C-.") #'imenu-anywhere)
@@ -1338,6 +1346,13 @@ It is for commands that depend on the major mode. One example is
 
 (use-package python-pytest)
 (evil-define-key 'normal python-mode-map (kbd "SPC t") #'python-pytest-dispatch)
+
+;; for font-lock and filling paragraphs inside docstring region:
+(use-package python-docstring)
+
+;; for generating docstring of a defun whenever needed
+(use-package sphinx-doc
+  :hook python-mode)
 
 (add-hook 'c-mode-hook #'linum-mode)
 (add-hook 'c++-mode-hook #'linum-mode)

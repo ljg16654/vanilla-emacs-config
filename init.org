@@ -137,6 +137,9 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 (define-key evil-motion-state-map "L" 'evil-forward-arg)
 (define-key evil-motion-state-map "H" 'evil-backward-arg)
 
+(use-package evil-nerd-commenter
+  :config (progn (evilnc-default-hotkeys)))
+
 (global-set-key (kbd "H-e") #'evil-mode)
 (global-set-key (kbd "H-x") #'helm-M-x)
 (evil-escape-mode)
@@ -221,7 +224,6 @@ A minimalistic example:
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 (global-set-key (kbd "s-o") #'helm-buffers-list)
-(global-set-key (kbd "η") #'helm-buffers-list)
 (global-set-key (kbd "s-O") #'helm-recentf)
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
@@ -755,11 +757,14 @@ Waiting for confirmation before tangling.
 
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "C-M-,") #'previous-buffer)
+(global-set-key (kbd "η") #'previous-buffer)
 (global-set-key (kbd "C-M-.") #'next-buffer)
+(global-set-key (kbd "λ") #'next-buffer)
+(global-set-key (kbd "") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
-                ;; originally bound to
-                ;; revert-buffer-with-coding-system
-                #'revert-buffer)
+		;; originally bound to
+		;; revert-buffer-with-coding-system
+		#'revert-buffer)
 
 ;; inside a tab
 
@@ -1728,6 +1733,12 @@ in my org-directory.
 *** TODO shortkey conflict 
 shortkey of org-mark-ring-goto conflicts with yasnippet.
 * miscellaneous
+** lorem ipsum
+
+#+begin_src emacs-lisp
+
+(use-package lorem-ipsum)
+#+end_src
 
 ** set debug on error, load custom
 
@@ -1761,11 +1772,12 @@ have
   
 ** ligature
 #+begin_src emacs-lisp
+
 (defconst lisp--prettify-symbols-alist
   '(("lambda"  . ?λ)))
 
 (add-hook 'lisp-mode-hook #'(lambda () (interactive)
-                              (prettify-symbols-mode +1)))
+			      (prettify-symbols-mode +1)))
 
 
 (setq python-prettify-symbols-alist
@@ -1774,6 +1786,7 @@ have
        '("**2" . ?²)
        '("sum" . ?∑)
        '("sigma" . ?σ)
+       '("rho" . ?ρ)
        '("mu" . ?μ)
        '("theta" . ?θ)
        '("_0" . ?₀)
@@ -2130,9 +2143,8 @@ frequently used commands for movement:
 (setq elfeed-feeds
       '(
         ("https://www.motorsport.com/rss/f1/news/" motorsport)
-        ("grandprix.com/rss.xml" motorsport)
-        ("https://www.reddit.com/r/motorsports/.rss?format=xml" motorsport)
         ("http://finance.yahoo.com/rss/headline?s=MSFT" finance)
+	("https://feeds.bloomberg.com/politics/news.rss" bloomberg-politics)
         ))
 #+end_src
 
@@ -2411,6 +2423,7 @@ see [[*org-capture]] for capture-templates creating anki entries.
 
 #+begin_src emacs-lisp
 (global-set-key (kbd "H-r") #'compile)
+(global-set-key (kbd "σ") #'compile)
 #+end_src
 
 code navigation:
@@ -2481,6 +2494,13 @@ code navigation:
 
 (use-package python-pytest)
 (evil-define-key 'normal python-mode-map (kbd "SPC t") #'python-pytest-dispatch)
+
+;; for font-lock and filling paragraphs inside docstring region:
+(use-package python-docstring)
+
+;; for generating docstring of a defun whenever needed
+(use-package sphinx-doc
+  :hook python-mode)
 #+end_src
 
 ** C/C++
