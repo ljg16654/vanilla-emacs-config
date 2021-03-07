@@ -42,6 +42,12 @@
     (evil-mode +1)
     ))
 
+;; major modes in which I prefer Emacs keybinding
+(evil-set-initial-state 'Info-mode 'emacs)
+(evil-set-initial-state 'elfeed-show-mode 'emacs)
+(evil-set-initial-state 'elfeed-search-mode 'emacs)
+(evil-set-initial-state 'nov-mode 'emacs)
+
 (use-package evil-escape
   :config
   (progn
