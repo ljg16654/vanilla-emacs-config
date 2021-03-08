@@ -1221,6 +1221,8 @@ It is for commands that depend on the major mode. One example is
  :keymaps 'vterm-copy-mode-map
  "q" #'vterm-copy-mode)
 
+(setq vterm-max-scrollback 10000)
+
 (use-package multi-vterm
   :after vterm)
 

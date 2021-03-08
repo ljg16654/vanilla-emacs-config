@@ -2146,6 +2146,8 @@ frequently used commands for movement:
 (general-define-key
  :keymaps 'vterm-copy-mode-map
  "q" #'vterm-copy-mode)
+
+(setq vterm-max-scrollback 10000)
 #+end_src
 
 #+begin_src emacs-lisp :tangle nil
