@@ -896,22 +896,15 @@ It is for commands that depend on the major mode. One example is
          ("C-c r t" . org-roam-tag-add)
          ))
 
-(defhydra roam (global-map "C-c r")
-  "Org Roam"
-  ("d" #'(lambda () (interactive)
-           (dired org-roam-directory))
-   "visit org-roam-directory")
-  ("f" #'org-roam-find-file
-   "find-file")
-  ("x" #'org-roam-dailies-capture-today
-   "capture today")
-  ("j" #'org-roam-dailies-today
-   "visit today")
-  ("i" #'org-roam-insert
-   "insert")
-  ("c" #'org-roam-build-cache
-   "build cache")
-  )
+(general-define-key
+ :prefix "C-c r"
+ "d" #'(lambda () (interactive)
+         (dired org-roam-directory))
+ "f" #'org-roam-find-file
+ "y" #'org-roam-dailies-find-yesterday
+ "x" #'org-roam-dailies-find-today
+ "j" #'org-roam-dailies-capture-today
+ "i" #'org-roam-insert)
 
 (use-package org-roam-server
   :ensure t
