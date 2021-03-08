@@ -1004,6 +1004,7 @@ It is for commands that depend on the major mode. One example is
 	("cp" . "src cpp\n")
 	("py" . "src python\n")
 	("sh" . "src shell")
+	("ex" . "example")
 	("E" . "export")
 	("h" . "export html\n")
 	("l" . "export latex\n")
@@ -1353,6 +1354,9 @@ It is for commands that depend on the major mode. One example is
 (use-package sphinx-doc
   :hook python-mode)
 
+(add-hook 'c-mode-hook #'autopair-mode)
+(add-hook 'c++-mode-hook #'autopair-mode)
+
 (add-hook 'c-mode-hook #'linum-mode)
 (add-hook 'c++-mode-hook #'linum-mode)
 
@@ -1420,4 +1424,5 @@ It is for commands that depend on the major mode. One example is
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook
+					      #'efs/org-babel-tangle-config)))

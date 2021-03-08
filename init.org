@@ -4,10 +4,10 @@
 
 Some of the awesome configurations used as reference:
 
-+ james cash :: [[https://github.com/jamesnvc/dotfiles]]
++ James Cash :: [[https://github.com/jamesnvc/dotfiles]]
 + Protesilaos Stavrou :: https://protesilaos.com/dotemacs/
 + Doom Emacs :: [[https://github.com/hlissner/doom-emacs]]
-+ Emacs from scratch series :: [[https://github.com/daviwil/emacs-from-scratch]]
++ Emacs From Scratch Series :: [[https://github.com/daviwil/emacs-from-scratch]]
 
 * personal info
 
@@ -1688,6 +1688,7 @@ in my org-directory.
 	("cp" . "src cpp\n")
 	("py" . "src python\n")
 	("sh" . "src shell")
+	("ex" . "example")
 	("E" . "export")
 	("h" . "export html\n")
 	("l" . "export latex\n")
@@ -1696,19 +1697,6 @@ in my org-directory.
 	("v" . "verse\n")))
 #+end_src
 
-#+begin_example
-((a . export ascii
-) (c . center
-) (C . comment
-) (e . src emacs-lisp
-) (cp . src cpp
-) (py . src python
-) (sh . src shell) (E . export) (h . export html
-) (l . export latex
-) (q . quote
-) (s . src) (v . verse
-))
-#+end_example
 ** pdf
 
 [[https://www.youtube.com/watch?v=zqc-CWm4DGE&feature=emb_logo][org pdftools workflow]]
@@ -2505,6 +2493,14 @@ code navigation:
 
 ** C/C++
 
+*** autopair
+
+#+begin_src emacs-lisp
+
+(add-hook 'c-mode-hook #'autopair-mode)
+(add-hook 'c++-mode-hook #'autopair-mode)
+#+end_src
+
 *** line number
 
 #+begin_src emacs-lisp
@@ -3055,7 +3051,8 @@ Automatically tangle /this file/ on save.
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook
+					      #'efs/org-babel-tangle-config)))
 
 #+end_src
  
