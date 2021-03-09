@@ -156,7 +156,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
 (evil-define-key 'normal 'global (kbd "J") #'tab-bar-switch-to-next-tab)
 (evil-define-key 'normal 'global (kbd "K") #'tab-bar-switch-to-prev-tab)
-(evil-define-key 'normal 'global (kbd "SPC x") #'helm-M-x)
+(evil-define-key 'normal 'global (kbd "SPC SPC") #'helm-M-x)
 (evil-define-key '(insert normal) 'global (kbd "C-e") #'end-of-line)
 #+end_src
 
@@ -2023,9 +2023,10 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 #+begin_src emacs-lisp
 
-(setq lsp-ui-doc-position 'bottom)
-(setq lsp-ui-doc-use-childframe nil)
-(setq lsp-ui-doc-delay 0)
+(setq lsp-ui-doc-enable nil)
+(setq lsp-enable-links nil)
+(setq lsp-headerline-breadcrumb-enable nil)
+(setq lsp-signature-render-documentation nil)
 (setq lsp-ui-sideline-show-diagnostics t)
 (setq lsp-ui-sideline-show-hover nil)
 (setq lsp-eldoc-render-all nil)
@@ -2505,6 +2506,13 @@ code navigation:
 (add-hook 'c-mode-hook #'c-mode-my-basic-settings)
 (add-hook 'c++-mode-hook #'c-mode-my-basic-settings)
 
+#+end_src
+
+*** formating
+
+#+begin_src emacs-lisp
+
+(use-package clang-format)
 #+end_src
 
 *** ccls

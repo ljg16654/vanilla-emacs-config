@@ -1100,9 +1100,10 @@ It is for commands that depend on the major mode. One example is
 (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
 
-(setq lsp-ui-doc-position 'bottom)
-(setq lsp-ui-doc-use-childframe nil)
-(setq lsp-ui-doc-delay 0)
+(setq lsp-ui-doc-enable nil)
+(setq lsp-enable-links nil)
+(setq lsp-headerline-breadcrumb-enable nil)
+(setq lsp-signature-render-documentation nil)
 (setq lsp-ui-sideline-show-diagnostics t)
 (setq lsp-ui-sideline-show-hover nil)
 (setq lsp-eldoc-render-all nil)
