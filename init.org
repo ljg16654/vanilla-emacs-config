@@ -1242,7 +1242,7 @@ which improves upon
 org-mode tutorial on beamer
 https://orgmode.org/worg/exporters/beamer/tutorial.html
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 ;; allow for export=>beamer by placing
 
 ;; #+LaTeX_CLASS: beamer in org files
@@ -1285,7 +1285,6 @@ https://orgmode.org/worg/exporters/beamer/tutorial.html
 ;; letter class, for formal letters
 
 (add-to-list 'org-latex-classes
-
 	     '("letter"
 	       "\\documentclass[11pt]{letter}\n
       \\usepackage[utf8]{inputenc}\n
@@ -2495,20 +2494,17 @@ code navigation:
 
 ** C/C++
 
-*** autopair
+*** basic settings
 
 #+begin_src emacs-lisp
+(defun c-mode-my-basic-settings
+    (progn
+      (linum-mode t)
+      (autopair-mode t)))
 
-(add-hook 'c-mode-hook #'autopair-mode)
-(add-hook 'c++-mode-hook #'autopair-mode)
-#+end_src
+(add-hook 'c-mode-hook #'c-mode-my-basic-settings)
+(add-hook 'c++-mode-hook #'c-mode-my-basic-settings)
 
-*** line number
-
-#+begin_src emacs-lisp
-
-(add-hook 'c-mode-hook #'linum-mode)
-(add-hook 'c++-mode-hook #'linum-mode)
 #+end_src
 
 *** ccls
@@ -2568,6 +2564,9 @@ code navigation:
 #+end_src
 
 *** rtags
+:PROPERTIES:
+:header-args: :tangle nil
+:END:
 
 #+begin_src emacs-lisp
 
@@ -2629,15 +2628,15 @@ code navigation:
 
 #+begin_src emacs-lisp
 
-  (add-hook 'c++-mode-hook 'flycheck-mode)
-  (add-hook 'c-mode-hook 'flycheck-mode)
-  (use-package flycheck-rtags)
-  (defun my-flycheck-rtags-setup ()
-    (flycheck-select-checker 'rtags)
-    (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
-    (setq-local flycheck-check-syntax-automatically nil))
-  ;; c-mode-common-hook is also called by c++-mode
-  (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
+;; (add-hook 'c++-mode-hook 'flycheck-mode)
+;; (add-hook 'c-mode-hook 'flycheck-mode)
+(use-package flycheck-rtags)
+(defun my-flycheck-rtags-setup ()
+  (flycheck-select-checker 'rtags)
+  (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
+  (setq-local flycheck-check-syntax-automatically nil))
+;; c-mode-common-hook is also called by c++-mode
+(add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
 
 #+end_src
 
@@ -2654,16 +2653,22 @@ code navigation:
 #+end_src
 
 *** cmake-ide
+:PROPERTIES:
+:header-args: :tangle nil
+:END:
 
 #+begin_src emacs-lisp
 
 (use-package cmake-ide)
-(cmake-ide-setup)
+;; (cmake-ide-setup)
 #+end_src
 
 *** cpputils-cmake
+:PROPERTIES:
+:header-args: :tangle nil
+:END:
 
-#+begin_src emacs-lisp :tangle nil
+#+begin_src emacs-lisp
 
 (use-package cpputils-cmake)
 

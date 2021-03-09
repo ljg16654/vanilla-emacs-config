@@ -685,61 +685,6 @@ buffer's window as well."
 
 (setq org-export-with-toc nil)
 
-;; allow for export=>beamer by placing
-
-;; #+LaTeX_CLASS: beamer in org files
-(unless (boundp 'org-latex-classes)
-  (setq org-latex-classes nil))
-(add-to-list 'org-latex-classes
-	     ;; beamer class, for presentations
-	     '("beamer"
-	       "\\documentclass[11pt]{beamer}\n
-      \\mode<{{{beamermode}}}>\n
-      \\usetheme{{{{beamertheme}}}}\n
-      \\usecolortheme{{{{beamercolortheme}}}}\n
-      \\beamertemplateballitem\n
-      \\setbeameroption{show notes}
-      \\usepackage[utf8]{inputenc}\n
-      \\usepackage[T1]{fontenc}\n
-      \\usepackage{hyperref}\n
-      \\usepackage{color}
-      \\usepackage{listings}
-      \\usepackage{physics}
-      \\lstset{numbers=none,language=[ISO]C++,tabsize=4,
-  frame=single,
-  basicstyle=\\small,
-  showspaces=false,showstringspaces=false,
-  showtabs=false,
-  keywordstyle=\\color{blue}\\bfseries,
-  commentstyle=\\color{red},
-  }\n
-      \\usepackage{verbatim}\n
-      \\institute{{{{beamerinstitute}}}}\n          
-       \\subject{{{{beamersubject}}}}\n"
-
-	       ("\\section{%s}" . "\\section*{%s}")
-
-	       ("\\begin{frame}[fragile]\\frametitle{%s}"
-		"\\end{frame}"
-		"\\begin{frame}[fragile]\\frametitle{%s}"
-		"\\end{frame}")))
-
-;; letter class, for formal letters
-
-(add-to-list 'org-latex-classes
-
-	     '("letter"
-	       "\\documentclass[11pt]{letter}\n
-      \\usepackage[utf8]{inputenc}\n
-      \\usepackage[T1]{fontenc}\n
-      \\usepackage{color}"
-
-	       ("\\section{%s}" . "\\section*{%s}")
-	       ("\\subsection{%s}" . "\\subsection*{%s}")
-	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
-	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
 (use-package org-sidebar)
 
 (defhydra org-sidebar (org-mode-map "C-c l")
@@ -1356,64 +1301,13 @@ It is for commands that depend on the major mode. One example is
 (use-package sphinx-doc
   :hook python-mode)
 
-(add-hook 'c-mode-hook #'autopair-mode)
-(add-hook 'c++-mode-hook #'autopair-mode)
+(defun c-mode-my-basic-settings
+    (progn
+      (linum-mode t)
+      (autopair-mode t)))
 
-(add-hook 'c-mode-hook #'linum-mode)
-(add-hook 'c++-mode-hook #'linum-mode)
-
-(setq rtags-completions-enabled t)
-(eval-after-load 'company
-  '(add-to-list
-    'company-backends 'company-rtags))
-(setq rtags-autostart-diagnostics t)
-
-(defun ciao-goto-symbol ()
-  (interactive)
-  (deactivate-mark)
-  (ring-insert find-tag-marker-ring (point-marker))
-  (or (and (require 'rtags nil t)
-           (rtags-find-symbol-at-point))
-      (and (require 'semantic/ia)
-           (condition-case nil
-               (semantic-ia-fast-jump (point))
-             (error nil)))))
-(define-key c++-mode-map (kbd "M-.") 'ciao-goto-symbol)
-(define-key c++-mode-map (kbd "M-,") 'pop-tag-mark)
-
-(use-package rtags-xref)
-(use-package company-rtags)
-(use-package helm-rtags)
-(setq rtags-use-helm t)
-
-(setq company-idle-delay 0)
-(define-key c-mode-map [(tab)] 'company-complete)
-(define-key c++-mode-map [(tab)] 'company-complete)
-
-
-(use-package company-irony-c-headers)
-(eval-after-load 'company
-  '(add-to-list
-    'company-backends '(company-irony-c-headers company-irony)))
-
-(add-hook 'c++-mode-hook 'flycheck-mode)
-(add-hook 'c-mode-hook 'flycheck-mode)
-(use-package flycheck-rtags)
-(defun my-flycheck-rtags-setup ()
-  (flycheck-select-checker 'rtags)
-  (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
-  (setq-local flycheck-check-syntax-automatically nil))
-;; c-mode-common-hook is also called by c++-mode
-(add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
-
-(defhydra rtags-movement (c-mode-base-map "ρ")
-  "code navigation using rtags"
-  ("ρ" #'rtags-find-symbol-at-point "gd")
-  (":" #'rtags-diagnostics "diagnostics")
-  )
-
-(use-package cmake-ide)
-(cmake-ide-setup)
+(add-hook 'c-mode-hook #'c-mode-my-basic-settings)
+(add-hook 'c++-mode-hook #'c-mode-my-basic-settings)
 
 (use-package cider)
 
