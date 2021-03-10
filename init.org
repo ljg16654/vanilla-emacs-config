@@ -642,6 +642,7 @@ use M-r for =isearch-toggle-regexp= during isearch.y
 * windows and buffers
 
 ** window rules and management
+
 *** monocle-window
 
 From prot's dotEmacs. Defines a monocole layout similar to Tiling
@@ -755,6 +756,17 @@ Waiting for confirmation before tangling.
 
 #+end_src
 
+** eyebrowse
+
+#+begin_src emacs-lisp
+
+(use-package eyebrowse)
+(global-set-key (kbd "η") #'eyebrowse-prev-window-config)
+(global-set-key (kbd "λ") #'eyebrowse-next-window-config)
+(global-set-key (kbd "ν") #'eyebrowse-create-named-window-config)
+(global-set-key (kbd "ρ") #'eyebrowse-switch-to-window-config)
+#+end_src
+
 ** buffer switch keys
 
 #+begin_src emacs-lisp
@@ -762,15 +774,15 @@ Waiting for confirmation before tangling.
 ;; between buffers
 
 (global-set-key (kbd "C-x C-b") #'ibuffer)
+(evil-define-key 'normal 'global (kbd "SPC b i") #'ibuffer)
 (global-set-key (kbd "C-M-,") #'previous-buffer)
-(global-set-key (kbd "η") #'previous-buffer)
 (global-set-key (kbd "C-M-.") #'next-buffer)
-(global-set-key (kbd "λ") #'next-buffer)
 (global-set-key (kbd "") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
 		;; originally bound to
 		;; revert-buffer-with-coding-system
 		#'revert-buffer)
+(evil-define-key 'normal 'global (kbd "SPC b r") #'revert-buffer)
 
 ;; inside a tab
 
@@ -924,6 +936,8 @@ In buffer or across buffers.
   )
 
 (evil-define-key 'normal 'global (kbd "SPC g") #'magit)
+
+(use-package git-gutter)
 #+end_src
 
 ** projectile
@@ -2349,10 +2363,10 @@ CS:CH-FR BUF  POS LINE (MAJOR MODE)
 #+begin_src emacs-lisp
 
 (use-package nyan-mode
-  :config
-  (progn
-    (nyan-mode)
-    (nyan-start-animation)))
+  ;; :config
+  ;; (nyan-mode)
+  ;; (nyan-start-animation)
+  )
 #+end_src
 
 * ROS
@@ -2498,10 +2512,10 @@ code navigation:
 *** basic settings
 
 #+begin_src emacs-lisp
-(defun c-mode-my-basic-settings
-    (progn
-      (linum-mode t)
-      (autopair-mode t)))
+(defun c-mode-my-basic-settings ()
+  (progn
+    (linum-mode t)
+    (autopair-mode t)))
 
 (add-hook 'c-mode-hook #'c-mode-my-basic-settings)
 (add-hook 'c++-mode-hook #'c-mode-my-basic-settings)
@@ -3071,5 +3085,3 @@ Automatically tangle /this file/ on save.
 
 #+end_src
  
-
-

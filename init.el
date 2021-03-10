@@ -91,7 +91,7 @@
 (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
 (evil-define-key 'normal 'global (kbd "J") #'tab-bar-switch-to-next-tab)
 (evil-define-key 'normal 'global (kbd "K") #'tab-bar-switch-to-prev-tab)
-(evil-define-key 'normal 'global (kbd "SPC x") #'helm-M-x)
+(evil-define-key 'normal 'global (kbd "SPC SPC") #'helm-M-x)
 (evil-define-key '(insert normal) 'global (kbd "C-e") #'end-of-line)
 
 (use-package evil-collection)
@@ -404,18 +404,24 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 (setq Man-notify-method 'pushy)
 
+(use-package eyebrowse)
+(global-set-key (kbd "η") #'eyebrowse-prev-window-config)
+(global-set-key (kbd "λ") #'eyebrowse-next-window-config)
+(global-set-key (kbd "ν") #'eyebrowse-create-named-window-config)
+(global-set-key (kbd "ρ") #'eyebrowse-switch-to-window-config)
+
 ;; between buffers
 
 (global-set-key (kbd "C-x C-b") #'ibuffer)
+(evil-define-key 'normal 'global (kbd "SPC b i") #'ibuffer)
 (global-set-key (kbd "C-M-,") #'previous-buffer)
-(global-set-key (kbd "η") #'previous-buffer)
 (global-set-key (kbd "C-M-.") #'next-buffer)
-(global-set-key (kbd "λ") #'next-buffer)
 (global-set-key (kbd "") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
 		;; originally bound to
 		;; revert-buffer-with-coding-system
 		#'revert-buffer)
+(evil-define-key 'normal 'global (kbd "SPC b r") #'revert-buffer)
 
 ;; inside a tab
 
@@ -529,6 +535,8 @@ buffer's window as well."
   )
 
 (evil-define-key 'normal 'global (kbd "SPC g") #'magit)
+
+(use-package git-gutter)
 
 (use-package projectile)
 (projectile-mode +1)
@@ -1241,10 +1249,10 @@ It is for commands that depend on the major mode. One example is
     (setq doom-modeline-height 15)))
 
 (use-package nyan-mode
-  :config
-  (progn
-    (nyan-mode)
-    (nyan-start-animation)))
+  ;; :config
+  ;; (nyan-mode)
+  ;; (nyan-start-animation)
+  )
 
 (use-package helm-catkin)
 
@@ -1302,13 +1310,15 @@ It is for commands that depend on the major mode. One example is
 (use-package sphinx-doc
   :hook python-mode)
 
-(defun c-mode-my-basic-settings
-    (progn
-      (linum-mode t)
-      (autopair-mode t)))
+(defun c-mode-my-basic-settings ()
+  (progn
+    (linum-mode t)
+    (autopair-mode t)))
 
 (add-hook 'c-mode-hook #'c-mode-my-basic-settings)
 (add-hook 'c++-mode-hook #'c-mode-my-basic-settings)
+
+(use-package clang-format)
 
 (use-package cider)
 
