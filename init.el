@@ -1180,19 +1180,19 @@ It is for commands that depend on the major mode. One example is
 (use-package multi-vterm
   :after vterm)
 
-(global-set-key (kbd "s-v v") #'multi-vterm)
-(global-set-key (kbd "s-v d") #'multi-vterm-dedicated-toggle)
+(global-set-key (kbd "s-v") #'multi-vterm-dedicated-toggle)
 
-(defhydra multi-vterm (vterm-mode-map "s-v")
-  "multi-vterm"
-  ("d" #'multi-vterm-dedicated-toggle "dedicated")
-  ("n" #'multi-vterm-next "next")
-  ("p" #'multi-vterm-prev "prev")
-  ("s" #'multi-vterm-dedicated-select "select as dedicated")
-  ("r" #'multi-vterm-rename-buffer "rename")
-  )
+;; (global-set-key (kbd "s-v v") #'multi-vterm)
+;; (defhydra multi-vterm (vterm-mode-map "s-v")
+;;   "multi-vterm"
+;;   ("d" #'multi-vterm-dedicated-toggle "dedicated")
+;;   ("n" #'multi-vterm-next "next")
+;;   ("p" #'multi-vterm-prev "prev")
+;;   ("s" #'multi-vterm-dedicated-select "select as dedicated")
+;;   ("r" #'multi-vterm-rename-buffer "rename")
+;;   )
 
-(setq multi-vterm-dedicated-window-height 15)
+(setq multi-vterm-dedicated-window-height 30)
 
 (use-package eshell-toggle)
 (global-set-key (kbd "s-e") #'eshell-toggle)
@@ -1307,8 +1307,10 @@ It is for commands that depend on the major mode. One example is
 (use-package python-docstring)
 
 ;; for generating docstring of a defun whenever needed
-(use-package sphinx-doc
-  :hook python-mode)
+(use-package sphinx-doc)
+(add-hook 'python-mode-hook #'(lambda ()
+				(sphinx-doc t)
+				))
 
 (defun c-mode-my-basic-settings ()
   (progn
