@@ -33,7 +33,6 @@
     (setq
      evil-want-C-d-scroll nil
      evil-want-C-u-delete nil
-     evil-want-Y-yank-to-eol t
      evil-regexp-search t
      evil-auto-indent t
      evil-cross-lines t
@@ -41,6 +40,8 @@
      )
     (evil-mode +1)
     ))
+
+(setq evil-want-Y-yank-to-eol t)
 
 ;; major modes in which I prefer Emacs keybinding
 (evil-set-initial-state 'Info-mode 'emacs)
@@ -73,6 +74,14 @@
 (use-package evil-surround
   :config
   (progn (global-evil-surround-mode 1)))
+
+(use-package evil-embrace
+  :after evil-surround
+  :hook (LaTeX-mode . embrace-LaTeX-mode-hook)
+  :hook (org-mode . embrace-org-mode-hook)
+  :hook (emacs-lisp-mode . embrace-emacs-lisp-mode-hook)
+  )
+
 
 (use-package evil-args)
 ;; bind evil-args text objects
