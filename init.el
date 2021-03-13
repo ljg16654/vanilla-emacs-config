@@ -60,12 +60,16 @@
     (evil-snipe-mode +1)
     (evil-snipe-override-mode +1)))
 
+;; '%' to jump
 (use-package evil-matchit)
 (global-evil-matchit-mode)
 
 (use-package evil-exchange)
 (evil-exchange-install)
 
+;; customize evil-surround-pairs-alist
+;; notice that different effects are expected from
+;; cs[( and cs])
 (use-package evil-surround
   :config
   (progn (global-evil-surround-mode 1)))
@@ -274,7 +278,7 @@
 (use-package dash)
 (use-package f)
 
-(set-face-attribute 'default nil :family "FiraCode" :height 135)
+(set-face-attribute 'default nil :family "Iosevka" :height 135)
 (setq line-spacing 0.2)
 
 (use-package anti-zenburn-theme
@@ -1241,6 +1245,7 @@ It is for commands that depend on the major mode. One example is
 (diminish 'helm-mode)
 (diminish 'auto-fill-function "AuF")
 (diminish 'evil-snipe-mode)
+(diminish 'evil-escape-mode)
 
 (use-package doom-modeline
   ;; :init (doom-modeline-mode 1)
