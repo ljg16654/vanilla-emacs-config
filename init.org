@@ -104,6 +104,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
     ))
 
 (setq evil-want-Y-yank-to-eol t)
+(setq evil-undo-system #'undo-redo)
 
 ;; major modes in which I prefer Emacs keybinding
 (evil-set-initial-state 'Info-mode 'emacs)
@@ -159,7 +160,6 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 (use-package evil-nerd-commenter
   :config (progn (evilnc-default-hotkeys)))
 
-(global-set-key (kbd "H-e") #'evil-mode)
 (global-set-key (kbd "H-x") #'helm-M-x)
 (evil-escape-mode)
 #+end_src
@@ -774,6 +774,7 @@ Waiting for confirmation before tangling.
 #+begin_src emacs-lisp
 
 (use-package eyebrowse)
+(setq eyebrowse-new-workspace t)
 (global-set-key (kbd "η") #'eyebrowse-prev-window-config)
 (global-set-key (kbd "λ") #'eyebrowse-next-window-config)
 (global-set-key (kbd "ν") #'eyebrowse-create-named-window-config)
@@ -1259,6 +1260,7 @@ Track state changes.
 #+end_src
 
 *** latex classes
+
 **** beamer
 
 temporary: yanked from
@@ -1528,6 +1530,17 @@ Automatically toggle preview of latex fragments:
 (add-hook 'org-mode-hook 'org-fragtog-mode)
 #+end_src
 
+#+begin_src emacs-lisp
+(straight-use-package
+ '(engrave-faces
+   :host github
+   :repo "tecosaur/engrave-faces"
+   :branch "master"))
+
+(with-eval-after-load 'ox-latex
+  (setq org-latex-listings 'engraved))
+#+end_src
+
 *** TODO rewrite clear cache
 #+begin_src emacs-lisp
 (defun langou/org-latex-delete-cache () (interactive)
@@ -1720,7 +1733,12 @@ in my org-directory.
 	("l" . "export latex\n")
 	("q" . "quote\n")
 	("s" . "src")
-	("v" . "verse\n")))
+	("v" . "verse\n")
+	;; org latex stuff
+	("pf" . "proof")
+	("th" . "theorem")
+	("le" . "lemma")
+	("pr" . "proposition")))
 #+end_src
 
 ** pdf
@@ -1746,6 +1764,22 @@ in my org-directory.
 *** TODO shortkey conflict 
 shortkey of org-mark-ring-goto conflicts with yasnippet.
 * miscellaneous
+
+** drop down emacs frame
+
+#+begin_src emacs-lisp
+
+(use-package yequake)
+
+(setq yequake-frames
+      '(("aba" .
+	 ((width . 0.75)
+	  (height . 0.5)
+	  (alpha . 0.90)
+	  (buffer-fns . (org-roam-dailies-find-today))
+	  (frame-parameters . ((undecorated . t)))))))
+#+end_src
+
 ** lorem ipsum
 
 #+begin_src emacs-lisp
@@ -1757,9 +1791,9 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 #+begin_src emacs-lisp
 
-  (setq debug-on-error nil)
-  (setq custom-file (concat user-emacs-directory "custom.el"))
-  (load custom-file)
+(setq debug-on-error nil)
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file)
 
 #+end_src
 

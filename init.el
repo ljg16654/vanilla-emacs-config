@@ -42,6 +42,7 @@
     ))
 
 (setq evil-want-Y-yank-to-eol t)
+(setq evil-undo-system #'undo-redo)
 
 ;; major modes in which I prefer Emacs keybinding
 (evil-set-initial-state 'Info-mode 'emacs)
@@ -97,7 +98,6 @@
 (use-package evil-nerd-commenter
   :config (progn (evilnc-default-hotkeys)))
 
-(global-set-key (kbd "H-e") #'evil-mode)
 (global-set-key (kbd "H-x") #'helm-M-x)
 (evil-escape-mode)
 
@@ -418,6 +418,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 (setq Man-notify-method 'pushy)
 
 (use-package eyebrowse)
+(setq eyebrowse-new-workspace t)
 (global-set-key (kbd "η") #'eyebrowse-prev-window-config)
 (global-set-key (kbd "λ") #'eyebrowse-next-window-config)
 (global-set-key (kbd "ν") #'eyebrowse-create-named-window-config)
@@ -843,6 +844,15 @@ It is for commands that depend on the major mode. One example is
   :after org)
 (add-hook 'org-mode-hook 'org-fragtog-mode)
 
+(straight-use-package
+ '(engrave-faces
+   :host github
+   :repo "tecosaur/engrave-faces"
+   :branch "master"))
+
+(with-eval-after-load 'ox-latex
+  (setq org-latex-listings 'engraved))
+
 (defun langou/org-latex-delete-cache () (interactive)
        (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
 
@@ -976,7 +986,12 @@ It is for commands that depend on the major mode. One example is
 	("l" . "export latex\n")
 	("q" . "quote\n")
 	("s" . "src")
-	("v" . "verse\n")))
+	("v" . "verse\n")
+	;; org latex stuff
+	("pf" . "proof")
+	("th" . "theorem")
+	("le" . "lemma")
+	("pr" . "proposition")))
 
 (use-package org-pdftools
   :hook (org-mode . org-pdftools-setup-link))
@@ -988,6 +1003,16 @@ It is for commands that depend on the major mode. One example is
   :config
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
+(use-package yequake)
+
+(setq yequake-frames
+      '(("aba" .
+	 ((width . 0.75)
+	  (height . 0.5)
+	  (alpha . 0.90)
+	  (buffer-fns . (org-roam-dailies-find-today))
+	  (frame-parameters . ((undecorated . t)))))))
 
 (use-package lorem-ipsum)
 
