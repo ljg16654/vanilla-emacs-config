@@ -993,6 +993,25 @@ It is for commands that depend on the major mode. One example is
 	("le" . "lemma")
 	("pr" . "proposition")))
 
+(use-package org-ref
+  :config
+  (setq org-ref-default-bibliography
+	(list "~/Documents/paper/references.bib"))
+  (setq bibtex-completion-bibliography
+	(list "~/Documents/paper/references.bib"))
+  (setq bibtex-completion-library-path
+	(list "~/Documents/paper"))
+  (setq bibtex-completion-pdf-open-function
+	(lambda (fpath)
+	  (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath)))
+  )
+
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"bibtex %b"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
 (use-package org-pdftools
   :hook (org-mode . org-pdftools-setup-link))
 
@@ -1348,7 +1367,7 @@ It is for commands that depend on the major mode. One example is
 ;; for generating docstring of a defun whenever needed
 (use-package sphinx-doc)
 (add-hook 'python-mode-hook #'(lambda ()
-				(sphinx-doc t)
+				(sphinx-doc-mode t)
 				))
 
 (defun c-mode-my-basic-settings ()

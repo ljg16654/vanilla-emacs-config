@@ -1741,6 +1741,43 @@ in my org-directory.
 	("pr" . "proposition")))
 #+end_src
 
+** ref
+
+[[https://www.youtube.com/watch?v=2t925KRBbFc][tutorial video by the author]]
+[[https://kitchingroup.cheme.cmu.edu/blog/2014/05/13/Using-org-ref-for-citations-and-references/#hautier-2012-accur][an introduction by the author]]
+[[https://nickgeorge.net/science/org_ref_setup/][setting up and configuring org ref]]
+
+frequently used commands:
+- org-ref-helm-insert-label (it can recognize labels in LaTeX blocks!)
+- org-ref-insert-link
+
+#+begin_src emacs-lisp
+(use-package org-ref
+  :config
+  (setq org-ref-default-bibliography
+	(list "~/Documents/paper/references.bib"))
+  (setq bibtex-completion-bibliography
+	(list "~/Documents/paper/references.bib"))
+  (setq bibtex-completion-library-path
+	(list "~/Documents/paper"))
+  (setq bibtex-completion-pdf-open-function
+	(lambda (fpath)
+	  (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath)))
+  )
+#+end_src 
+
+In order for the export to work properly, the compilation of LaTeX
+buffer should be changed!
+
+#+begin_src emacs-lisp
+
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"bibtex %b"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
 ** pdf
 
 [[https://www.youtube.com/watch?v=zqc-CWm4DGE&feature=emb_logo][org pdftools workflow]]
@@ -2553,7 +2590,7 @@ code navigation:
 ;; for generating docstring of a defun whenever needed
 (use-package sphinx-doc)
 (add-hook 'python-mode-hook #'(lambda ()
-				(sphinx-doc t)
+				(sphinx-doc-mode t)
 				))
 #+end_src
 
