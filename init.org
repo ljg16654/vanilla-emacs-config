@@ -532,7 +532,7 @@ correct, completion is triggered.
 
 (use-package doom-themes)
 
-(load-theme 'doom-city-lights t)
+(load-theme 'modus-operandi t)
 #+end_src
 
 * linum
@@ -1547,6 +1547,72 @@ Automatically toggle preview of latex fragments:
        (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
 #+end_src
 
+** ref
+
+[[https://www.youtube.com/watch?v=2t925KRBbFc][tutorial video by the author]]
+[[https://kitchingroup.cheme.cmu.edu/blog/2014/05/13/Using-org-ref-for-citations-and-references/#hautier-2012-accur][an introduction by the author]]
+[[https://nickgeorge.net/science/org_ref_setup/][setting up and configuring org ref]]
+
+frequently used commands:
+- org-ref-helm-insert-label (it can recognize labels in LaTeX blocks!)
+- org-ref-insert-link
+
+#+begin_src emacs-lisp
+(use-package org-ref
+  :config
+  ;; list of BibTex database files used
+  (setq reftex-default-bibliography
+	(list "~/Zot/mylib/references.bib"))
+  (setq org-ref-default-bibliography
+	(list "~/Zot/mylib/references.bib"))
+  ;; for helm completion:
+  (setq bibtex-completion-bibliography
+	(list "~/Zot/mylib/references.bib"))
+  (setq org-ref-pdf-directory
+	'("~/Zot/mylib/files"))
+  (setq bibtex-completion-library-path
+	(list "~/Zot/mylib/files"))
+  (setq org-ref-get-pdf-filename-function
+	#'org-ref-get-pdf-filename-helm-bibtex)
+  (setq org-ref-notes-function 'org-ref-notes-function-many-files)
+  (setq bibtex-completion-pdf-open-function
+	(lambda (fpath)
+	  (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath))))
+#+end_src 
+
+#+begin_src emacs-lisp
+
+(setq bibtex-completion-pdf-field "file")
+
+#+end_src
+
+#+begin_src emacs-lisp
+
+(defun my/org-ref-open-pdf-at-point ()
+  "Open the pdf for bibtex key under point if it exists."
+  (interactive)
+  (let* ((results (org-ref-get-bibtex-key-and-file))
+         (key (car results))
+	 (pdf-cite:mur-artal_orb-slam2_2017file (car (bibtex-completion-find-pdf key))))
+    (if (file-exists-p pdf-file)
+	(org-open-file pdf-file)
+      (message "No PDF found for %s" key))))
+
+(setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
+#+end_src
+
+In order for the export to work properly, the compilation of LaTeX
+buffer should be changed!
+
+#+begin_src emacs-lisp
+
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"bibtex %b"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+end_src
+
 ** org-roam
 
 #+begin_src emacs-lisp
@@ -1621,14 +1687,27 @@ template brought with org-roam.
 
 #+begin_src emacs-lisp
 
-  (setq org-roam-dailies-directory "daily/")
+(setq org-roam-dailies-directory "daily/")
 
-  (setq org-roam-dailies-capture-templates
-        '(("d" "default" entry
-           #'org-roam-capture--get-point
-           "* %?"
-           :file-name "daily/%<%Y-%m-%d>"
-           :head "#+title: %<%Y-%m-%d>\n\n")))
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry
+         #'org-roam-capture--get-point
+         "* %?"
+         :file-name "daily/%<%Y-%m-%d>"
+         :head "#+title: %<%Y-%m-%d>\n\n")))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package org-roam-bibtex
+  :after org-roam
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :config
+  (require 'org-ref)) ; optional: if Org Ref is not loaded anywhere else, load it here
+
+(setq org-file-apps '((auto-mode . emacs)
+                      ("\\.mm\\'" . default)
+                      ("\\.x?html?\\'" . default)
+                      ("\\.pdf\\'" . "zathura %s")))
 #+end_src
 
 ** TODO org-capture: define entries separately 
@@ -1741,43 +1820,6 @@ in my org-directory.
 	("pr" . "proposition")))
 #+end_src
 
-** ref
-
-[[https://www.youtube.com/watch?v=2t925KRBbFc][tutorial video by the author]]
-[[https://kitchingroup.cheme.cmu.edu/blog/2014/05/13/Using-org-ref-for-citations-and-references/#hautier-2012-accur][an introduction by the author]]
-[[https://nickgeorge.net/science/org_ref_setup/][setting up and configuring org ref]]
-
-frequently used commands:
-- org-ref-helm-insert-label (it can recognize labels in LaTeX blocks!)
-- org-ref-insert-link
-
-#+begin_src emacs-lisp
-(use-package org-ref
-  :config
-  (setq org-ref-default-bibliography
-	(list "~/Documents/paper/references.bib"))
-  (setq bibtex-completion-bibliography
-	(list "~/Documents/paper/references.bib"))
-  (setq bibtex-completion-library-path
-	(list "~/Documents/paper"))
-  (setq bibtex-completion-pdf-open-function
-	(lambda (fpath)
-	  (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath)))
-  )
-#+end_src 
-
-In order for the export to work properly, the compilation of LaTeX
-buffer should be changed!
-
-#+begin_src emacs-lisp
-
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-	"bibtex %b"
-	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+end_src
-
 ** pdf
 
 [[https://www.youtube.com/watch?v=zqc-CWm4DGE&feature=emb_logo][org pdftools workflow]]
@@ -1800,6 +1842,19 @@ buffer should be changed!
 ** misc
 *** TODO shortkey conflict 
 shortkey of org-mark-ring-goto conflicts with yasnippet.
+
+* academic writing
+
+** zotero integration
+
+#+begin_src emacs-lisp
+(use-package zotxt
+  :after org
+  :config
+  (org-zotxt-mode t)
+  )
+#+end_src
+
 * miscellaneous
 
 ** drop down emacs frame
@@ -2222,7 +2277,7 @@ frequently used commands for movement:
 
 ** elfeed
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 
 (use-package elfeed)
 (global-set-key (kbd "C-x w") #'elfeed)
@@ -3171,4 +3226,3 @@ Automatically tangle /this file/ on save.
 					      #'efs/org-babel-tangle-config)))
 
 #+end_src
- 

@@ -308,7 +308,7 @@
 
 (use-package doom-themes)
 
-(load-theme 'doom-city-lights t)
+(load-theme 'modus-operandi t)
 
 (setq linum-format " %d  ")
 (add-hook 'python-mode-hook #'linum-mode)
@@ -856,6 +856,47 @@ It is for commands that depend on the major mode. One example is
 (defun langou/org-latex-delete-cache () (interactive)
        (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
 
+(use-package org-ref
+  :config
+  ;; list of BibTex database files used
+  (setq reftex-default-bibliography
+	(list "~/Zot/mylib/references.bib"))
+  (setq org-ref-default-bibliography
+	(list "~/Zot/mylib/references.bib"))
+  ;; for helm completion:
+  (setq bibtex-completion-bibliography
+	(list "~/Zot/mylib/references.bib"))
+  (setq org-ref-pdf-directory
+	'("~/Zot/mylib/files"))
+  (setq bibtex-completion-library-path
+	(list "~/Zot/mylib/files"))
+  (setq org-ref-get-pdf-filename-function
+	#'org-ref-get-pdf-filename-helm-bibtex)
+  (setq org-ref-notes-function 'org-ref-notes-function-many-files)
+  (setq bibtex-completion-pdf-open-function
+	(lambda (fpath)
+	  (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath))))
+
+(setq bibtex-completion-pdf-field "file")
+
+(defun my/org-ref-open-pdf-at-point ()
+  "Open the pdf for bibtex key under point if it exists."
+  (interactive)
+  (let* ((results (org-ref-get-bibtex-key-and-file))
+         (key (car results))
+	 (pdf-cite:mur-artal_orb-slam2_2017file (car (bibtex-completion-find-pdf key))))
+    (if (file-exists-p pdf-file)
+	(org-open-file pdf-file)
+      (message "No PDF found for %s" key))))
+
+(setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
+
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"bibtex %b"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
 (use-package org-roam
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
@@ -905,6 +946,17 @@ It is for commands that depend on the major mode. One example is
          "* %?"
          :file-name "daily/%<%Y-%m-%d>"
          :head "#+title: %<%Y-%m-%d>\n\n")))
+
+(use-package org-roam-bibtex
+  :after org-roam
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :config
+  (require 'org-ref)) ; optional: if Org Ref is not loaded anywhere else, load it here
+
+(setq org-file-apps '((auto-mode . emacs)
+                      ("\\.mm\\'" . default)
+                      ("\\.x?html?\\'" . default)
+                      ("\\.pdf\\'" . "zathura %s")))
 
 (defvar +org-capture-journal-file+ "journal.org")
 (defvar +org-capture-todo-file+ "todo.org")
@@ -993,25 +1045,6 @@ It is for commands that depend on the major mode. One example is
 	("le" . "lemma")
 	("pr" . "proposition")))
 
-(use-package org-ref
-  :config
-  (setq org-ref-default-bibliography
-	(list "~/Documents/paper/references.bib"))
-  (setq bibtex-completion-bibliography
-	(list "~/Documents/paper/references.bib"))
-  (setq bibtex-completion-library-path
-	(list "~/Documents/paper"))
-  (setq bibtex-completion-pdf-open-function
-	(lambda (fpath)
-	  (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath)))
-  )
-
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-	"bibtex %b"
-	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
 (use-package org-pdftools
   :hook (org-mode . org-pdftools-setup-link))
 
@@ -1022,6 +1055,12 @@ It is for commands that depend on the major mode. One example is
   :config
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
+(use-package zotxt
+  :after org
+  :config
+  (org-zotxt-mode t)
+  )
 
 (use-package yequake)
 
@@ -1217,15 +1256,6 @@ It is for commands that depend on the major mode. One example is
   (progn
     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
     ))
-
-(use-package elfeed)
-(global-set-key (kbd "C-x w") #'elfeed)
-(setq elfeed-feeds
-      '(
-        ("https://www.motorsport.com/rss/f1/news/" motorsport)
-        ("http://finance.yahoo.com/rss/headline?s=MSFT" finance)
-	("https://feeds.bloomberg.com/politics/news.rss" bloomberg-politics)
-        ))
 
 (use-package vterm)
 (general-define-key
