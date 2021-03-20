@@ -235,6 +235,8 @@ A minimalistic example:
   (progn
     (helm-mode 1)
     ))
+
+(setq helm-completion-style 'helm)
 #+end_src
 
 
@@ -1348,7 +1350,7 @@ https://orgmode.org/worg/exporters/beamer/tutorial.html
 #+begin_src emacs-lisp
 
 (setq org-confirm-babel-evaluate nil)
-(setq org-src-window-setup 'current-window)
+(setq org-src-window-setup 'other-window)
 
 ;; display/update images in the buffer after I evaluate
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)

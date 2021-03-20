@@ -146,6 +146,8 @@
     (helm-mode 1)
     ))
 
+(setq helm-completion-style 'helm)
+
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 (global-set-key (kbd "s-o") #'helm-buffers-list)
@@ -716,7 +718,7 @@ buffer's window as well."
   )
 
 (setq org-confirm-babel-evaluate nil)
-(setq org-src-window-setup 'current-window)
+(setq org-src-window-setup 'other-window)
 
 ;; display/update images in the buffer after I evaluate
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
