@@ -21,6 +21,8 @@
 
 (straight-use-package 'use-package)
 
+(use-package s)
+
 (use-package general)
 
 ;; variables that must be set before Evil is loaded:
@@ -172,41 +174,6 @@
 (eval-after-load "helm"
   '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
-(use-package s)
-
-(cl-macrolet
-    ((make-splitter-fn (name open-fn split-fn)
-		       `(defun ,name (_candidate)
-			  ;; Display buffers in new windows
-			  (dolist (cand (helm-marked-candidates))
-			    (select-window (,split-fn))
-			    (,open-fn cand))
-			  ;; Adjust size of windows
-			  (balance-windows)))
-     (generate-helm-splitter-funcs
-      (op-type open-fn)
-      (let* ((prefix (s-concat "helm-" op-type "-switch-"))
-	     (vert-split (intern (s-concat prefix "vert-window")))
-	     (horiz-split (intern (s-concat prefix "horiz-window"))))
-	`(progn
-	   (make-splitter-fn ,vert-split ,open-fn split-window-right)
-
-	   (make-splitter-fn ,horiz-split ,open-fn split-window-below)
-
-	   (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
-	       ()
-	     (interactive)
-	     (with-helm-alive-p
-	       (helm-exit-and-execute-action (quote ,vert-split))))
-
-	   (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
-	       ()
-	     (interactive)
-	     (with-helm-alive-p
-	       (helm-exit-and-execute-action (quote ,horiz-split))))))))
-  (generate-helm-splitter-funcs "buffer" switch-to-buffer)
-  (generate-helm-splitter-funcs "file" find-file))
-
 ;; install the actions for helm-find-files after that source is
 ;; inited, which fortunately has a hook
 (add-hook
@@ -286,6 +253,8 @@
 (setq tab-always-indent 'complete)
 (add-to-list 'completion-styles 'initials t)
 
+(add-hook 'inferior-emacs-lisp-mode #'(lambda () (autopair-mode t)))
+
 (use-package dash)
 (use-package f)
 
@@ -310,7 +279,7 @@
 
 (use-package doom-themes)
 
-(load-theme 'modus-operandi t)
+(load-theme 'modus-vivendi t)
 
 (setq linum-format " %d  ")
 (add-hook 'python-mode-hook #'linum-mode)
@@ -334,6 +303,7 @@
 
 (use-package helm-swoop)
 (global-set-key (kbd "C-s") #'helm-swoop)
+(global-set-key (kbd "C-_") #'helm-multi-swoop-all)
 ;; enable whitespace to match arbitrary string that doesn't contain a newline
 ;; non-greedily
 ;; such behavior is, however, limited to non-regexp search
@@ -388,7 +358,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
         ;; left side window
         ("\\*Help.*"
          (display-buffer-in-side-window)
-         (window-width . 0.25)       ; See the :hook
+         (window-width . 0.35)       ; See the :hook
          (side . left)
          (slot . 0)
          (window-parameters . ((no-other-window . t))))
@@ -511,6 +481,7 @@ questions.  Else use completion to select the tab to switch to."
   "<tab>" 'prot-tab-select-tab-dwim)
 
 (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
+(global-set-key (kbd "ψ") #'prot-tab-select-tab-dwim)
 
 (defun prot-simple-kill-buffer-current (&optional arg)
   "Kill current buffer or abort recursion when in minibuffer.
@@ -855,6 +826,8 @@ It is for commands that depend on the major mode. One example is
 (with-eval-after-load 'ox-latex
   (setq org-latex-listings 'engraved))
 
+(load-file "./lisp/my-org-extra.el")
+
 (defun langou/org-latex-delete-cache () (interactive)
        (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
 
@@ -1071,8 +1044,17 @@ It is for commands that depend on the major mode. One example is
 	 ((width . 0.75)
 	  (height . 0.5)
 	  (alpha . 0.90)
-	  (buffer-fns . (org-roam-dailies-find-today))
+	  (buffer-fns .  (org-roam-dailies-find-today
+			  split-window-horizontally
+			  (find-file "~/org/reading-list.org")))
 	  (frame-parameters . ((undecorated . t)))))))
+
+(defun my-aba-float ()
+  (progn  (select-frame (make-frame '((name . "aba")
+				      (alpha . 80))))
+	  (find-file "~/org/reading-list.org")
+	  (split-window-horizontally)
+	  (org-roam-dailies-find-today)))
 
 (use-package lorem-ipsum)
 
@@ -1365,11 +1347,12 @@ It is for commands that depend on the major mode. One example is
 
 (use-package lispy)
 (use-package evil-lispy)
-(add-hook 'emacs-lisp-mode-hook (lambda () (evil-lispy-mode 1)))
-(add-hook 'racket-mode-hook (lambda () (evil-lispy-mode 1)))
 
 (use-package paren-face)
 (add-hook 'emacs-lisp-mode-hook (lambda () (paren-face-mode 1)))
+
+(use-package highlight-parentheses)
+(add-hook 'emacs-lisp-mode-hook (lambda () (highlight-parentheses-mode 1)))
 
 (use-package racket-mode)
 

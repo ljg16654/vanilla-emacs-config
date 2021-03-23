@@ -12,7 +12,6 @@ Some of the awesome configurations used as reference:
 * personal info
 
 #+begin_src emacs-lisp
-
 (setq user-full-name "Jigang Li"
       user-mail-address "ljg16654@sjtu.edu.cn")
 #+end_src
@@ -20,7 +19,6 @@ Some of the awesome configurations used as reference:
 * server
 
 #+begin_src emacs-lisp
-
 (server-start)
 #+end_src
 
@@ -66,6 +64,16 @@ package will do something to cause your package to load at the
 appropriate time, and thus you would like to defer loading even though
 use-package isn't creating any autoloads for you.
 #+end_quote
+
+* elisp libs
+
+Libraries useful for writing elisp but may not be used interactively.
+
+#+begin_src emacs-lisp
+(use-package s)
+
+(use-package flx)
+#+end_src
 
 * keybinding and grouping commands
 
@@ -177,6 +185,31 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 (use-package evil-collection)
 (evil-collection-init)
 #+end_src
+
+toggling evil:
+http://www.makble.com/how-to-toggle-evil-mode-in-emacs
+
+#+begin_src emacs-lisp :tangle nil
+(defun toggle-evilmode ()
+  (interactive)
+  (if (bound-and-true-p evil-local-mode)
+    (progn
+      ; go emacs
+      (evil-local-mode (or -1 1))
+      (undo-tree-mode (or -1 1))
+      (set-variable 'cursor-type 'bar)
+    )
+    (progn
+      ; go evil
+      (evil-local-mode (or 1 1))
+      (set-variable 'cursor-type 'box)
+    )
+  )
+)
+ 
+(global-set-key (kbd "M-u") 'toggle-evilmode)
+#+end_src
+
 
 ** hydra
 
@@ -293,7 +326,7 @@ posframe:
 
 https://occasionallycogent.com/emacs_custom_helm_actions/index.html
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 
 (use-package s)
 
@@ -496,6 +529,11 @@ correct, completion is triggered.
 
 * elisp
 
+
+#+begin_src emacs-lisp
+(add-hook 'inferior-emacs-lisp-mode #'(lambda () (autopair-mode t)))
+#+end_src
+
 #+begin_src emacs-lisp
 
 (use-package dash)
@@ -534,7 +572,7 @@ correct, completion is triggered.
 
 (use-package doom-themes)
 
-(load-theme 'modus-operandi t)
+(load-theme 'modus-vivendi t)
 #+end_src
 
 * linum
@@ -642,6 +680,7 @@ be performed throughout all present buffers with =helm-multi-swoop-all=.
 
 (use-package helm-swoop)
 (global-set-key (kbd "C-s") #'helm-swoop)
+(global-set-key (kbd "C-_") #'helm-multi-swoop-all)
 ;; enable whitespace to match arbitrary string that doesn't contain a newline
 ;; non-greedily
 ;; such behavior is, however, limited to non-regexp search
@@ -721,7 +760,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
         ;; left side window
         ("\\*Help.*"
          (display-buffer-in-side-window)
-         (window-width . 0.25)       ; See the :hook
+         (window-width . 0.35)       ; See the :hook
          (side . left)
          (slot . 0)
          (window-parameters . ((no-other-window . t))))
@@ -878,6 +917,7 @@ questions.  Else use completion to select the tab to switch to."
   "<tab>" 'prot-tab-select-tab-dwim)
 
 (global-set-key (kbd "C-x t t") #'prot-tab-select-tab-dwim)
+(global-set-key (kbd "ψ") #'prot-tab-select-tab-dwim)
 #+end_src
 
 integration with projectile:
@@ -1543,6 +1583,12 @@ Automatically toggle preview of latex fragments:
   (setq org-latex-listings 'engraved))
 #+end_src
 
+company backend for inline math:
+
+#+begin_src emacs-lisp
+(load-file "./lisp/my-org-extra.el")
+#+end_src
+
 *** TODO rewrite clear cache
 #+begin_src emacs-lisp
 (defun langou/org-latex-delete-cache () (interactive)
@@ -1870,9 +1916,30 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 	 ((width . 0.75)
 	  (height . 0.5)
 	  (alpha . 0.90)
-	  (buffer-fns . (org-roam-dailies-find-today))
+	  (buffer-fns .  (org-roam-dailies-find-today
+			  split-window-horizontally
+			  (find-file "~/org/reading-list.org")))
 	  (frame-parameters . ((undecorated . t)))))))
+
 #+end_src
+
+Or write my own...
+
+#+begin_src emacs-lisp
+(defun my-aba-float ()
+  (progn  (select-frame (make-frame '((name . "aba")
+				      (alpha . 80))))
+	  (find-file "~/org/reading-list.org")
+	  (split-window-horizontally)
+	  (org-roam-dailies-find-today)))
+#+end_src
+
+And in =sxhkdrc=, do
+
+#+begin_example
+super + e
+        emacsclient -n -e '(my-aba-float)'
+#+end_example
 
 ** lorem ipsum
 
@@ -2597,14 +2664,17 @@ code navigation:
 
 (use-package lispy)
 (use-package evil-lispy)
-(add-hook 'emacs-lisp-mode-hook (lambda () (evil-lispy-mode 1)))
-(add-hook 'racket-mode-hook (lambda () (evil-lispy-mode 1)))
 #+end_src
 
 #+begin_src emacs-lisp
 
 (use-package paren-face)
 (add-hook 'emacs-lisp-mode-hook (lambda () (paren-face-mode 1)))
+(add-hook 'emacs-lisp-mode-hook (lambda () (autopair-mode 1)))
+
+(use-package highlight-parentheses)
+(add-hook 'emacs-lisp-mode-hook (lambda () (highlight-parentheses-mode 1)))
+
 #+end_src
 
 ** racket
@@ -2859,7 +2929,7 @@ installed (for overlay display of eval results...)
 
 #+begin_src emacs-lisp
 
-  (use-package cider)
+(use-package cider)
 #+end_src
 
 ** TODO format on save:
