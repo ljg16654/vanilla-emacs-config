@@ -23,6 +23,8 @@
 
 (use-package s)
 
+(use-package flx)
+
 (use-package general)
 
 ;; variables that must be set before Evil is loaded:
@@ -826,7 +828,7 @@ It is for commands that depend on the major mode. One example is
 (with-eval-after-load 'ox-latex
   (setq org-latex-listings 'engraved))
 
-(load-file "./lisp/my-org-extra.el")
+(load-file (concat user-emacs-directory "lisp/my-org-extra.el"))
 
 (defun langou/org-latex-delete-cache () (interactive)
        (delete-directory "~/.emacs.d/.local/cache/org-latex" :RECURSIVE t))
@@ -835,12 +837,15 @@ It is for commands that depend on the major mode. One example is
   :config
   ;; list of BibTex database files used
   (setq reftex-default-bibliography
-	(list "~/Zot/mylib/references.bib"))
+	(list "~/Zot/mylib/references.bib"
+	      "~/canvassync/VR369/Assignments/ipe.bib"))
   (setq org-ref-default-bibliography
-	(list "~/Zot/mylib/references.bib"))
+	(list "~/Zot/mylib/references.bib"
+	      "~/canvassync/VR369/Assignments/ipe.bib"))
   ;; for helm completion:
   (setq bibtex-completion-bibliography
-	(list "~/Zot/mylib/references.bib"))
+	(list "~/Zot/mylib/references.bib"
+	      "~/canvassync/VR369/Assignments/ipe.bib"))
   (setq org-ref-pdf-directory
 	'("~/Zot/mylib/files"))
   (setq bibtex-completion-library-path
@@ -1062,8 +1067,7 @@ It is for commands that depend on the major mode. One example is
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
 
-(setq browse-url-generic-program "qutebrowser")
-(setq browse-url-browser-function #'browse-url-generic)
+(setq browse-url-browser-function 'browse-url-firefox)
 
 (use-package command-log-mode)
 
@@ -1350,6 +1354,7 @@ It is for commands that depend on the major mode. One example is
 
 (use-package paren-face)
 (add-hook 'emacs-lisp-mode-hook (lambda () (paren-face-mode 1)))
+(add-hook 'emacs-lisp-mode-hook (lambda () (autopair-mode 1)))
 
 (use-package highlight-parentheses)
 (add-hook 'emacs-lisp-mode-hook (lambda () (highlight-parentheses-mode 1)))

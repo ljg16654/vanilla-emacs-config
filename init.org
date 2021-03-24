@@ -1586,7 +1586,7 @@ Automatically toggle preview of latex fragments:
 company backend for inline math:
 
 #+begin_src emacs-lisp
-(load-file "./lisp/my-org-extra.el")
+(load-file (concat user-emacs-directory "lisp/my-org-extra.el"))
 #+end_src
 
 *** TODO rewrite clear cache
@@ -1610,12 +1610,15 @@ frequently used commands:
   :config
   ;; list of BibTex database files used
   (setq reftex-default-bibliography
-	(list "~/Zot/mylib/references.bib"))
+	(list "~/Zot/mylib/references.bib"
+	      "~/canvassync/VR369/Assignments/ipe.bib"))
   (setq org-ref-default-bibliography
-	(list "~/Zot/mylib/references.bib"))
+	(list "~/Zot/mylib/references.bib"
+	      "~/canvassync/VR369/Assignments/ipe.bib"))
   ;; for helm completion:
   (setq bibtex-completion-bibliography
-	(list "~/Zot/mylib/references.bib"))
+	(list "~/Zot/mylib/references.bib"
+	      "~/canvassync/VR369/Assignments/ipe.bib"))
   (setq org-ref-pdf-directory
 	'("~/Zot/mylib/files"))
   (setq bibtex-completion-library-path
@@ -1961,13 +1964,13 @@ super + e
 ** default browser
 
 For firefox:
-#+begin_src emacs-lisp :tangle nil
+#+begin_src emacs-lisp
 (setq browse-url-browser-function 'browse-url-firefox)
 #+end_src
 
 As I've recently (as of Feb2021) switched to =qutebrowser=, I'd like to
 have
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 (setq browse-url-generic-program "qutebrowser")
 (setq browse-url-browser-function #'browse-url-generic)
 #+end_src

@@ -66,11 +66,11 @@ fragments in the org buffer"
 (add-to-list 'company-backends #'company-inline-math-backend)
 
 (defun my-select-inline-math ()
-  "Complete inline math."
+  "Complete inline math and insert."
   (interactive)
-    (completing-read "Select inline math: "
+    (insert (completing-read "Select inline math: "
 		 (progn (my-org-get-all-inline-math)
 			inline-math-candidates)
-		 nil t))
+		 nil t)))
 
 
