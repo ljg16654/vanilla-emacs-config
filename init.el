@@ -330,6 +330,57 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
       (delete-other-windows)))
   :bind ("C-c s" . prot/window-single-toggle))
 
+(use-package popper
+  :init
+  (setq popper-display-control nil)
+  (setq popper-reference-buffers
+	(list "\\*Python\\*"
+        "\\*ielm\\*"))
+  :config
+  (defhydra 'popper-stuff
+    (global-map "C-c t")
+    ("t" #'popper-toggle-latest)
+    ("o" #'popper-cycle)
+    ("p" #'popper-toggle-type))
+
+  (popper-mode +1))
+
+(defun clear-popper-popup-alive ()
+  "Clear popup buffers that are currently maintained by
+popper.el. Useful when related rules are changed."
+  (interactive)
+  (progn
+    (setq popper-open-popup-alist nil)
+    (setq popper-buried-popup-alist nil)
+    (message "Popper active alist cleared."))
+  )
+
+(defun popper-open-and-select-latest (&optional group)
+  "Open and select window related to the last closed popup.
+
+Optional argument GROUP is called with no arguments to select
+a popup buffer to open."
+  (interactive)
+  (unless popper-mode (user-error "Popper-mode not active!"))
+  (let* ((identifier (when popper-group-function group))
+        (no-popup-msg (format "No buried popups for group %s"
+                                 (if (symbolp identifier)
+                                     (symbol-name identifier)
+                                   identifier))))
+    (if (null (alist-get identifier popper-buried-popup-alist
+                         nil 'remove 'equal))
+        (message (if identifier no-popup-msg "No buried popups"))
+      (if-let* ((new-popup (pop (alist-get identifier popper-buried-popup-alist
+                                           nil 'remove 'equal)))
+                (buf (cdr new-popup)))
+          (if (buffer-live-p buf)
+              (select-window (display-buffer buf))
+            (popper-open-latest))
+        (message no-popup-msg)))))
+
+
+(global-set-key (kbd "H-t") #'popper-open-and-select-latest)
+
 (setq display-buffer-alist
       '(
         ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
@@ -357,6 +408,17 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
          (side . bottom)
          (slot . 0)
          (window-parameters . ((no-other-window . t))))
+	;; bottom side window
+        ("\\*Python\\*"
+         (display-buffer-in-side-window)
+         (window-height . 0.4)
+         (side . bottom)
+         (slot . 1))
+        ("\\*ielm\\*"
+         (display-buffer-in-side-window)
+         (window-height . 0.4)
+         (side . bottom)
+         (slot . 2))
         ;; left side window
         ("\\*Help.*"
          (display-buffer-in-side-window)

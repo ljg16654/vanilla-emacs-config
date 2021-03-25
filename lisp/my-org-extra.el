@@ -68,7 +68,7 @@ fragments in the org buffer"
 (defun my-select-inline-math ()
   "Complete inline math and insert."
   (interactive)
-    (insert (completing-read "Select inline math: "
+    (insert (try-completion "Select inline math: "
 		 (progn (my-org-get-all-inline-math)
 			inline-math-candidates)
 		 nil t)))
