@@ -144,18 +144,13 @@
            (dired (concat user-emacs-directory "snippet/"))
            "snippets")))
 
-(use-package helm
-  :config
-  (progn
-    (helm-mode 1)
-    ))
+(use-package helm)
 
 (setq helm-completion-style 'helm)
 
 (global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "C-x C-f") #'helm-find-files)
+(global-set-key (kbd "C-x C-f") #'find-file)
 (global-set-key (kbd "s-o") #'helm-buffers-list)
-(global-set-key (kbd "s-O") #'helm-recentf)
 (global-set-key (kbd "M-i") #'helm-imenu)
 (global-set-key (kbd "C-h a") #'helm-apropos)
 (global-set-key (kbd "μ") #'helm-filtered-bookmarks)
@@ -224,6 +219,19 @@
  :keymaps 'helm-find-files-map
  "C-v" #'helm-file-switch-vert-window-command
  "C-s" #'helm-file-switch-horiz-window-command)
+
+(use-package orderless)
+
+(require 'orderless)
+(setq completion-styles
+      '(partial-completion
+	orderless))
+
+(use-package embark
+  :demand org
+  :config
+  (global-set-key (kbd "C-,") #'embark-act)
+  (global-set-key (kbd "H-b") #'embark-bindings))
 
 (use-package yasnippet
   :config
@@ -355,32 +363,6 @@ popper.el. Useful when related rules are changed."
     (message "Popper active alist cleared."))
   )
 
-(defun popper-open-and-select-latest (&optional group)
-  "Open and select window related to the last closed popup.
-
-Optional argument GROUP is called with no arguments to select
-a popup buffer to open."
-  (interactive)
-  (unless popper-mode (user-error "Popper-mode not active!"))
-  (let* ((identifier (when popper-group-function group))
-        (no-popup-msg (format "No buried popups for group %s"
-                                 (if (symbolp identifier)
-                                     (symbol-name identifier)
-                                   identifier))))
-    (if (null (alist-get identifier popper-buried-popup-alist
-                         nil 'remove 'equal))
-        (message (if identifier no-popup-msg "No buried popups"))
-      (if-let* ((new-popup (pop (alist-get identifier popper-buried-popup-alist
-                                           nil 'remove 'equal)))
-                (buf (cdr new-popup)))
-          (if (buffer-live-p buf)
-              (select-window (display-buffer buf))
-            (popper-open-latest))
-        (message no-popup-msg)))))
-
-
-(global-set-key (kbd "H-t") #'popper-open-and-select-latest)
-
 (setq display-buffer-alist
       '(
         ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
@@ -410,12 +392,14 @@ a popup buffer to open."
          (window-parameters . ((no-other-window . t))))
 	;; bottom side window
         ("\\*Python\\*"
-         (display-buffer-in-side-window)
+         (display-buffer-reuse-mode-window display-buffer-at-bottom)
          (window-height . 0.4)
          (side . bottom)
-         (slot . 1))
+         (slot . 1)
+	 (window-parameters ((mode-line-format . none))
+			    ))
         ("\\*ielm\\*"
-         (display-buffer-in-side-window)
+         (display-buffer-reuse-mode-window display-buffer-at-bottom)
          (window-height . 0.4)
          (side . bottom)
          (slot . 2))
@@ -426,6 +410,13 @@ a popup buffer to open."
          (side . left)
          (slot . 0)
          (window-parameters . ((no-other-window . t))))
+	("\\*pytest.*"
+	 (display-buffer-in-side-window)
+	 (window-width . 0.35)       ; See the :hook
+	 (side . left)
+	 (slot . 0)
+         (window-parameters . ((no-other-window . t))))
+
         ;; right side window
         ("\\*Faces\\*"
          (display-buffer-in-side-window)
@@ -438,7 +429,7 @@ a popup buffer to open."
                  mode-line-buffer-identification)))))
         ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
-         (window-height . 0.2)
+         (window-height . 0.4)
          ;; (mode . '(eshell-mode shell-mode))
          )))
 
@@ -684,6 +675,7 @@ buffer's window as well."
 (use-package org
   :config
   (progn
+    (define-key org-mode-map (kbd "C-,") nil)
     (setq org-ellipsis " ▾"
           org-hide-emphasis-markers t
           org-imenu-depth 7
@@ -1428,17 +1420,6 @@ It is for commands that depend on the major mode. One example is
 (use-package elpy)
 ;; (elpy-enable)
 (use-package jedi)
-
-(defhydra python-move-defun (python-mode-map "C-c n")
-  "python mode movement"
-  ("a" #'beginning-of-defun "beginning of defun")
-  ("e" #'python-nav-end-of-defun "end of defun")
-  ("p" #'python-nav-backward-defun "prev defun")
-  ("n" #'python-nav-forward-defun "next defun")
-  ("b" #'python-nav-backward-sexp "prev sexp")
-  ("f" #'python-nav-forward-sexp "next sexp")
-  ("k" #'python-nav-backward-block "prev block")
-  ("j" #'python-nav-forward-block "next block"))
 
 (use-package python-pytest)
 (evil-define-key 'normal python-mode-map (kbd "SPC t") #'python-pytest-dispatch)

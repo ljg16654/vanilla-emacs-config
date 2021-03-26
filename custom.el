@@ -224,6 +224,7 @@ is the buffer position of the start of the containing expression."
 	   (when
 	       (< emacs-major-version 28)
 	     (advice-add #'calculate-lisp-indent :around #'wrap-calculate-lisp-indent)))))
+ '(warning-suppress-types '((use-package) (:warning)))
  '(yas-global-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
