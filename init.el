@@ -171,66 +171,22 @@
 (eval-after-load "helm"
   '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
-;; install the actions for helm-find-files after that source is
-;; inited, which fortunately has a hook
-(add-hook
- 'helm-find-files-after-init-hook
- (lambda ()
-   (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
-                              #'helm-file-switch-vert-window
-                              helm-source-find-files)
-   (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
-                              #'helm-file-switch-horiz-window
-                              helm-source-find-files)))
-
-;; ditto for helm-projectile; that defines the source when loaded, so we can
-;; just eval-after-load
-(with-eval-after-load "helm-projectile"
-  (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
-                             #'helm-file-switch-vert-window
-                             helm-source-projectile-files-list)
-  (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
-                             #'helm-file-switch-horiz-window
-                             helm-source-projectile-files-list))
-
-;; ...but helm-buffers defines the source by calling an init function, but doesn't
-;; have a hook, so we use advice to add the actions after that init function
-;; is called
-(defun cogent/add-helm-buffer-actions (&rest _args)
-  (helm-add-action-to-source "Display buffer(s) in new vertical split(s) `C-v'"
-                             #'helm-buffer-switch-vert-window
-                             helm-source-buffers-list)
-  (helm-add-action-to-source "Display buffer(s) in new horizontal split(s) `C-s'"
-                             #'helm-buffer-switch-horiz-window
-                             helm-source-buffers-list))
-(advice-add 'helm-buffers-list--init :after #'cogent/add-helm-buffer-actions)
-
-(general-define-key
- :keymaps 'helm-buffer-map
- "C-v" #'helm-buffer-switch-vert-window-command
- "C-s" #'helm-buffer-switch-horiz-window-command)
-
-(general-define-key
- :keymaps 'helm-projectile-find-file-map
- "C-v" #'helm-file-switch-vert-window-command
- "C-s" #'helm-file-switch-horiz-window-command)
-
-(general-define-key
- :keymaps 'helm-find-files-map
- "C-v" #'helm-file-switch-vert-window-command
- "C-s" #'helm-file-switch-horiz-window-command)
-
 (use-package orderless)
-
 (require 'orderless)
+
 (setq completion-styles
       '(partial-completion
+	flex
+	initials
+	substring
 	orderless))
 
+;; set files to ignore in completion
+;; completion-ignored-*
+
 (use-package embark
-  :demand org
   :config
-  (global-set-key (kbd "C-,") #'embark-act)
+  (global-set-key (kbd "s-,") #'embark-act)
   (global-set-key (kbd "H-b") #'embark-bindings))
 
 (use-package yasnippet
@@ -343,7 +299,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (setq popper-display-control nil)
   (setq popper-reference-buffers
 	(list "\\*Python\\*"
-        "\\*ielm\\*"))
+              "\\*ielm\\*"))
   :config
   (defhydra 'popper-stuff
     (global-map "C-c t")
@@ -383,13 +339,6 @@ popper.el. Useful when related rules are changed."
          (side . top)
          (slot . 2)
          (window-parameters . ((no-other-window . t))))
-        ;; bottom side window
-        ("\\*\\(Completions\\|Embark Collect Live\\).*"
-         (display-buffer-in-side-window)
-         (window-height . 0.16)
-         (side . bottom)
-         (slot . 0)
-         (window-parameters . ((no-other-window . t))))
 	;; bottom side window
         ("\\*Python\\*"
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
@@ -403,13 +352,14 @@ popper.el. Useful when related rules are changed."
          (window-height . 0.4)
          (side . bottom)
          (slot . 2))
+	("\\*Async Shell Command\\*"
+	 (display-buffer-no-window))
         ;; left side window
         ("\\*Help.*"
-         (display-buffer-in-side-window)
-         (window-width . 0.35)       ; See the :hook
+         (display-buffer-reuse-mode-window display-buffer-at-bottom)
+         (window-height . 0.35)       ; See the :hook
          (side . left)
-         (slot . 0)
-         (window-parameters . ((no-other-window . t))))
+         (slot . 0))
 	("\\*pytest.*"
 	 (display-buffer-in-side-window)
 	 (window-width . 0.35)       ; See the :hook
@@ -1089,6 +1039,12 @@ It is for commands that depend on the major mode. One example is
   :config
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
+(defun pdf-open-with-zathura ()
+  (interactive)
+  (async-shell-command
+   (concat "zathura "
+	   (buffer-file-name (current-buffer)))))
 
 (use-package zotxt
   :after org

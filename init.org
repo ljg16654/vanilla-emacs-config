@@ -315,155 +315,50 @@ posframe:
 
 #+end_src
 
-*** custom actions
-
-**** open in split
-
-https://occasionallycogent.com/emacs_custom_helm_actions/index.html
-
-#+begin_src emacs-lisp :tangle nil
-
-(use-package s)
-
-(cl-macrolet
-    ((make-splitter-fn (name open-fn split-fn)
-		       `(defun ,name (_candidate)
-			  ;; Display buffers in new windows
-			  (dolist (cand (helm-marked-candidates))
-			    (select-window (,split-fn))
-			    (,open-fn cand))
-			  ;; Adjust size of windows
-			  (balance-windows)))
-     (generate-helm-splitter-funcs
-      (op-type open-fn)
-      (let* ((prefix (s-concat "helm-" op-type "-switch-"))
-	     (vert-split (intern (s-concat prefix "vert-window")))
-	     (horiz-split (intern (s-concat prefix "horiz-window"))))
-	`(progn
-	   (make-splitter-fn ,vert-split ,open-fn split-window-right)
-
-	   (make-splitter-fn ,horiz-split ,open-fn split-window-below)
-
-	   (defun ,(intern (s-concat "helm-" op-type "-switch-vert-window-command"))
-	       ()
-	     (interactive)
-	     (with-helm-alive-p
-	       (helm-exit-and-execute-action (quote ,vert-split))))
-
-	   (defun ,(intern (s-concat "helm-" op-type "-switch-horiz-window-command"))
-	       ()
-	     (interactive)
-	     (with-helm-alive-p
-	       (helm-exit-and-execute-action (quote ,horiz-split))))))))
-  (generate-helm-splitter-funcs "buffer" switch-to-buffer)
-  (generate-helm-splitter-funcs "file" find-file))
-#+end_src
-
-install the commands defined above with hooks:
-
-#+begin_src emacs-lisp
-
-;; install the actions for helm-find-files after that source is
-;; inited, which fortunately has a hook
-(add-hook
- 'helm-find-files-after-init-hook
- (lambda ()
-   (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
-                              #'helm-file-switch-vert-window
-                              helm-source-find-files)
-   (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
-                              #'helm-file-switch-horiz-window
-                              helm-source-find-files)))
-
-;; ditto for helm-projectile; that defines the source when loaded, so we can
-;; just eval-after-load
-(with-eval-after-load "helm-projectile"
-  (helm-add-action-to-source "Display file(s) in new vertical split(s) `C-v'"
-                             #'helm-file-switch-vert-window
-                             helm-source-projectile-files-list)
-  (helm-add-action-to-source "Display file(s) in new horizontal split(s) `C-s'"
-                             #'helm-file-switch-horiz-window
-                             helm-source-projectile-files-list))
-
-;; ...but helm-buffers defines the source by calling an init function, but doesn't
-;; have a hook, so we use advice to add the actions after that init function
-;; is called
-(defun cogent/add-helm-buffer-actions (&rest _args)
-  (helm-add-action-to-source "Display buffer(s) in new vertical split(s) `C-v'"
-                             #'helm-buffer-switch-vert-window
-                             helm-source-buffers-list)
-  (helm-add-action-to-source "Display buffer(s) in new horizontal split(s) `C-s'"
-                             #'helm-buffer-switch-horiz-window
-                             helm-source-buffers-list))
-(advice-add 'helm-buffers-list--init :after #'cogent/add-helm-buffer-actions)
-
-#+end_src
-
-and define keys
-
-#+begin_src emacs-lisp
-
-
-(general-define-key
- :keymaps 'helm-buffer-map
- "C-v" #'helm-buffer-switch-vert-window-command
- "C-s" #'helm-buffer-switch-horiz-window-command)
-
-(general-define-key
- :keymaps 'helm-projectile-find-file-map
- "C-v" #'helm-file-switch-vert-window-command
- "C-s" #'helm-file-switch-horiz-window-command)
-
-(general-define-key
- :keymaps 'helm-find-files-map
- "C-v" #'helm-file-switch-vert-window-command
- "C-s" #'helm-file-switch-horiz-window-command)
-
-#+end_src
-
 ** minibuffer completion
 
-Notes on usage of =embark=:
-- determine the target
-- classify
+By default, one needs to press 'M-v' to jump to the *completion*
+buffer. With =fido= or =icomplete=, however, rotation inside the candidate
+list can be done right inside the minibuffer with 'C-,' and 'C-.'.
 
-Variables of interest
-embark-keymap-alist
+#+begin_src emacs-lisp
+(use-package orderless)
+(require 'orderless)
+#+end_src
 
-utilizes the metadata of Emacs minibuffer completion system.
+Just like company, the Emacs completion supports multiple completions,
+which are called iteratively (see [[help:completion-cycle-threshold]] for
+fine-tuning the interation) during the process.
+These completions are stored in the variable =completion-styles=.
+
+#+begin_src emacs-lisp
+(setq completion-styles
+      '(partial-completion
+	flex
+	initials
+	substring
+	orderless))
+#+end_src
+
+Different completion styles can be set depending on the context: set
+[[help:completion-category-overrides]] which overrides completion-category-defaults.
 
 #+begin_src emacs-lisp
 
-(use-package orderless)
+;; set files to ignore in completion
+;; completion-ignored-*
 
-(require 'orderless)
-(setq completion-styles
-      '(partial-completion
-	orderless))
-
-(use-package embark
-  :demand org
-  :config
-  (global-set-key (kbd "C-,") #'embark-act)
-  (global-set-key (kbd "H-b") #'embark-bindings))
 #+end_src
 
-** ivy, swiper and counsel
+Embark provides meaningful actions on objects.
+For minibuffer, try out 'S', 'L', 'E'!
 
-#+begin_src emacs-lisp :tangle nil
+#+begin_src emacs-lisp
 
-(use-package ivy
+(use-package embark
   :config
-  (setq ivy-use-virtual-buffers t
-	enable-recursive-minibuffers t)
-  :bind (("C-s" . swiper)
-	 ("C-c C-r" . ivy-resume)
-	 ("M-x" . counsel-M-x)
-	 ("C-x C-f" . counsel-find-file)))
-
-(ivy-mode 1)
-(define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
-
+  (global-set-key (kbd "s-,") #'embark-act)
+  (global-set-key (kbd "H-b") #'embark-bindings))
 #+end_src
 
 ** yasnippet
@@ -754,7 +649,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (setq popper-display-control nil)
   (setq popper-reference-buffers
 	(list "\\*Python\\*"
-        "\\*ielm\\*"))
+              "\\*ielm\\*"))
   :config
   (defhydra 'popper-stuff
     (global-map "C-c t")
@@ -807,13 +702,6 @@ https://depp.brause.cc/shackle/
          (side . top)
          (slot . 2)
          (window-parameters . ((no-other-window . t))))
-        ;; bottom side window
-        ("\\*\\(Completions\\|Embark Collect Live\\).*"
-         (display-buffer-in-side-window)
-         (window-height . 0.16)
-         (side . bottom)
-         (slot . 0)
-         (window-parameters . ((no-other-window . t))))
 	;; bottom side window
         ("\\*Python\\*"
          (display-buffer-reuse-mode-window display-buffer-at-bottom)
@@ -827,13 +715,14 @@ https://depp.brause.cc/shackle/
          (window-height . 0.4)
          (side . bottom)
          (slot . 2))
+	("\\*Async Shell Command\\*"
+	 (display-buffer-no-window))
         ;; left side window
         ("\\*Help.*"
-         (display-buffer-in-side-window)
-         (window-width . 0.35)       ; See the :hook
+         (display-buffer-reuse-mode-window display-buffer-at-bottom)
+         (window-height . 0.35)       ; See the :hook
          (side . left)
-         (slot . 0)
-         (window-parameters . ((no-other-window . t))))
+         (slot . 0))
 	("\\*pytest.*"
 	 (display-buffer-in-side-window)
 	 (window-width . 0.35)       ; See the :hook
@@ -1966,6 +1855,16 @@ in my org-directory.
   :config
   (with-eval-after-load 'pdf-annot
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+#+end_src
+
+open current pdf file in zathura.
+
+#+begin_src emacs-lisp
+(defun pdf-open-with-zathura ()
+  (interactive)
+  (async-shell-command
+   (concat "zathura "
+	   (buffer-file-name (current-buffer)))))
 #+end_src
 
 ** misc
