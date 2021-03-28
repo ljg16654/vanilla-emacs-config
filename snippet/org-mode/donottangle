@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: donottangle
+# key: donottangle
+# --
+:PROPERTIES:
+:header-args: :tangle nil
+:END:
