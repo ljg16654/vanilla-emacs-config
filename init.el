@@ -1055,6 +1055,13 @@ It is for commands that depend on the major mode. One example is
   (org-zotxt-mode t)
   )
 
+(use-package hl-todo
+  :config
+  (setq hl-todo-keyword-faces
+	'(("TODO" . "#FF0000")))
+  (add-hook #'prog-mode-hook #'(lambda ()
+				 (hl-todo-mode t))))
+
 (use-package yequake)
 
 (setq yequake-frames

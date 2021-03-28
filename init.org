@@ -1892,6 +1892,19 @@ shortkey of org-mark-ring-goto conflicts with yasnippet.
 
 * miscellaneous
 
+** hl-todo
+
+#+begin_src emacs-lisp
+
+(use-package hl-todo
+  :config
+  (setq hl-todo-keyword-faces
+	'(("TODO" . "#FF0000")))
+  (add-hook #'prog-mode-hook #'(lambda ()
+				 (hl-todo-mode t))))
+
+#+end_src
+
 ** drop down emacs frame
 
 #+begin_src emacs-lisp
