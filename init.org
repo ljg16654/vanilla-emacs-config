@@ -90,6 +90,23 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 (use-package general)
 #+end_src
 
+** key-chord
+
+#+begin_src emacs-lisp
+
+(use-package key-chord
+  :init
+  (setq key-chord-two-keys-delay 0.05)
+  (setq key-chord-one-key-delay 0.2)
+  :config
+  (key-chord-mode t)
+  (key-chord-define-global ",." "<>\C-b")
+  (key-chord-define-global "pp" "()\C-b")
+  (key-chord-define-global "jk" "[]\C-b")
+  (key-chord-define-global "JK" "{}\C-b")
+  )
+#+end_src
+
 ** evil
 
 #+begin_src emacs-lisp
@@ -119,11 +136,6 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
 (evil-set-initial-state 'elfeed-show-mode 'emacs)
 (evil-set-initial-state 'elfeed-search-mode 'emacs)
 (evil-set-initial-state 'nov-mode 'emacs)
-
-(use-package evil-escape
-  :config
-  (progn
-    (setq-default evil-escape-key-sequence "jk")))
 
 (use-package evil-snipe
   :config
@@ -268,18 +280,6 @@ A minimalistic example:
 (setq helm-completion-style 'helm)
 #+end_src
 
-
-#+begin_src emacs-lisp
-
-(global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "C-x C-f") #'find-file)
-(global-set-key (kbd "s-o") #'helm-buffers-list)
-(global-set-key (kbd "M-i") #'helm-imenu)
-(global-set-key (kbd "C-h a") #'helm-apropos)
-(global-set-key (kbd "μ") #'helm-filtered-bookmarks)
-
-#+end_src
-
 *** geometry
 
 #+begin_src emacs-lisp
@@ -322,6 +322,11 @@ buffer. With =fido= or =icomplete=, however, rotation inside the candidate
 list can be done right inside the minibuffer with 'C-,' and 'C-.'.
 
 #+begin_src emacs-lisp
+(ido-mode t)
+(global-set-key (kbd "M-i") #'ido-imenu-anywhere)
+#+end_src
+
+#+begin_src emacs-lisp
 (use-package orderless)
 (require 'orderless)
 #+end_src
@@ -338,6 +343,9 @@ These completions are stored in the variable =completion-styles=.
 	initials
 	substring
 	orderless))
+
+;; for file name completion, ignore case
+(setq read-file-name-completion-ignore-case t)
 #+end_src
 
 Different completion styles can be set depending on the context: set
@@ -794,11 +802,11 @@ Waiting for confirmation before tangling.
 
 ;; between buffers
 
+(global-set-key (kbd "s-o") #'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (evil-define-key 'normal 'global (kbd "SPC b i") #'ibuffer)
 (global-set-key (kbd "C-M-,") #'previous-buffer)
 (global-set-key (kbd "C-M-.") #'next-buffer)
-(global-set-key (kbd "") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
 		;; originally bound to
 		;; revert-buffer-with-coding-system
@@ -813,10 +821,6 @@ Waiting for confirmation before tangling.
 (global-set-key (kbd "χ") #'other-window)
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
-;; new tab starts with scratch buffer
-
-(setq tab-bar-new-tab-choice "*scratch*")
-
 #+end_src
 
 ** tab-bar
@@ -828,7 +832,7 @@ Waiting for confirmation before tangling.
   (setq tab-bar-close-button-show nil)
   (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
   (setq tab-bar-close-tab-select 'recent)
-  (setq tab-bar-new-tab-choice t)
+  (setq tab-bar-new-tab-choice "*scratch*")
   (setq tab-bar-new-tab-to 'right)
   (setq tab-bar-position nil)
   (setq tab-bar-show nil)
@@ -846,9 +850,9 @@ Waiting for confirmation before tangling.
 
 (defun prot-tab-select-tab-dwim ()
   "Do-What-I-Mean function for getting to a `tab-bar' tab.
-If no other tab exists, create one and switch to it.  If there is
-one other tab (so two in total) switch to it without further
-questions.  Else use completion to select the tab to switch to."
+  If no other tab exists, create one and switch to it.  If there is
+  one other tab (so two in total) switch to it without further
+  questions.  Else use completion to select the tab to switch to."
   (interactive)
   (let ((tabs (prot-tab--tab-bar-tabs)))
     (cond ((eq tabs nil)
@@ -1861,11 +1865,14 @@ open current pdf file in zathura.
 
 #+begin_src emacs-lisp
 (defun pdf-open-with-zathura ()
+  "Use zathura to open file related to current buffer"
   (interactive)
   (async-shell-command
    (concat "zathura "
 	   (buffer-file-name (current-buffer)))))
 #+end_src
+
+Also, add a dired embark action to open pdf/docx in external applications.
 
 ** misc
 *** TODO shortkey conflict 
@@ -2661,6 +2668,17 @@ code navigation:
 
 #+begin_src emacs-lisp
 (use-package racket-mode)
+#+end_src
+
+** wolfram
+
+#+begin_src emacs-lisp
+(use-package wolfram-mode
+  :config
+  (setq wolfram-path "~/.Mathematica/Applications")
+  (add-to-list 'auto-mode-alist
+	       '("\\.wl\\'" . wolfram-mode))
+  )
 #+end_src
 
 ** cmake

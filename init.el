@@ -27,6 +27,18 @@
 
 (use-package general)
 
+(use-package key-chord
+  :init
+  (setq key-chord-two-keys-delay 0.05)
+  (setq key-chord-one-key-delay 0.2)
+  :config
+  (key-chord-mode t)
+  (key-chord-define-global ",." "<>\C-b")
+  (key-chord-define-global "pp" "()\C-b")
+  (key-chord-define-global "jk" "[]\C-b")
+  (key-chord-define-global "JK" "{}\C-b")
+  )
+
 ;; variables that must be set before Evil is loaded:
 (setq evil-respect-visual-line-mode t)
 (setq evil-want-keybinding nil)
@@ -53,11 +65,6 @@
 (evil-set-initial-state 'elfeed-show-mode 'emacs)
 (evil-set-initial-state 'elfeed-search-mode 'emacs)
 (evil-set-initial-state 'nov-mode 'emacs)
-
-(use-package evil-escape
-  :config
-  (progn
-    (setq-default evil-escape-key-sequence "jk")))
 
 (use-package evil-snipe
   :config
@@ -148,13 +155,6 @@
 
 (setq helm-completion-style 'helm)
 
-(global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "C-x C-f") #'find-file)
-(global-set-key (kbd "s-o") #'helm-buffers-list)
-(global-set-key (kbd "M-i") #'helm-imenu)
-(global-set-key (kbd "C-h a") #'helm-apropos)
-(global-set-key (kbd "μ") #'helm-filtered-bookmarks)
-
 (helm-autoresize-mode)
 (setq helm-autoresize-max-height 40)
 
@@ -171,6 +171,9 @@
 (eval-after-load "helm"
   '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
+(ido-mode t)
+(global-set-key (kbd "M-i") #'ido-imenu-anywhere)
+
 (use-package orderless)
 (require 'orderless)
 
@@ -180,6 +183,9 @@
 	initials
 	substring
 	orderless))
+
+;; for file name completion, ignore case
+(setq read-file-name-completion-ignore-case t)
 
 ;; set files to ignore in completion
 ;; completion-ignored-*
@@ -403,11 +409,11 @@ popper.el. Useful when related rules are changed."
 
 ;; between buffers
 
+(global-set-key (kbd "s-o") #'switch-to-buffer)
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (evil-define-key 'normal 'global (kbd "SPC b i") #'ibuffer)
 (global-set-key (kbd "C-M-,") #'previous-buffer)
 (global-set-key (kbd "C-M-.") #'next-buffer)
-(global-set-key (kbd "") #'next-buffer)
 (global-set-key (kbd "C-x <return> r")
 		;; originally bound to
 		;; revert-buffer-with-coding-system
@@ -422,16 +428,12 @@ popper.el. Useful when related rules are changed."
 (global-set-key (kbd "χ") #'other-window)
 (global-set-key (kbd "H-s") #'delete-other-windows)
 
-;; new tab starts with scratch buffer
-
-(setq tab-bar-new-tab-choice "*scratch*")
-
 (use-package tab-bar
   :init
   (setq tab-bar-close-button-show nil)
   (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
   (setq tab-bar-close-tab-select 'recent)
-  (setq tab-bar-new-tab-choice t)
+  (setq tab-bar-new-tab-choice "*scratch*")
   (setq tab-bar-new-tab-to 'right)
   (setq tab-bar-position nil)
   (setq tab-bar-show nil)
@@ -449,9 +451,9 @@ popper.el. Useful when related rules are changed."
 
 (defun prot-tab-select-tab-dwim ()
   "Do-What-I-Mean function for getting to a `tab-bar' tab.
-If no other tab exists, create one and switch to it.  If there is
-one other tab (so two in total) switch to it without further
-questions.  Else use completion to select the tab to switch to."
+  If no other tab exists, create one and switch to it.  If there is
+  one other tab (so two in total) switch to it without further
+  questions.  Else use completion to select the tab to switch to."
   (interactive)
   (let ((tabs (prot-tab--tab-bar-tabs)))
     (cond ((eq tabs nil)
@@ -1041,6 +1043,7 @@ It is for commands that depend on the major mode. One example is
     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
 (defun pdf-open-with-zathura ()
+  "Use zathura to open file related to current buffer"
   (interactive)
   (async-shell-command
    (concat "zathura "
@@ -1370,6 +1373,13 @@ It is for commands that depend on the major mode. One example is
 (add-hook 'emacs-lisp-mode-hook (lambda () (highlight-parentheses-mode 1)))
 
 (use-package racket-mode)
+
+(use-package wolfram-mode
+  :config
+  (setq wolfram-path "~/.Mathematica/Applications")
+  (add-to-list 'auto-mode-alist
+	       '("\\.wl\\'" . wolfram-mode))
+  )
 
 (use-package cmake-mode)
 
