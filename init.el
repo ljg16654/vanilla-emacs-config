@@ -22,7 +22,8 @@
 (straight-use-package 'use-package)
 
 (use-package s)
-
+(use-package dash)
+(use-package f)
 (use-package flx)
 
 (use-package general)
@@ -34,7 +35,7 @@
   :config
   (key-chord-mode t)
   (key-chord-define-global ",." "<>\C-b")
-  (key-chord-define-global "pp" "()\C-b")
+  (key-chord-define-global "dk" "()\C-b")
   (key-chord-define-global "jk" "[]\C-b")
   (key-chord-define-global "JK" "{}\C-b")
   )
@@ -185,6 +186,7 @@
 
 ;; for file name completion, ignore case
 (setq read-file-name-completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
 
 ;; set files to ignore in completion
 ;; completion-ignored-*
@@ -1202,6 +1204,22 @@ It is for commands that depend on the major mode. One example is
     (exec-path-from-shell-initialize)))
 
 (use-package rainbow-mode)
+
+(use-package pyim
+  :ensure nil
+  :config
+  (use-package pyim-basedict
+    :ensure nil
+    :config (pyim-basedict-enable))
+  (setq default-input-method "pyim")
+  ;; quanpin
+  (setq pyim-default-scheme 'quanpin)
+  (pyim-isearch-mode 1)
+  (setq pyim-page-tooltip 'posframe)
+  (setq pyim-page-length 5)
+  (add-hook 'emacs-startup-hook
+            #'(lambda () (pyim-restart-1 t)))
+  )
 
 (use-package lsp-mode)
 

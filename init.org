@@ -70,7 +70,8 @@ Libraries useful for writing elisp but may not be used interactively.
 
 #+begin_src emacs-lisp
 (use-package s)
-
+(use-package dash)
+(use-package f)
 (use-package flx)
 #+end_src
 
@@ -100,7 +101,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
   :config
   (key-chord-mode t)
   (key-chord-define-global ",." "<>\C-b")
-  (key-chord-define-global "pp" "()\C-b")
+  (key-chord-define-global "dk" "()\C-b")
   (key-chord-define-global "jk" "[]\C-b")
   (key-chord-define-global "JK" "{}\C-b")
   )
@@ -344,6 +345,7 @@ These completions are stored in the variable =completion-styles=.
 
 ;; for file name completion, ignore case
 (setq read-file-name-completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
 #+end_src
 
 Different completion styles can be set depending on the context: set
@@ -2213,6 +2215,27 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 (use-package rainbow-mode)
 
 #+end_src
+
+** chinese input method
+
+#+begin_src emacs-lisp
+(use-package pyim
+  :ensure nil
+  :config
+  (use-package pyim-basedict
+    :ensure nil
+    :config (pyim-basedict-enable))
+  (setq default-input-method "pyim")
+  ;; quanpin
+  (setq pyim-default-scheme 'quanpin)
+  (pyim-isearch-mode 1)
+  (setq pyim-page-tooltip 'posframe)
+  (setq pyim-page-length 5)
+  (add-hook 'emacs-startup-hook
+            #'(lambda () (pyim-restart-1 t)))
+  )
+#+end_src
+
 * lsp
 * basic
 
