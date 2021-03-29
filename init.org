@@ -25,7 +25,6 @@ Some of the awesome configurations used as reference:
 * straight.el
 
 #+begin_src emacs-lisp
-
 ;; each use-package form also invoke straight.el to install the package
 (setq straight-use-package-by-default t)
 #+end_src
@@ -181,7 +180,6 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
   :config (progn (evilnc-default-hotkeys)))
 
 (global-set-key (kbd "H-x") #'helm-M-x)
-(evil-escape-mode)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -322,7 +320,7 @@ buffer. With =fido= or =icomplete=, however, rotation inside the candidate
 list can be done right inside the minibuffer with 'C-,' and 'C-.'.
 
 #+begin_src emacs-lisp
-(ido-mode t)
+(icomplete-mode t)
 (global-set-key (kbd "M-i") #'ido-imenu-anywhere)
 #+end_src
 
@@ -1582,14 +1580,14 @@ frequently used commands:
   ;; list of BibTex database files used
   (setq reftex-default-bibliography
 	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/ipe.bib"))
+	      "~/canvassync/VR369/Assignments/leb.bib"))
   (setq org-ref-default-bibliography
 	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/ipe.bib"))
+	      "~/canvassync/VR369/Assignments/leb.bib"))
   ;; for helm completion:
   (setq bibtex-completion-bibliography
 	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/ipe.bib"))
+	      "~/canvassync/VR369/Assignments/leb.bib"))
   (setq org-ref-pdf-directory
 	'("~/Zot/mylib/files"))
   (setq bibtex-completion-library-path
@@ -1637,36 +1635,45 @@ buffer should be changed!
 
 ** org-roam
 
+Org-roam is a minor mode that manages backlinks.
+With =org-roam-buffer-toggle-display=, the buffer with name specified by
+=org-roam-buffer= shows the nodes that points to the current buffer.
+
 #+begin_src emacs-lisp
+(executable-find "sqlite3")
 (use-package org-roam
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config
+  (require 'org-ref)
   (progn
     ;; all subdirectories of org-roam-directory are considered part of
     ;; org-roam regardless of level of nesting.
-    (setq org-roam-directory "~/org-roam")
+    (setq org-roam-buffer "*org-roam-backlinks*")
+    (setq org-roam-buffer-window-parameters
+	  '((mode-line-format . nil)))
+    (setq org-roam-directory (file-truename "~/org-roam"))
     (setq org-roam-tag-sources
-          (list
-           'prop
-           'last-directory)))
-  :bind (
-         ("C-c r t" . org-roam-tag-add)
-         ))
-#+end_src
+	  (list
+	   'prop
+	   'last-directory)))
 
-#+begin_src emacs-lisp
-
-(general-define-key
- :prefix "C-c r"
- "d" #'(lambda () (interactive)
-         (dired org-roam-directory))
- "f" #'org-roam-find-file
- "y" #'org-roam-dailies-find-yesterday
- "x" #'org-roam-dailies-find-today
- "j" #'org-roam-dailies-capture-today
- "i" #'org-roam-insert)
-
+  (general-define-key
+   :prefix "C-c r"
+   "r" #'helm-bibtex
+   "d" #'(lambda () (interactive)
+	   (dired org-roam-directory))
+   "s" #'(lambda () (interactive)
+	   (progn
+	     (org-roam-backlinks-mode t)
+	     (org-roam-buffer-toggle-display)))
+   "c" #'org-roam-db-build-cache
+   "f" #'org-roam-find-file
+   "y" #'org-roam-dailies-find-yesterday
+   "x" #'org-roam-dailies-find-today
+   "j" #'org-roam-dailies-capture-today
+   "i" #'org-roam-insert)
+  )
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1695,11 +1702,11 @@ compatible with regular 'org-capture'. In fact, improvment have been
 made to allow string prefilling:
 
 #+begin_quote
-   In org-roam templates, the ‘${var}’ syntax allows for the expansion
+   In org-roam templates, the =${var}= syntax allows for the expansion
 of variables, stored in ‘org-roam-capture--info’.  For example, during
-‘org-roam-insert’, the user is prompted for a title.  Upon entering a
+‘org-roam-insert’, the user is prompted for a title. Upon entering a
 non-existent title, the ‘title’ key in ‘org-roam-capture--info’ is set
-to the provided title.  ‘${title}’ is then expanded into the provided
+to the provided title.  =${title}= is then expanded into the provided
 title during the org-capture process.  Any variables that do not contain
 strings, are prompted for values using ‘completing-read’.
 #+end_quote
@@ -2012,7 +2019,7 @@ have
 #+begin_src emacs-lisp
 
 (add-hook 'kill-emacs-hook #'bookmark-save)
-
+(global-set-key (kbd "μ") #'bookmark-jump)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -2051,7 +2058,9 @@ frequently used register commands:
 #+begin_src emacs-lisp
 
 (use-package search-web)
-(use-package wordnut)
+(use-package wordnut
+  :config
+  (define-key wordnut-mode-map (kbd "g") #'wordnut))
 (setq search-web-engines
       '(
         ("duck" "https://duckduckgo.com/?q=%s" nil)
@@ -2629,7 +2638,6 @@ see [[*org-capture]] for capture-templates creating anki entries.
 #+begin_src emacs-lisp
 
 (use-package rainbow-delimiters)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 #+end_src
 
 * programming languages
@@ -3296,5 +3304,4 @@ Automatically tangle /this file/ on save.
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook
 					      #'efs/org-babel-tangle-config)))
-
 #+end_src

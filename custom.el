@@ -19,6 +19,8 @@
  '(midnight-mode t)
  '(nrepl-message-colors
    '("#336c6c" "#205070" "#0f2050" "#806080" "#401440" "#6c1f1c" "#6b400c" "#23733c"))
+ '(org-agenda-files
+   '("~/vanilla/init.org" "~/org/journal/2020-10-25.org" "~/org/journal/2020-10-30.org" "~/org/journal/2020-11-12.org" "~/org/journal/2020-11-13.org" "~/org/journal/2020-11-14.org" "~/org/journal/2020-11-17.org" "~/org/journal/2020-12-20.org" "~/org/newsArchive/lebanon_next_meal.org" "~/org/bug.org" "~/org/desire.org" "~/org/journal.org" "~/org/just-for-fun.org" "~/org/notes.org" "~/org/project.org" "~/org/read-archive.org" "~/org/read-later.org" "~/org/reading-list.org" "~/org/srt.org" "~/org/todo.org" "~/org/voc.org"))
  '(org-format-latex-options
    '(:foreground default :background default :scale 4.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
 		 ("begin" "$1" "$" "$$" "\\(" "\\[")))

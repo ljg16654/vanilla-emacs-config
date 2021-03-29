@@ -110,7 +110,6 @@
   :config (progn (evilnc-default-hotkeys)))
 
 (global-set-key (kbd "H-x") #'helm-M-x)
-(evil-escape-mode)
 
 (evil-define-key 'normal 'prog-mode-map (kbd "SPC s") #'save-buffer)
 (evil-define-key 'normal 'global (kbd "J") #'tab-bar-switch-to-next-tab)
@@ -171,7 +170,7 @@
 (eval-after-load "helm"
   '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
-(ido-mode t)
+(icomplete-mode t)
 (global-set-key (kbd "M-i") #'ido-imenu-anywhere)
 
 (use-package orderless)
@@ -844,14 +843,14 @@ It is for commands that depend on the major mode. One example is
   ;; list of BibTex database files used
   (setq reftex-default-bibliography
 	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/ipe.bib"))
+	      "~/canvassync/VR369/Assignments/leb.bib"))
   (setq org-ref-default-bibliography
 	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/ipe.bib"))
+	      "~/canvassync/VR369/Assignments/leb.bib"))
   ;; for helm completion:
   (setq bibtex-completion-bibliography
 	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/ipe.bib"))
+	      "~/canvassync/VR369/Assignments/leb.bib"))
   (setq org-ref-pdf-directory
 	'("~/Zot/mylib/files"))
   (setq bibtex-completion-library-path
@@ -883,31 +882,40 @@ It is for commands that depend on the major mode. One example is
 	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
 	"pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
+(executable-find "sqlite3")
 (use-package org-roam
   :commands org-roam-mode
   :init (add-hook 'after-init-hook 'org-roam-mode)
   :config
+  (require 'org-ref)
   (progn
     ;; all subdirectories of org-roam-directory are considered part of
     ;; org-roam regardless of level of nesting.
-    (setq org-roam-directory "~/org-roam")
+    (setq org-roam-buffer "*org-roam-backlinks*")
+    (setq org-roam-buffer-window-parameters
+	  '((mode-line-format . nil)))
+    (setq org-roam-directory (file-truename "~/org-roam"))
     (setq org-roam-tag-sources
-          (list
-           'prop
-           'last-directory)))
-  :bind (
-         ("C-c r t" . org-roam-tag-add)
-         ))
+	  (list
+	   'prop
+	   'last-directory)))
 
-(general-define-key
- :prefix "C-c r"
- "d" #'(lambda () (interactive)
-         (dired org-roam-directory))
- "f" #'org-roam-find-file
- "y" #'org-roam-dailies-find-yesterday
- "x" #'org-roam-dailies-find-today
- "j" #'org-roam-dailies-capture-today
- "i" #'org-roam-insert)
+  (general-define-key
+   :prefix "C-c r"
+   "r" #'helm-bibtex
+   "d" #'(lambda () (interactive)
+	   (dired org-roam-directory))
+   "s" #'(lambda () (interactive)
+	   (progn
+	     (org-roam-backlinks-mode t)
+	     (org-roam-buffer-toggle-display)))
+   "c" #'org-roam-db-build-cache
+   "f" #'org-roam-find-file
+   "y" #'org-roam-dailies-find-yesterday
+   "x" #'org-roam-dailies-find-today
+   "j" #'org-roam-dailies-capture-today
+   "i" #'org-roam-insert)
+  )
 
 (use-package org-roam-server
   :ensure t
@@ -1115,6 +1123,7 @@ It is for commands that depend on the major mode. One example is
 (add-hook 'python-mode-hook #'prettify-symbols-mode)
 
 (add-hook 'kill-emacs-hook #'bookmark-save)
+(global-set-key (kbd "μ") #'bookmark-jump)
 
 (global-set-key (kbd "H-j") #'jump-to-register)
 (global-set-key (kbd "H-SPC") #'point-to-register)
@@ -1123,7 +1132,9 @@ It is for commands that depend on the major mode. One example is
   :after helm)
 
 (use-package search-web)
-(use-package wordnut)
+(use-package wordnut
+  :config
+  (define-key wordnut-mode-map (kbd "g") #'wordnut))
 (setq search-web-engines
       '(
         ("duck" "https://duckduckgo.com/?q=%s" nil)
@@ -1358,7 +1369,6 @@ It is for commands that depend on the major mode. One example is
 (use-package anki-editor)
 
 (use-package rainbow-delimiters)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 (global-set-key (kbd "H-r") #'compile)
 (global-set-key (kbd "σ") #'compile)
