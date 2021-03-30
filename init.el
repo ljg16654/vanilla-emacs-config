@@ -306,6 +306,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
   (setq popper-display-control nil)
   (setq popper-reference-buffers
 	(list "\\*Python\\*"
+	      "\\*eshell\\*"
               "\\*ielm\\*"))
   :config
   (defhydra 'popper-stuff
@@ -318,7 +319,7 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
 
 (defun clear-popper-popup-alive ()
   "Clear popup buffers that are currently maintained by
-popper.el. Useful when related rules are changed."
+	      popper.el. Useful when related rules are changed."
   (interactive)
   (progn
     (setq popper-open-popup-alist nil)
@@ -843,28 +844,39 @@ It is for commands that depend on the major mode. One example is
 (use-package org-ref
   :config
   ;; list of BibTex database files used
-  (setq reftex-default-bibliography
-	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/leb.bib"))
-  (setq org-ref-default-bibliography
-	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/leb.bib"))
-  ;; for helm completion:
-  (setq bibtex-completion-bibliography
-	(list "~/Zot/mylib/references.bib"
-	      "~/canvassync/VR369/Assignments/leb.bib"))
-  (setq org-ref-pdf-directory
-	'("~/Zot/mylib/files"))
-  (setq bibtex-completion-library-path
-	(list "~/Zot/mylib/files"))
-  (setq org-ref-get-pdf-filename-function
-	#'org-ref-get-pdf-filename-helm-bibtex)
-  (setq org-ref-notes-function 'org-ref-notes-function-many-files)
-  (setq bibtex-completion-pdf-open-function
-	(lambda (fpath)
-	  (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath))))
-
-(setq bibtex-completion-pdf-field "file")
+  (progn
+    ;; The name of the BibTeX field in which the path to PDF files is stored
+    (setq bibtex-completion-pdf-field "file")
+    ;; and bibtex-completion will look up PDF in the directories
+    ;; specifies by 'bibtex-completion-library-path
+    (let* ((my-ref-bibtex
+	    (mapcar #'file-truename
+		    (list "~/Zot/mylib/references.bib"
+			  "~/Zot/math/math.bib"
+			  "~/canvassync/VR369/Assignments/leb.bib")))
+	   (my-pdf-parent-dirs
+	    (mapcar #'file-truename (list "~/Zot/mylib/"
+					  "~/Zot/math/")))
+	   (my-pdf-dirs
+	    (seq-concatenate 'list
+			     (mapcar
+			      #'(lambda (dir) (directory-files-recursively dir "" t))
+			      my-pdf-parent-dirs)))
+	   )
+      (setq reftex-default-bibliography my-ref-bibtex
+	    org-ref-default-bibliography my-ref-bibtex
+	    bibtex-completion-bibliography my-ref-bibtex
+	    org-ref-pdf-directory my-pdf-parent-dirs
+	    bibtex-completion-library-path my-pdf-parent-dirs)
+      )
+    ;; (setq org-ref-get-pdf-filename-function
+    ;; 	  #'org-ref-get-pdf-filename-helm-bibtex)
+    ;; (setq org-ref-notes-function 'org-ref-notes-function-many-files)
+    ;; (setq bibtex-completion-pdf-open-function
+    ;; 	  (lambda (fpath)
+    ;; 	    (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath)))
+    )
+    )
 
 (defun my/org-ref-open-pdf-at-point ()
   "Open the pdf for bibtex key under point if it exists."
@@ -1211,7 +1223,6 @@ It is for commands that depend on the major mode. One example is
   (use-package pyim-basedict
     :ensure nil
     :config (pyim-basedict-enable))
-  (setq default-input-method "pyim")
   ;; quanpin
   (setq pyim-default-scheme 'quanpin)
   (pyim-isearch-mode 1)
@@ -1408,6 +1419,11 @@ It is for commands that depend on the major mode. One example is
 (add-hook 'emacs-lisp-mode-hook (lambda () (highlight-parentheses-mode 1)))
 
 (use-package racket-mode)
+
+(use-package rust-mode
+  :config
+  (add-hook 'rust-mode-hook (lambda ()
+			      (setq indent-tabs-mode nil))))
 
 (use-package wolfram-mode
   :config

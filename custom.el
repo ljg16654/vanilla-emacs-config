@@ -24,6 +24,7 @@
  '(org-format-latex-options
    '(:foreground default :background default :scale 4.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
 		 ("begin" "$1" "$" "$$" "\\(" "\\[")))
+ '(org-roam-mode t nil (org-roam))
  '(package-selected-packages
    '(window ag orderless embark evil-escape ripgrep evil rg general cpputils-cmake wallpaper define-word org-noter-pdftools org-pdftools solarized-theme prescient ivy-prescient cmake-mode anki-editor ivy-rich doom-modeline exwm racket-mode telephone-line diminish org-roam-server lispy which-key yasnippet vterm pdf-tools powerline dired color-theme-sanityinc-tomorrow spacemacs-theme anti-zenburn-theme eyebrowse flycheck lsp-ui company company-mode lsp-python-ms lsp-mode projectile org-bullets emms olivetti olivette avy counsel ivy magit org-roam cdlatex use-package command-log-mode))
  '(safe-local-variable-values
