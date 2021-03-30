@@ -1286,6 +1286,9 @@ It is for commands that depend on the major mode. One example is
 (global-set-key (kbd "C-c m m") #'emms)
 (global-set-key (kbd "C-c m p") #'emms-add-playlist)
 
+(straight-use-package
+ '(pdf-tools :host github :repo "vedang/pdf-tools")
+ )
 (pdf-tools-install)
 (setq pdf-view-midnight-colors
       '("#cccccc" . "#000000"))

@@ -2353,9 +2353,13 @@ lsp-ui-doc childframe, the cpu usage rises to 100% and Emacs freezes.
 ** pdf
 
 #+begin_src emacs-lisp
+(straight-use-package
+ '(pdf-tools :host github :repo "vedang/pdf-tools")
+ )
 (pdf-tools-install)
 (setq pdf-view-midnight-colors
       '("#cccccc" . "#000000"))
+
 #+end_src
 
 #+begin_src emacs-lisp
