@@ -55,7 +55,7 @@
      evil-cross-lines t
      evil-insert-state-cursor 'hbar
      )
-    (evil-mode +1)
+    ;; (evil-mode +1)
     ))
 
 (setq evil-want-Y-yank-to-eol t)
@@ -275,7 +275,8 @@
 (global-set-key (kbd "C-;") #'iedit-mode)
 
 (use-package helm-swoop)
-(global-set-key (kbd "C-s") #'helm-swoop)
+(global-set-key (kbd "C-s") #'isearch-forward)
+(key-chord-define-global "a/" #'helm-swoop)
 (global-set-key (kbd "C-_") #'helm-multi-swoop-all)
 ;; enable whitespace to match arbitrary string that doesn't contain a newline
 ;; non-greedily
@@ -519,16 +520,14 @@ buffer's window as well."
            "eshell-mode"
            "vterm-mode"
            "helm-mode"
-           "dired-mode"))
-    ))
+           "dired-mode"))))
 
 (use-package avy)
 
 (global-set-key (kbd "θ") #'ace-window)
 
 (use-package magit
-  :bind (("C-c g" . magit))
-  )
+  :bind (("C-c g" . magit)))
 
 (evil-define-key 'normal 'global (kbd "SPC g") #'magit)
 
@@ -869,6 +868,9 @@ It is for commands that depend on the major mode. One example is
 	    org-ref-pdf-directory my-pdf-parent-dirs
 	    bibtex-completion-library-path my-pdf-parent-dirs)
       )
+    (setq org-ref-get-pdf-filename-function
+	  #'org-ref-get-pdf-filename-helm-bibtex
+	  )
     ;; (setq org-ref-get-pdf-filename-function
     ;; 	  #'org-ref-get-pdf-filename-helm-bibtex)
     ;; (setq org-ref-notes-function 'org-ref-notes-function-many-files)
@@ -876,19 +878,10 @@ It is for commands that depend on the major mode. One example is
     ;; 	  (lambda (fpath)
     ;; 	    (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath)))
     )
-    )
+  )
 
-(defun my/org-ref-open-pdf-at-point ()
-  "Open the pdf for bibtex key under point if it exists."
-  (interactive)
-  (let* ((results (org-ref-get-bibtex-key-and-file))
-         (key (car results))
-	 (pdf-cite:mur-artal_orb-slam2_2017file (car (bibtex-completion-find-pdf key))))
-    (if (file-exists-p pdf-file)
-	(org-open-file pdf-file)
-      (message "No PDF found for %s" key))))
-
-(setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
+(setq org-ref-open-pdf-function #'org-ref-open-pdf-at-point)
+(define-key org-mode-map (kbd "H-p") #'org-ref-open-pdf-at-point)
 
 (setq org-latex-pdf-process
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
@@ -964,7 +957,8 @@ It is for commands that depend on the major mode. One example is
 (setq org-file-apps '((auto-mode . emacs)
                       ("\\.mm\\'" . default)
                       ("\\.x?html?\\'" . default)
-                      ("\\.pdf\\'" . "zathura %s")))
+                      ;; ("\\.pdf\\'" . "zathura %s")
+))
 
 (defvar +org-capture-journal-file+ "journal.org")
 (defvar +org-capture-todo-file+ "todo.org")
@@ -1217,21 +1211,6 @@ It is for commands that depend on the major mode. One example is
 
 (use-package rainbow-mode)
 
-(use-package pyim
-  :ensure nil
-  :config
-  (use-package pyim-basedict
-    :ensure nil
-    :config (pyim-basedict-enable))
-  ;; quanpin
-  (setq pyim-default-scheme 'quanpin)
-  (pyim-isearch-mode 1)
-  (setq pyim-page-tooltip 'posframe)
-  (setq pyim-page-length 5)
-  (add-hook 'emacs-startup-hook
-            #'(lambda () (pyim-restart-1 t)))
-  )
-
 (use-package lsp-mode)
 
 (use-package flycheck)
@@ -1289,6 +1268,7 @@ It is for commands that depend on the major mode. One example is
 (straight-use-package
  '(pdf-tools :host github :repo "vedang/pdf-tools")
  )
+(define-key pdf-view-mode-map (kbd "z") #'pdf-open-with-zathura)
 (pdf-tools-install)
 (setq pdf-view-midnight-colors
       '("#cccccc" . "#000000"))

@@ -125,7 +125,7 @@ For examples, see [[file:../org-roam/20210113022951-general_el_define_keybinding
      evil-cross-lines t
      evil-insert-state-cursor 'hbar
      )
-    (evil-mode +1)
+    ;; (evil-mode +1)
     ))
 
 (setq evil-want-Y-yank-to-eol t)
@@ -204,19 +204,19 @@ http://www.makble.com/how-to-toggle-evil-mode-in-emacs
 (defun toggle-evilmode ()
   (interactive)
   (if (bound-and-true-p evil-local-mode)
+      (progn
+					; go emacs
+	(evil-local-mode (or -1 1))
+	(undo-tree-mode (or -1 1))
+	(set-variable 'cursor-type 'bar)
+	)
     (progn
-      ; go emacs
-      (evil-local-mode (or -1 1))
-      (undo-tree-mode (or -1 1))
-      (set-variable 'cursor-type 'bar)
-    )
-    (progn
-      ; go evil
+					; go evil
       (evil-local-mode (or 1 1))
       (set-variable 'cursor-type 'box)
+      )
     )
   )
-)
  
 (global-set-key (kbd "M-u") 'toggle-evilmode)
 #+end_src
@@ -382,6 +382,7 @@ For minibuffer, try out 'S', 'L', 'E'!
           (list (concat user-emacs-directory "snippet/")))
     (yas-global-mode)))
 #+end_src
+
 
 Yasnippet's own major-mode, =snippet-mode=, provides
 =yas-tryout-snippet= (bound to C-c C-t) by default for users to
@@ -604,7 +605,8 @@ be performed throughout all present buffers with =helm-multi-swoop-all=.
 #+begin_src emacs-lisp
 
 (use-package helm-swoop)
-(global-set-key (kbd "C-s") #'helm-swoop)
+(global-set-key (kbd "C-s") #'isearch-forward)
+(key-chord-define-global "a/" #'helm-swoop)
 (global-set-key (kbd "C-_") #'helm-multi-swoop-all)
 ;; enable whitespace to match arbitrary string that doesn't contain a newline
 ;; non-greedily
@@ -1606,6 +1608,9 @@ frequently used commands:
 	    org-ref-pdf-directory my-pdf-parent-dirs
 	    bibtex-completion-library-path my-pdf-parent-dirs)
       )
+    (setq org-ref-get-pdf-filename-function
+	  #'org-ref-get-pdf-filename-helm-bibtex
+	  )
     ;; (setq org-ref-get-pdf-filename-function
     ;; 	  #'org-ref-get-pdf-filename-helm-bibtex)
     ;; (setq org-ref-notes-function 'org-ref-notes-function-many-files)
@@ -1613,25 +1618,15 @@ frequently used commands:
     ;; 	  (lambda (fpath)
     ;; 	    (start-process "zathura_bibtex" "*zathura open pdf*" "zathura" fpath)))
     )
-    )
+  )
 #+end_src 
-cite:hess_real-time_2016,diestelGraphTheory2006,mur-artal_orb-slam2_2017
-
 
 #+begin_src emacs-lisp
-
-(defun my/org-ref-open-pdf-at-point ()
-  "Open the pdf for bibtex key under point if it exists."
-  (interactive)
-  (let* ((results (org-ref-get-bibtex-key-and-file))
-         (key (car results))
-	 (pdf-cite:mur-artal_orb-slam2_2017file (car (bibtex-completion-find-pdf key))))
-    (if (file-exists-p pdf-file)
-	(org-open-file pdf-file)
-      (message "No PDF found for %s" key))))
-
-(setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
+(setq org-ref-open-pdf-function #'org-ref-open-pdf-at-point)
+(define-key org-mode-map (kbd "H-p") #'org-ref-open-pdf-at-point)
 #+end_src
+
+cite:mur-artal_orb-slam2_2017
 
 In order for the export to work properly, the compilation of LaTeX
 buffer should be changed!
@@ -1748,7 +1743,8 @@ template brought with org-roam.
 (setq org-file-apps '((auto-mode . emacs)
                       ("\\.mm\\'" . default)
                       ("\\.x?html?\\'" . default)
-                      ("\\.pdf\\'" . "zathura %s")))
+                      ;; ("\\.pdf\\'" . "zathura %s")
+))
 #+end_src
 
 ** TODO org-capture: define entries separately 
@@ -2142,12 +2138,10 @@ currently disabled as I'm not using evil.
 ** expand-region.el
 
 #+begin_src emacs-lisp
-
 (use-package expand-region
   :config
   (progn
-    (global-set-key (kbd "C-=") #'er/expand-region)
-    ))
+    (global-set-key (kbd "C-=") #'er/expand-region)))
 #+end_src
 
 ** remove unused UI components
@@ -2228,7 +2222,7 @@ From Doom Emacs. Naming is altered to be consistent with Emacs terms
 
 ** chinese input method
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle nil
 (use-package pyim
   :ensure nil
   :config
@@ -2356,6 +2350,7 @@ lsp-ui-doc childframe, the cpu usage rises to 100% and Emacs freezes.
 (straight-use-package
  '(pdf-tools :host github :repo "vedang/pdf-tools")
  )
+(define-key pdf-view-mode-map (kbd "z") #'pdf-open-with-zathura)
 (pdf-tools-install)
 (setq pdf-view-midnight-colors
       '("#cccccc" . "#000000"))
@@ -3240,31 +3235,6 @@ Assign workspaces to monitors.
 
 (setq desktop-save-mode nil)
 
-#+end_src
-
-* eaf
-
-experimental.  By default it override some tools that I've been
-familiar with (like pdf-tools).  Only used after manual execution of
-code block.
-
-#+begin_src emacs-lisp :tangle nil
-
-(add-to-list 'load-path "~/vanilla/site-lisp/emacs-application-framework/")
-(require 'eaf)
-#+end_src
-
-#+begin_src emacs-lisp :tangle nil :eval never
-
-(use-package eaf
-  :custom
-  (eaf-browser-continue-where-left-off t)
-  :config
-  (eaf-setq eaf-browser-enable-adblocker "true")
-  (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-  (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
 #+end_src
 
 * workflow

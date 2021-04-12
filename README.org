@@ -1,17 +1,9 @@
 #+title: README
 
-The configuration is used on a daily basis on Ubuntu 20.04, Arch Linux
-and occasionally on Ubuntu 18.04 LTS. With dependencies met, it's
-supposed to functional properly with branch =native-comp=.
+The configuration, written in a literate programming approach, was
+used on a daily basis on Ubuntu 20.04, Arch Linux and occasionally on
+Ubuntu 18.04 LTS. With dependencies met, it's supposed to functional
+properly with branch =native-comp=.
 
-* TODO dependencies
-
-** ubuntu 20.04 LTS
-
-#+begin_src sh :tangle nil
-#+end_src
-
-** arch linux
-
-#+begin_src :tangle nil
-#+end_src
+For various reasons, I decided to migrate to a non-literate config,
+which is now located at https://github.com/ljg16654/.emacs.d.
